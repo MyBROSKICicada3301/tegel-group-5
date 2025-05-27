@@ -149,9 +149,11 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg" style="background: rgba(255, 140, 26, 0.95); backdrop-filter: blur(10px);">
+<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255); backdrop-filter: blur(10px);">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="index.html">tegel</a>
+        <a class="navbar-brand" href="index.html" style="padding:0;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -175,6 +177,7 @@
         <h3>Sign Up</h3>
         <form id="signupForm">
             <input id="fullName" class="form-control" type="text" placeholder="Full Name" required>
+            <input id="nickname" class="form-control" type="text" placeholder="Nickname (optional)">
             <input id="emailAddress" class="form-control" type="email" placeholder="Email Address" required>
             <input id="password" class="form-control" type="password" placeholder="Password" required>
             <button type="submit" class="btn btn-register w-100">Create Account</button>
@@ -188,15 +191,15 @@
 <footer class="footer">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
         <div class="social-links">
-            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==">
-                <img src='images/Insta_Icon.png' alt="Instagram">
+            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
             </a>
-            <a href="#">
-                <img src="images/Gmail_Icon.png" alt="Gmail">
+            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
             </a>
         </div>
         <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
-        <div class="footer-brand">tegel</div>
+        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
     </div>
 </footer>
 
@@ -208,8 +211,9 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault(); // Prevent default form submission
         
         // Get form values
-        const fullName = document.getElementById('full_Name').value;
-        const emailAddress = document.getElementById('email_Address').value;
+        const fullName = document.getElementById('fullName').value;
+        const nickname = document.getElementById('nickname').value;
+        const emailAddress = document.getElementById('emailAddress').value;
         const password = document.getElementById('password').value;
         
         // Validate all fields are filled
@@ -221,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Store signup data in localStorage to pass to personal details page
         const signupData = {
             name: fullName,
+            nickname: nickname,
             email: emailAddress,
             password: password,
             timestamp: new Date().toISOString()

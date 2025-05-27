@@ -8,7 +8,6 @@
           rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-
     <style>
         html, body {
             height: 100%;
@@ -18,37 +17,141 @@
             display: flex;
             flex-direction: column;
             font-family: 'Segoe UI', sans-serif;
-            background: #ffb56b;
+            background: linear-gradient(rgba(255, 181, 107, 0.8), rgba(255, 140, 26, 0.8)), 
+                        url('images/5185208.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
         }
 
         main {
             flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
 
         .navbar-brand {
             font-family: 'Courier New', cursive;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .signup-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 450px;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .signup-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .signup-card h3 {
+            color: #ff8c1a;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #ff8c1a;
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
+        }
+
+        .btn-register {
+            background: linear-gradient(45deg, #ff8c1a, #ffb56b);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(45deg, #e67e22, #ff8c1a);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 140, 26, 0.3);
         }
 
         .footer {
-            background: #000;
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 20px;
+            padding: 25px 0;
+            backdrop-filter: blur(10px);
         }
 
         .footer img {
-            width: 24px;
-            height: 24px;
-            margin-right: 10px;
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer a {
+            text-decoration: none;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .signup-card {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .signup-card h3 {
+                font-size: 28px;
+            }
         }
     </style>
-
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg" style="background: #ff8c1a;">
+<nav class="navbar navbar-expand-lg" style="background: rgba(255, 140, 26, 0.95); backdrop-filter: blur(10px);">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">tegel</a>
+        <a class="navbar-brand text-white" href="index.html">tegel</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -56,8 +159,7 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
-                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
             </ul>
             <div>
@@ -68,27 +170,69 @@
     </div>
 </nav>
 
-<main class="container my-4">
-    <div class="card p-4 shadow mx-auto" style="max-width: 500px;"><h3>Sign Up</h3>
-        <form><input class="form-control mb-3" placeholder="Name"><input class="form-control mb-3"
-                                                                         placeholder="Email"><input
-                class="form-control mb-3" type="password" placeholder="Password">
-            <button class="btn btn-primary w-100">Register</button>
+<main>
+    <div class="signup-card">
+        <h3>Sign Up</h3>
+        <form id="signupForm">
+            <input id="fullName" class="form-control" type="text" placeholder="Full Name" required>
+            <input id="emailAddress" class="form-control" type="email" placeholder="Email Address" required>
+            <input id="password" class="form-control" type="password" placeholder="Password" required>
+            <button type="submit" class="btn btn-register w-100">Create Account</button>
         </form>
+        <div class="text-center mt-3">
+            <p class="text-muted">Already have an account? <a href="login.html" style="color: #ff8c1a; text-decoration: none;">Login here</a></p>
+        </div>
     </div>
 </main>
 
-<footer class="footer mt-auto">
+<footer class="footer">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><img
-                    src='images\Insta_Icon.png' alt="Instagram"></a>
-            <a href="#"><img src="images\Gmail_Icon.png" alt="Gmail"></a>
+        <div class="social-links">
+            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==">
+                <img src='images/Insta_Icon.png' alt="Instagram">
+            </a>
+            <a href="#">
+                <img src="images/Gmail_Icon.png" alt="Gmail">
+            </a>
         </div>
-        <div>Drienerlolaan 5, 7522 NB Enschede</div>
-        <div class="navbar-brand text-white">tegel</div>
+        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
+        <div class="footer-brand">tegel</div>
     </div>
 </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const signupForm = document.getElementById('signupForm');
+    
+    signupForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get form values
+        const fullName = document.getElementById('fullName').value;
+        const emailAddress = document.getElementById('emailAddress').value;
+        const password = document.getElementById('password').value;
+        
+        // Validate all fields are filled
+        if (!fullName || !emailAddress || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        // Store signup data in localStorage to pass to personal details page
+        const signupData = {
+            name: fullName,
+            email: emailAddress,
+            password: password,
+            timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem('signupData', JSON.stringify(signupData));
+        
+        // Redirect to personal details page
+        window.location.href = 'personal-details.html';
+    });
+});
+</script>
 
 </body>
 </html>

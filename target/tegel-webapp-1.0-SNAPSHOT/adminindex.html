@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | Tegel</title>
+    <title>Admin Home | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <style>
-        html, body {
-            height: 100%;
-        }
-
+        html, body { height: 100%; }
         body {
             display: flex;
             flex-direction: column;
@@ -21,18 +17,12 @@
             margin: 0;
             padding: 0;
         }
-
-        main {
-            flex: 1;
-            padding: 40px 20px;
-        }
-
+        main { flex: 1; padding: 40px 20px; }
         .navbar-brand {
             font-family: 'Courier New', cursive;
             font-size: 28px;
             font-weight: bold;
         }
-
         .hero-section {
             position: relative;
             height: 400px;
@@ -44,27 +34,23 @@
             align-items: center;
             justify-content: center;
         }
-
         .hero-content {
             position: relative;
             z-index: 2;
             text-align: center;
             color: white;
         }
-
         .hero-title {
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-
         .hero-subtitle {
             font-size: 24px;
             margin-bottom: 0;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-
         .hero-background {
             position: absolute;
             top: 0;
@@ -74,14 +60,12 @@
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><defs><pattern id="hexagons" patternUnits="userSpaceOnUse" width="100" height="87"><polygon points="50,0 93.3,25 93.3,75 50,100 6.7,75 6.7,25" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23hexagons)"/></svg>');
             opacity: 0.3;
         }
-
         .content-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-top: 40px;
         }
-
         .content-card {
             background: white;
             border-radius: 15px;
@@ -89,12 +73,10 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
         .content-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
         }
-
         .content-card h3 {
             color: #b4afaa;
             font-size: 24px;
@@ -103,80 +85,54 @@
             border-bottom: 3px solid #ff8c1a;
             padding-bottom: 10px;
         }
-
         .content-card p {
             color: #333;
             line-height: 1.6;
             margin-bottom: 15px;
         }
-
         .event-date {
             color: #ff8c1a;
             font-weight: bold;
             font-size: 16px;
         }
-
         .event-title {
             color: #333;
             margin-top: 5px;
         }
-
         .newsletter-card {
             grid-column: 1 / -1;
         }
-
         .footer {
             background: #000;
             color: white;
             padding: 25px 0;
             margin-top: auto;
         }
-
         .footer img {
             width: 28px;
             height: 28px;
             margin-right: 15px;
             filter: brightness(0) invert(1);
         }
-
-        .footer a {
-            text-decoration: none;
-        }
-
-        .social-links {
-            display: flex;
-            align-items: center;
-        }
-
-        .address-text {
-            color: #ccc;
-            font-size: 14px;
-        }
-
+        .footer a { text-decoration: none; }
+        .social-links { display: flex; align-items: center; }
+        .address-text { color: #ccc; font-size: 14px; }
         .footer-brand {
             font-family: 'Courier New', cursive;
             font-size: 24px;
             color: #ff8c1a;
             font-weight: bold;
         }
-
         @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .hero-title {
-                font-size: 36px;
-            }
-            
-            .hero-subtitle {
-                font-size: 18px;
-            }
-            
-            .content-card {
-                padding: 20px;
-            }
+            .content-grid { grid-template-columns: 1fr; gap: 20px; }
+            .hero-title { font-size: 36px; }
+            .hero-subtitle { font-size: 18px; }
+            .content-card { padding: 20px; }
+        }
+        .admin-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
         }
     </style>
 </head>
@@ -198,8 +154,8 @@
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
             </ul>
             <div>
-                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
-                <a href="login.html" class="btn btn-light">Login</a>
+                <a href="adminindex.html" class="btn btn-light me-2">Admin Home</a>
+                <a href="login.html" class="btn btn-light">Logout</a>
             </div>
         </div>
     </div>
@@ -209,8 +165,8 @@
     <div class="hero-section">
         <div class="hero-background"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Admin/member/user</h1>
-            <p class="hero-subtitle">No slideshow yet☠️</p>
+            <h1 class="hero-title">Admin Dashboard</h1>
+            <p class="hero-subtitle">Welcome, Admin! Manage users and events below.</p>
         </div>
     </div>
 
@@ -220,14 +176,12 @@
                 <h3>ABOUT</h3>
                 <p>S.G.V. Tegel is a close-knit group of friends from Enschede, actively engaged in the study association Inter-Actief and broader university activities.</p>
             </div>
-            
             <div class="content-card">
-                <h3>YOUR EVENTS</h3>
-                <div class="event-date">May 16, Thu</div>
-                <div class="event-title">Lunch Lecture | Nord Security</div>
+                <h3>ADMIN TOOLS</h3>
+                <p>As an admin, you can manage users, update roles, and view/delete users. You can also view all events in chronological order.</p>
+                <a href="admin.html" class="btn btn-warning admin-link">Go to Admin Management Page</a>
             </div>
         </div>
-        
         <div class="content-card newsletter-card" style="margin-top: 30px;">
             <h3>Newsletter</h3>
             <div class="event-date">Jun 5, Sat</div>
@@ -250,6 +204,16 @@
         <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
     </div>
 </footer>
+
+<script>
+    // Only allow admins to view this page (dummy check)
+    // Replace this with your real authentication/authorization logic
+    const currentUser = { role: "admin" }; // Example: get from session/cookie/backend
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Access denied. Admins only.");
+        window.location.href = "login.html";
+    }
+</script>
 
 </body>
 </html>

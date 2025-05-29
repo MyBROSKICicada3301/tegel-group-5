@@ -178,7 +178,7 @@
     </style>
 </head>
 <body>
-    
+
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html" style="padding:0;">
@@ -264,7 +264,6 @@
     document.getElementById('personalDetailsForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Collect form data
         const formData = {
             name: document.getElementById('name').value,
             dob: document.getElementById('dob').value,
@@ -273,13 +272,10 @@
             dietary: document.getElementById('dietary').value
         };
         
-        // Here you would typically send the data to your server
         console.log('Form submitted:', formData);
         
-        // Show success message or redirect
         alert('Personal details submitted successfully!');
         
-        // Redirect to dashboard or home page
         window.location.href = 'index.html';
     });
 </script>

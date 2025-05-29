@@ -3,49 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
+    <title>Announcements | Tegel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        html, body {
-            height: 100%;
+        .announcements-section {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 40px 30px;
+            margin-top: 40px;
         }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            font-family: 'Segoe UI', sans-serif;
-            background: #ffb56b;
+        .announcements-section h1 {
+            color: #ff8c1a;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
-
-        main {
-            flex: 1;
+        .announcements-section p {
+            color: #333;
+            font-size: 1.2rem;
         }
-
-        .navbar-brand {
-            font-family: 'Courier New', cursive;
-            font-size: 24px;
+        @media (max-width: 768px) {
+            .announcements-section {
+                padding: 20px 10px;
+                margin-top: 20px;
+            }
+            .announcements-section h1 {
+                font-size: 2rem;
+            }
+            .announcements-section p {
+                font-size: 1rem;
+            }
         }
-
         .footer {
             background: #000;
             color: white;
-            padding: 20px;
+            padding: 25px 0;
+            margin-top: auto;
         }
-
         .footer img {
-            width: 24px;
-            height: 24px;
-            margin-right: 10px;
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+        .footer a {
+            text-decoration: none;
+        }
+        .social-links {
+            display: flex;
+            align-items: center;
+        }
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .footer {
+                text-align: center;
+            }
+            .footer .container {
+                flex-direction: column !important;
+                gap: 10px;
+            }
         }
     </style>
-
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html" style="padding:0;">
@@ -71,14 +101,12 @@
 </nav>
 
 <main class="container my-4">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm"><h5>Event 1</h5>
-                <p>Details...</p></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm"><h5>Event 2</h5>
-                <p>Details...</p></div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="announcements-section">
+                <h1>Announcements</h1>
+                <p>No announcements yet. Stay tuned!</p>
+            </div>
         </div>
     </div>
 </main>
@@ -86,7 +114,7 @@
 <footer class="footer">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
         <div class="social-links">
-            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+            <a href="https://www.instagram.com/sgvtegel" target="_blank" rel="noopener">
                 <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
             </a>
             <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
@@ -97,6 +125,6 @@
         <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
     </div>
 </footer>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

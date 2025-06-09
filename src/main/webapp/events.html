@@ -71,17 +71,48 @@
 </nav>
 
 <main class="container my-4">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm"><h5>Event 1</h5>
-                <p>Details...</p></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm"><h5>Event 2</h5>
-                <p>Details...</p></div>
-        </div>
+    <div class="row g-4" id="eventsContainer">
+        <!-- Events will be loaded here -->
     </div>
 </main>
+
+<script>
+    function loadEvents() {
+        fetch('/events')
+            .then(response => response.json())
+            .then(events => {
+                const container = document.getElementById('eventsContainer');
+                container.innerHTML = '';
+                
+                if (events.length === 0) {
+                    container.innerHTML = '<div class="col-12"><p class="text-center">No events available.</p></div>';
+                    return;
+                }
+                
+                events.forEach(event => {
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'col-md-4';
+                    eventCard.innerHTML = `
+                        <div class="card p-3 shadow-sm">
+                            <h5>${event.title}</h5>
+                            <p><strong>Date:</strong> ${event.date}</p>
+                            <p><strong>Location:</strong> ${event.location || 'TBA'}</p>
+                            <p>${event.description || 'No description available.'}</p>
+                            <p><strong>Max Participants:</strong> ${event.maxParticipants || 'Unlimited'}</p>
+                        </div>
+                    `;
+                    container.appendChild(eventCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading events:', error);
+                document.getElementById('eventsContainer').innerHTML = 
+                    '<div class="col-12"><p class="text-center text-danger">Error loading events.</p></div>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadEvents);
+</script>
 
 <footer class="footer">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">

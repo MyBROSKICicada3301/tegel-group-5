@@ -208,11 +208,26 @@
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const email = document.getElementById('emailInput').value.trim();
-        const password = document.getElementById('passwordInput').value;
-        if (email === 'admin@gmail.com' && password === 'admin1234') {
-            window.location.href = 'adminindex.html';
-        }
+        
+        const formData = new FormData();
+        formData.append('email', document.getElementById('emailInput').value);
+        formData.append('password', document.getElementById('passwordInput').value);
+        
+        fetch('/login', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                alert('Invalid email or password');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Login failed. Please try again.');
+        });
     });
 </script>
 

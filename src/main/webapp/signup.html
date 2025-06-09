@@ -256,33 +256,35 @@ document.addEventListener('DOMContentLoaded', function() {
     signupForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        const fullName = document.getElementById('fullName').value;
-        const nickname = document.getElementById('nickname').value;
-        const emailAddress = document.getElementById('emailAddress').value;
-        const password = document.getElementById('password').value;
-        const dob = document.getElementById('dob').value;
-        const phone = document.getElementById('phone').value;
-        const dietary = document.getElementById('dietary').value;
+        const formData = new FormData();
+        formData.append('fullName', document.getElementById('fullName').value);
+        formData.append('nickname', document.getElementById('nickname').value);
+        formData.append('emailAddress', document.getElementById('emailAddress').value);
+        formData.append('password', document.getElementById('password').value);
+        formData.append('dob', document.getElementById('dob').value);
+        formData.append('phone', document.getElementById('phone').value);
+        formData.append('dietary', document.getElementById('dietary').value);
 
-        if (!fullName || !emailAddress || !password || !dob || !phone) {
-            alert('Please fill in all required fields');
-            return;
-        }
-
-        const signupData = {
-            name: fullName,
-            nickname: nickname,
-            email: emailAddress,
-            password: password,
-            dob: dob,
-            phone: phone,
-            dietary: dietary,
-            timestamp: new Date().toISOString()
-        };
-        localStorage.setItem('signupData', JSON.stringify(signupData));
-
-        alert('Sign up successful!');
-        window.location.href = 'index.html';
+        fetch('/signup', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.text();
+            }
+        })
+        .then(data => {
+            if (data) {
+                alert('Registration failed. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Registration failed. Please try again.');
+        });
     });
 });
 </script>

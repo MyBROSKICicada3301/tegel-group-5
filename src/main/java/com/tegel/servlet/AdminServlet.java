@@ -20,69 +20,69 @@ public class AdminServlet extends HttpServlet {
     private Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String pathInfo = request.getPathInfo();
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
-        
+
         // Check admin authorization
         if (!"admin".equals(userRole)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        
+
         response.setContentType("application/json");
-        
+
         if ("/users".equals(pathInfo)) {
             List<User> users = userDAO.getAllUsers();
             response.getWriter().write(gson.toJson(users));
         }
     }
-    
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String pathInfo = request.getPathInfo();
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
-        
+
         // Check admin authorization
         if (!"admin".equals(userRole)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        
+
         if ("/updateRole".equals(pathInfo)) {
             int userId = Integer.parseInt(request.getParameter("userId"));
             String newRole = request.getParameter("newRole");
-            
+
             boolean success = userDAO.updateUserRole(userId, newRole);
             response.setContentType("application/json");
             response.getWriter().write("{\"success\":" + success + "}");
         }
     }
-    
+
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
-        
+
         // Check admin authorization
         if (!"admin".equals(userRole)) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        
+
         String pathInfo = request.getPathInfo();
         if (pathInfo != null && pathInfo.startsWith("/user/")) {
             int userId = Integer.parseInt(pathInfo.substring(6));
             boolean success = userDAO.deleteUser(userId);
-            
+
             response.setContentType("application/json");
             response.getWriter().write("{\"success\":" + success + "}");
         }

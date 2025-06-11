@@ -34,16 +34,13 @@ public class SecurityUtils {
         "(?i)(\\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT|JAVASCRIPT|VBSCRIPT)\\b|['\";\\-\\-]|/\\*|\\*/)"
     );
     
-    /**
-     * Hash password using Argon2id (recommended variant)
-     */
+    
     public static String hashPassword(String password) {
         if (password == null || password.isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
         
         try {
-            // Using Argon2id with recommended parameters
             // iterations=3, memory=65536 KB (64 MB), parallelism=1
             String hash = argon2.hash(3, 65536, 1, password.toCharArray());
             logger.info("Password hashed successfully using Argon2");
@@ -54,9 +51,7 @@ public class SecurityUtils {
         }
     }
     
-    /**
-     * Verify password against Argon2 hash
-     */
+    
     public static boolean verifyPassword(String password, String hash) {
         if (password == null || hash == null) {
             return false;
@@ -222,7 +217,6 @@ public class SecurityUtils {
             return false;
         }
 
-        // Username must be alphanumeric, underscores, or hyphens, and 3-30 characters long
         Pattern usernamePattern = Pattern.compile("^[a-zA-Z0-9_-]{3,30}$");
 
         return usernamePattern.matcher(userName).matches() &&

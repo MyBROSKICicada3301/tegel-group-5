@@ -12,24 +12,24 @@ public class InsertUserTest {
             conn = DatabaseManager.getConnection();
 
             String sql = """
-                INSERT INTO "mod4db"."users" 
-                (email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+                        INSERT INTO "mod4db"."users" 
+                        (email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """;
 
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, "insert@test.com");
+            stmt.setString(1, "etnmail@test.com");
             stmt.setString(2, "secureHashedPassword");
             stmt.setString(3, "0123456789");
-            stmt.setDate(4, java.sql.Date.valueOf("1995-12-15"));
-            stmt.setString(5, "vegan");
+            stmt.setDate(4, java.sql.Date.valueOf("1995-12-17"));
+            stmt.setString(5, "No dietary restrictions");
             stmt.setString(6, "member");
-            stmt.setString(7, "Test Insert");
-            stmt.setString(8, "t-inz");
+            stmt.setString(7, "Ethan Noronha");
+            stmt.setString(8, "actualnick");
 
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
-                System.out.println("✅ Test user inserted successfully!");
+                System.out.println(" Test user inserted successfully!");
             }
 
             stmt.close();

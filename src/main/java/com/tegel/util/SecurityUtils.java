@@ -216,4 +216,16 @@ public class SecurityUtils {
         // using wipeArray with explicit type cast to resolve ambiguity in case of cleanup
         argon2.wipeArray((char[]) null);
     }
+
+    public static boolean isValidUsername(String userName) {
+        if (userName == null || userName.isEmpty()) {
+            return false;
+        }
+
+        // Username must be alphanumeric, underscores, or hyphens, and 3-30 characters long
+        Pattern usernamePattern = Pattern.compile("^[a-zA-Z0-9_-]{3,30}$");
+
+        return usernamePattern.matcher(userName).matches() &&
+               !SQL_INJECTION_PATTERN.matcher(userName).find();
+    }
 }

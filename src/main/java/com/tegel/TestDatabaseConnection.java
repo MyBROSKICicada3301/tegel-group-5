@@ -10,10 +10,10 @@ public class TestDatabaseConnection {
         try {
             conn = DatabaseManager.getConnection();
             if (conn != null) {
-                System.out.println("✅ Connection test successful!");
+                System.out.println(" Connection test successful!");
             }
         } catch (SQLException e) {
-            System.out.println("❌ Connection test failed: " + e.getMessage());
+            System.out.println(" Connection test failed: " + e.getMessage());
         } finally {
             DatabaseManager.closeConnection(conn);
         }

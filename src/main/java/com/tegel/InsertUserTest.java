@@ -1,9 +1,10 @@
 package com.tegel;
 
-import com.tegel.dao.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import com.tegel.dao.DatabaseManager;
 
 public class InsertUserTest {
     public static void main(String[] args) {
@@ -11,21 +12,19 @@ public class InsertUserTest {
         try {
             conn = DatabaseManager.getConnection();
 
-            String sql = """
-                INSERT INTO "mod4db"."users" 
-                (email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+            String sql = "INSERT INTO \"mod4db\".\"users\" " +
+                "(email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, "insert@test.com");
-            stmt.setString(2, "secureHashedPassword");
+            stmt.setString(1, "John@test.com");
+            stmt.setString(2, "VerySecureHashedPassword");
             stmt.setString(3, "0123456789");
-            stmt.setDate(4, java.sql.Date.valueOf("1995-12-15"));
-            stmt.setString(5, "vegan");
+            stmt.setDate(4, java.sql.Date.valueOf("1990-02-14"));
+            stmt.setString(5, "veg");
             stmt.setString(6, "member");
-            stmt.setString(7, "Test Insert");
-            stmt.setString(8, "t-inz");
+            stmt.setString(7, "John Doe");
+            stmt.setString(8, "test nick name");
 
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {

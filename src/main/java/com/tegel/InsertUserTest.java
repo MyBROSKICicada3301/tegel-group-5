@@ -17,23 +17,23 @@ public class InsertUserTest {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, "John@test.com");
-            stmt.setString(2, "VerySecureHashedPassword");
-            stmt.setString(3, "0123456789");
-            stmt.setDate(4, java.sql.Date.valueOf("1990-02-14"));
-            stmt.setString(5, "veg");
-            stmt.setString(6, "member");
-            stmt.setString(7, "John Doe");
-            stmt.setString(8, "test nick name");
+            stmt.setString(1, "TEGEl5@test.com");
+            stmt.setString(2, "aVery$trongP@ssword");
+            stmt.setString(3, "11223344");
+            stmt.setDate(4, java.sql.Date.valueOf("2006-05-16"));
+            stmt.setString(5, "non-veg");
+            stmt.setString(6, "user");
+            stmt.setString(7, "Tegel User");
+            stmt.setString(8, "Teg");
 
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
-                System.out.println("✅ Test user inserted successfully!");
+                System.out.println("Test user inserted successfully!");
             }
 
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("❌ Insert failed: " + e.getMessage());
+            System.out.println("Insert failed: " + e.getMessage());
         } finally {
             DatabaseManager.closeConnection(conn);
         }

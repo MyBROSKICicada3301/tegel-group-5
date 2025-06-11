@@ -1,9 +1,10 @@
 package com.tegel;
 
-import com.tegel.dao.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import com.tegel.dao.DatabaseManager;
 
 public class InsertUserTest {
     public static void main(String[] args) {
@@ -11,11 +12,9 @@ public class InsertUserTest {
         try {
             conn = DatabaseManager.getConnection();
 
-            String sql = """
-                        INSERT INTO "mod4db"."users" 
-                        (email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """;
+            String sql = "INSERT INTO \"mod4db\".\"users\" " +
+                        "(email, passwordhash, phonenumber, dateofbirth, dietres, role, full_name, nick_name) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, "etnmail@test.com");

@@ -251,11 +251,12 @@
 </footer>
 
 <script>
+console.log("logging test")
 document.addEventListener('DOMContentLoaded', function() {
     const signupForm = document.getElementById('signupForm');
     signupForm.addEventListener('submit', function(event) {
+        console.log("submission triggered")
         event.preventDefault();
-
         const formData = new FormData();
         formData.append('fullName', document.getElementById('fullName').value);
         formData.append('nickname', document.getElementById('nickname').value);
@@ -265,11 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('phone', document.getElementById('phone').value);
         formData.append('dietary', document.getElementById('dietary').value);
 
+        console.log("fetching signup")
         fetch('/tegel_webapp/signup', {
             method: 'POST',
             body: formData
         })
         .then(response => {
+            console.log("response found")
             if (response.redirected) {
                 window.location.href = response.url;
             } else {
@@ -277,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(data => {
+            console.log('logging data')
             console.log(data)
             if (data) {
                 alert('Registration failed. Please try again.');
@@ -288,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 </script>
 </body>
 </html>

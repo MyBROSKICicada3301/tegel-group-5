@@ -27,7 +27,7 @@ public class SignupServlet extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+        System.out.println("servlet reach, THIS IS BIG");
         try {
             // Get parameters with null checks
             String fullName = request.getParameter("fullName");

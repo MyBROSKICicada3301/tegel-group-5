@@ -145,6 +145,7 @@ public class SignupServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Registration failed\"}");
             }
 
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error during user registration", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

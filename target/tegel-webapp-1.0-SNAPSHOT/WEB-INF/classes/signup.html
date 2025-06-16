@@ -251,7 +251,6 @@
 </footer>
 
 <script>
-console.log("logging test")
 document.addEventListener('DOMContentLoaded', function() {
     const signupForm = document.getElementById('signupForm');
     signupForm.addEventListener('submit', function(event) {
@@ -280,8 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(data => {
-            console.log('logging data')
-            console.log(data)
             if (data) {
                 alert('Registration failed. Please try again.');
             }

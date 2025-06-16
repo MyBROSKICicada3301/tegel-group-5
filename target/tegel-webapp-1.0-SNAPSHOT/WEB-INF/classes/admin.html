@@ -353,7 +353,7 @@
 
     // Load users from database
     function loadUsers() {
-        fetch('/admin/users')
+        fetch('/tegel_webapp/admin/users')
             .then(response => response.json())
             .then(data => {
                 users = data;
@@ -366,7 +366,7 @@
 
     // Load events from database (admin view - all events)
     function loadEvents() {
-        fetch('/admin/events/all')
+        fetch('/tegel_webapp/admin/events/all')
             .then(response => response.json())
             .then(data => {
                 events = data;
@@ -375,7 +375,7 @@
             .catch(error => {
                 console.error('Error loading events:', error);
                 // Fallback to public events endpoint
-                fetch('/events')
+                fetch('/tegel_webapp/events')
                     .then(response => response.json())
                     .then(data => {
                         events = data;
@@ -461,7 +461,7 @@
             return;
         }
 
-        fetch('/admin/events', {
+        fetch('/tegel_webapp/admin/events', {
             method: 'POST',
             body: formData
         })
@@ -507,7 +507,7 @@
         const formData = new FormData(form);
         const eventId = formData.get('eventId');
 
-        fetch(`/admin/events/${eventId}`, {
+        fetch(`/tegel_webapp/admin/events/${eventId}`, {
             method: 'PUT',
             body: formData
         })
@@ -529,7 +529,7 @@
 
     function deleteEvent(eventId) {
         if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-            fetch(`/admin/events/${eventId}`, {
+            fetch(`/tegel_webapp/admin/events/${eventId}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())
@@ -559,7 +559,7 @@
         formData.append('userId', userId);
         formData.append('newRole', newRole);
 
-        fetch('/admin/updateRole', {
+        fetch('/tegel_webapp/admin/updateRole', {
             method: 'POST',
             body: formData
         })
@@ -584,7 +584,7 @@
 
     function deleteUser(userId) {
         if (confirm("Are you sure you want to delete this user?")) {
-            fetch(`/admin/user/${userId}`, {
+            fetch(`/tegel_webapp/admin/user/${userId}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())

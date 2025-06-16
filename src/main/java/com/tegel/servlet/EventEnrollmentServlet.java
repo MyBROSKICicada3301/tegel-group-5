@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import jakarta.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 
 import com.google.gson.Gson;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@MultipartConfig
 @WebServlet("/events/enroll")
 public class EventEnrollmentServlet extends HttpServlet {
     private EventDAO eventDAO = new EventDAO();

@@ -197,7 +197,7 @@
     ];
 
     function loadEvents() {
-        fetch('/events')
+        fetch('/tegel_webapp/events')
             .then(response => response.json())
             .then(events => {
                 displayEvents(events);

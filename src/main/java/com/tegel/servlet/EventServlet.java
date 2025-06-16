@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import jakarta.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@MultipartConfig
 @WebServlet("/events/*")
 public class EventServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventServlet.class.getName());

@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+@MultipartConfig
 @WebServlet("/admin/events/*")
 public class EventManagementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());

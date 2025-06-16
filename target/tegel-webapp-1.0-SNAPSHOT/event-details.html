@@ -302,7 +302,7 @@
             return;
         }
 
-        fetch(`/events/${eventId}`)
+        fetch(`/tegel_webapp/events/${eventId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Event not found');

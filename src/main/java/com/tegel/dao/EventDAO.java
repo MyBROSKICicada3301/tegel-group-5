@@ -104,22 +104,20 @@ public class EventDAO {
     
     public List<Event> getAllActiveEvents() {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM mod4db.event WHERE isactive = ? ORDER BY date";
+        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " +
+                    "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
+                    "WHERE e.isactive = true GROUP BY e.event_id ORDER BY e.date";
         
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setBoolean(1, true);
-            ResultSet rs = stmt.executeQuery();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
-                events.add(mapResultSetToEvent(rs));
+                Event event = mapResultSetToEvent(rs);
+                events.add(event);
             }
-            
-            logger.info("Retrieved " + events.size() + " active events");
-            
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database error retrieving active events", e);
+            logger.log(Level.SEVERE, "Error getting active events", e);
         }
         
         return events;
@@ -153,7 +151,9 @@ public class EventDAO {
             return null;
         }
         
-        String sql = "SELECT * FROM mod4db.event WHERE event_id = ?";
+        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " +
+                    "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
+                    "WHERE e.event_id = ? GROUP BY e.event_id";
         
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -164,9 +164,8 @@ public class EventDAO {
             if (rs.next()) {
                 return mapResultSetToEvent(rs);
             }
-            
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database error retrieving event by ID", e);
+            logger.log(Level.SEVERE, "Error getting event by ID: " + eventId, e);
         }
         
         return null;
@@ -424,4 +423,25 @@ public class EventDAO {
             throw new SQLException("Error mapping event data", e);
         }
     }
+
+    public boolean enrollUserInEvent(int userId, int eventId) {
+    // Implementation to enroll a user in an event
+    // Connect to database, execute SQL, etc.
+    try {
+        // Example implementation:
+        // connection = getConnection();
+        // String sql = "INSERT INTO event_enrollments (user_id, event_id) VALUES (?, ?)";
+        // PreparedStatement statement = connection.prepareStatement(sql);
+        // statement.setInt(1, userId);
+        // statement.setInt(2, eventId);
+        // int rowsInserted = statement.executeUpdate();
+        // return rowsInserted > 0;
+        
+        // Placeholder return until implemented
+        return true;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 }

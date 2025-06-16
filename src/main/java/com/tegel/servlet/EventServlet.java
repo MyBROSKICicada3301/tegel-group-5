@@ -1,16 +1,10 @@
 package com.tegel.servlet;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSerializer;
 import com.tegel.dao.EventDAO;
 import com.tegel.model.Event;
 
@@ -20,47 +14,48 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/events")
+@WebServlet("/events/*")
 public class EventServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventServlet.class.getName());
     private EventDAO eventDAO = new EventDAO();
-    private Gson gson;
-    
-    public EventServlet() {
-        // Configure Gson with custom serializers for LocalDate and LocalDateTime
-        this.gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> 
-                context.serialize(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
-            .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> 
-                context.serialize(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
-            .create();
-    }
+    private Gson gson = new Gson();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
+        String pathInfo = request.getPathInfo();
+        
         try {
-            String filter = request.getParameter("filter");
-            List<Event> events;
-            
-            if ("upcoming".equals(filter)) {
-                events = eventDAO.getUpcomingEvents();
-                logger.info("Retrieved upcoming events for public view");
+            if (pathInfo == null || pathInfo.equals("/")) {
+                // Get all active events for public view
+                List<Event> events = eventDAO.getAllActiveEvents();
+                response.getWriter().write(gson.toJson(events));
+                logger.info("Retrieved " + events.size() + " active events for public view");
             } else {
-                events = eventDAO.getAllActiveEvents();
-                logger.info("Retrieved all active events for public view");
+                // Get specific event by ID
+                String eventIdStr = pathInfo.substring(1);
+                int eventId = Integer.parseInt(eventIdStr);
+                Event event = eventDAO.getEventById(eventId);
+                
+                if (event != null) {
+                    response.getWriter().write(gson.toJson(event));
+                    logger.info("Retrieved event details for ID: " + eventId);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\":\"Event not found\"}");
+                }
             }
-            
-            response.getWriter().write(gson.toJson(events));
-            
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"error\":\"Invalid event ID format\"}");
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error retrieving public events", e);
+            logger.severe("Error retrieving events: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Unable to load events\"}");
+            response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
     }
 }

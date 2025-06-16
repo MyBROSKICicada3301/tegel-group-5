@@ -24,7 +24,7 @@ public class SignupServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
@@ -147,6 +147,7 @@ public class SignupServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
+
     }
     
     private boolean isValidRequiredFields(String fullName, String email, String password, 

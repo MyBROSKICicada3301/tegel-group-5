@@ -212,7 +212,8 @@
         const formData = new FormData();
         formData.append('email', document.getElementById('emailInput').value);
         formData.append('password', document.getElementById('passwordInput').value);
-        
+
+        console.log("fetching data")
         fetch('/login', {
             method: 'POST',
             body: formData

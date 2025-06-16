@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('phone', document.getElementById('phone').value);
         formData.append('dietary', document.getElementById('dietary').value);
 
-        fetch('/signup', {
+        fetch('/tegel_webapp/signup', {
             method: 'POST',
             body: formData
         })
@@ -277,6 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .then(data => {
+            console.log(data)
             if (data) {
                 alert('Registration failed. Please try again.');
             }

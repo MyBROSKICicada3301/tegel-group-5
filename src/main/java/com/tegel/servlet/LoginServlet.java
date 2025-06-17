@@ -1,7 +1,11 @@
 package com.tegel.servlet;
 
+import com.tegel.util.JwtUtil;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.tegel.dao.UserDAO;
@@ -10,10 +14,6 @@ import com.tegel.util.SecurityUtils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @MultipartConfig
 @WebServlet("/login")
@@ -51,14 +51,21 @@ public class LoginServlet extends HttpServlet {
             User user = userDAO.getUserByEmail(email);
             
             if (user != null && SecurityUtils.verifyPassword(password, user.getPasswordHash())) {
-                // Successful login
-                HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-                session.setAttribute("userId", user.getUserId());
-                session.setAttribute("userRole", user.getRole());
-                
-                // Set session timeout (30 minutes)
-                session.setMaxInactiveInterval(1800);
+                // create JWT based session
+                // turn the information that will be stored into claims
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("email", email);
+                claims.put("role", user.getRole());
+
+                // create token
+                String token = JwtUtil.generateToken(Integer.toString(user.getUserId()), claims, JwtUtil.EXPIRATION_TIME);
+
+                // create and add a cookie
+                Cookie cookie = new Cookie("token", token);
+                cookie.setHttpOnly(true);
+                cookie.setPath("/");
+                cookie.setMaxAge((int)(JwtUtil.EXPIRATION_TIME / 1000)); // in seconds
+                response.addCookie(cookie);
                 
                 logger.info("Successful login for user: " + email);
                 

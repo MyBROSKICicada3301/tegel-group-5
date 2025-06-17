@@ -45,9 +45,7 @@
         <option name="m_maxLength" value="255" />
       </extension>
     </inspection_tool>
-    <inspection_tool class="IncorrectFormatting" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="Style Problem">
-      <option name="reportPerFile" value="true" />
-    </inspection_tool>
+    <inspection_tool class="IncorrectFormatting" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="Style Problem" />
     <inspection_tool class="LambdaParameterNamingConvention" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="Style Problem">
       <option name="m_maxLength" value="255" />
     </inspection_tool>

@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import jakarta.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+@MultipartConfig
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(LoginServlet.class.getName());
@@ -22,7 +24,9 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
+
+        System.out.println("doPost called in /login");
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         

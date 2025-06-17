@@ -280,7 +280,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data) {
-                alert('Registration failed. Please try again.');
+                try {
+                    const json = JSON.parse(data);
+                    if (json.error) {
+                        alert(json.error); // Or display in a nicer way on the page
+                    } else {
+                        alert('Registration failed. Please try again.');
+                    }
+                } catch (e) {
+                    alert('Registration failed. Please try again.');
+                }
             }
         })
         .catch(error => {

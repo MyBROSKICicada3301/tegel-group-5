@@ -33,15 +33,13 @@ public class JwtUtil {
 
     public static boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
             return true; // token is valid
         } catch (JwtException | IllegalArgumentException e) {
             // invalid token, expired, malformed, or null/empty
             return false;
         }
+    }
 
     // try to get the claims without crashing
     public static Claims getClaims(String token) {

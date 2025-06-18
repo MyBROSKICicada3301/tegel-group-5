@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
             // Validate inputs
             if (email == null || password == null || email.trim().isEmpty() || password.isEmpty()) {
                 logger.warning("Login attempt with missing credentials");
-                response.sendRedirect("login.html?error=invalid");
+                response.sendRedirect("login.html?error=missing");
                 return;
             }
 
@@ -43,39 +43,48 @@ public class LoginServlet extends HttpServlet {
 
             if (!SecurityUtils.isValidEmail(email)) {
                 logger.warning("Login attempt with invalid email format: " + email);
-                response.sendRedirect("login.html?error=invalid");
+                response.sendRedirect("login.html?error=invalid_email");
                 return;
             }
 
             // Get user from database
             User user = userDAO.getUserByEmail(email);
 
-            if (user != null && SecurityUtils.verifyPassword(password, user.getPasswordHash())) {
-                // Successful login
-                HttpSession session = request.getSession();
-                session.setAttribute("user", user);
-                session.setAttribute("userId", user.getUserId());
-                session.setAttribute("userRole", user.getRole());
+            if (user == null) {
+                // User doesn't exist
+                logger.warning("Login attempt with non-existent email: " + email);
+                response.sendRedirect("login.html?error=user_not_found");
+                return;
+            }
 
-                // Set session timeout (2 minutes)
-                session.setMaxInactiveInterval(120);
+            if (!SecurityUtils.verifyPassword(password, user.getPasswordHash())) {
+                // Wrong password
+                logger.warning("Failed login attempt due to wrong password for email: " + email);
+                response.sendRedirect("login.html?error=wrong_password");
+                return;
+            }
 
-                logger.info("Successful login for user: " + email);
+            // Successful login
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getUserId());
+            session.setAttribute("userRole", user.getRole());
 
-                // Redirect based on role
-                if ("admin".equals(user.getRole())) {
-                    response.sendRedirect("adminindex.html");
-                } else {
-                    response.sendRedirect("index.html");
-                }
+            // Set session timeout (2 minutes)
+            session.setMaxInactiveInterval(120);
+
+            logger.info("Successful login for user: " + email);
+
+            // Redirect based on role
+            if ("admin".equals(user.getRole())) {
+                response.sendRedirect("adminindex.html");
             } else {
-                logger.warning("Failed login attempt for email: " + email);
-                response.sendRedirect("login.html?error=invalid");
+                response.sendRedirect("index.html");
             }
 
         } catch (SecurityException e) {
             logger.severe("Security violation during login: " + e.getMessage());
-            response.sendRedirect("login.html?error=invalid");
+            response.sendRedirect("login.html?error=security");
         } catch (Exception e) {
             logger.severe("Error during login: " + e.getMessage());
             response.sendRedirect("login.html?error=server");

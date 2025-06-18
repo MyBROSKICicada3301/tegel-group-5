@@ -23,7 +23,14 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
+
             throws ServletException, IOException {
+        HttpSession existingSession = request.getSession(false);
+        if (existingSession != null) {
+            System.out.println("Existing session found at login with ID: " + existingSession.getId());
+        } else {
+            System.out.println("No existing session found at login.");
+        }
 
         System.out.println("doPost called in /login");
 
@@ -57,6 +64,11 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("userId", user.getUserId());
                 session.setAttribute("userRole", user.getRole());
 
+                // Debug: print session info
+                System.out.println("Session created/used with ID: " + session.getId());
+                System.out.println("Session user attribute: " + session.getAttribute("user"));
+                System.out.println("Session userId attribute: " + session.getAttribute("userId"));
+                System.out.println("Session userRole attribute: " + session.getAttribute("userRole"));
                 // Set session timeout (30 minutes)
                 session.setMaxInactiveInterval(1800);
 

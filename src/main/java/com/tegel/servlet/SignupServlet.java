@@ -29,7 +29,9 @@ public class SignupServlet extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
         System.out.println("servlet reach, THIS IS BIG");
+
         try {
             // Get parameters with null checks
             String fullName = request.getParameter("fullName");
@@ -40,15 +42,23 @@ public class SignupServlet extends HttpServlet {
             String phone = request.getParameter("phone");
             String dietary = request.getParameter("dietary");
 
-            // Validate required fields
+            System.out.println("Raw Inputs:");
+            System.out.println("fullName = " + fullName);
+            System.out.println("nickname = " + nickname);
+            System.out.println("email = " + email);
+            System.out.println("password = " + password);
+            System.out.println("dob = " + dobString);
+            System.out.println("phone = " + phone);
+            System.out.println("dietary = " + dietary);
+
             if (!isValidRequiredFields(fullName, email, password, dobString, phone)) {
-                logger.warning("Missing required fields in signup attempt");
+                System.out.println("❌ Missing required fields");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Missing required fields\"}");
                 return;
             }
 
-            // Sanitize inputs (except password which will be hashed)
+            // Sanitize
             try {
                 fullName = SecurityUtils.sanitizeInput(fullName);
                 nickname = nickname != null ? SecurityUtils.sanitizeInput(nickname) : null;
@@ -56,26 +66,31 @@ public class SignupServlet extends HttpServlet {
                 phone = SecurityUtils.sanitizeInput(phone);
                 dietary = dietary != null ? SecurityUtils.sanitizeTextArea(dietary) : null;
             } catch (SecurityException e) {
-                logger.warning("Security violation in signup data: " + e.getMessage());
+                System.out.println("❌ Security error in inputs: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid input data detected\"}");
                 return;
             }
 
-            // Validate input formats
+            System.out.println("✅ Inputs sanitized successfully");
+
+            // Validation
             if (!SecurityUtils.isValidEmail(email)) {
+                System.out.println("❌ Invalid email");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid email format\"}");
                 return;
             }
 
             if (!SecurityUtils.isValidName(fullName)) {
+                System.out.println("❌ Invalid name");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid name format\"}");
                 return;
             }
 
             if (!SecurityUtils.isValidPassword(password)) {
+                System.out.println("❌ Invalid password format");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter()
                         .write("{\"error\":\"Password must be at least 8 characters with uppercase, lowercase, number and special character\"}");
@@ -83,75 +98,77 @@ public class SignupServlet extends HttpServlet {
             }
 
             if (!SecurityUtils.isValidPhone(phone)) {
+                System.out.println("❌ Invalid phone");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid phone number format\"}");
                 return;
             }
 
-            // Check if user already exists
+            System.out.println("✅ All fields validated");
+
             if (userDAO.getUserByEmail(email) != null) {
-                logger.info("Signup attempt with existing email: " + email);
+                System.out.println("❌ Email already exists: " + email);
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.getWriter().write("{\"error\":\"User already exists\"}");
                 return;
             }
 
-            // Parse and validate date of birth
             LocalDate dateOfBirth;
             try {
                 dateOfBirth = LocalDate.parse(dobString);
 
-                // Validate age (must be at least 13 years old)
                 if (dateOfBirth.isAfter(LocalDate.now().minusYears(13))) {
+                    System.out.println("❌ Too young to register");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"error\":\"Must be at least 13 years old\"}");
                     return;
                 }
 
-                // Validate reasonable birth year (not too old)
                 if (dateOfBirth.isBefore(LocalDate.now().minusYears(120))) {
+                    System.out.println("❌ Birth year too old");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write("{\"error\":\"Invalid birth date\"}");
                     return;
                 }
             } catch (DateTimeParseException e) {
+                System.out.println("❌ Invalid date format");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid date format\"}");
                 return;
             }
 
-            // Hash password using Argon2
+            System.out.println("✅ DOB valid");
+
             String hashedPassword;
             try {
                 hashedPassword = SecurityUtils.hashPassword(password);
+                System.out.println("✅ Password hashed");
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Password hashing failed", e);
+                System.out.println("❌ Password hashing failed");
+                e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Registration failed\"}");
                 return;
             }
 
-            // Create user object
-            User user = new User(email, hashedPassword, phone, dateOfBirth, dietary, fullName,
-                                 nickname);
+            User user = new User(email, hashedPassword, phone, dateOfBirth, dietary, fullName, nickname);
+            System.out.println("✅ User object created");
 
-            // Save to database
             if (userDAO.createUser(user)) {
-                logger.info("User created successfully: " + email);
+                System.out.println("✅ User successfully registered");
                 response.sendRedirect("login.html?success=registered");
             } else {
-                logger.severe("Failed to create user in database: " + email);
+                System.out.println("❌ Failed to save user in DB");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Registration failed\"}");
             }
 
-
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unexpected error during user registration", e);
+            System.out.println("❌ Unexpected error");
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
-
     }
 
     private boolean isValidRequiredFields(String fullName, String email, String password,

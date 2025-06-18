@@ -1,9 +1,13 @@
 package com.tegel.servlet;
 
 import jakarta.servlet.annotation.MultipartConfig;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.tegel.dao.EventDAO;
 
 import jakarta.servlet.ServletException;
@@ -15,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @MultipartConfig
 @WebServlet("/events/enroll")
 public class EventEnrollmentServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(EventEnrollmentServlet.class.getName());
     private EventDAO eventDAO = new EventDAO();
     private Gson gson = new Gson();
 
@@ -26,19 +31,38 @@ public class EventEnrollmentServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         try {
-            int eventId = Integer.parseInt(request.getParameter("eventId"));
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            
+            // Parse JSON data from request body
+            StringBuilder buffer = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+
+            String data = buffer.toString();
+            JsonObject jsonObject = gson.fromJson(data, JsonObject.class);
+
+            // Extract event ID and user ID
+            int eventId = jsonObject.get("eventId").getAsInt();
+            int userId = jsonObject.get("userId").getAsInt();
+
+            logger.info("Enrollment request received for user " + userId + " in event " + eventId);
+
+            // Attempt to enroll user in event
             boolean success = eventDAO.enrollUserInEvent(userId, eventId);
             
+            // Return appropriate response
             if (success) {
-                response.getWriter().write("{\"success\":true}");
+                response.getWriter().write("{\"success\":true,\"message\":\"Enrollment successful\"}");
+                logger.info("Enrollment successful for user " + userId + " in event " + eventId);
             } else {
-                response.getWriter().write("{\"success\":false,\"message\":\"Enrollment failed\"}");
+                response.getWriter().write("{\"success\":false,\"message\":\"Enrollment failed. You may already be enrolled or the event is full.\"}");
+                logger.warning("Enrollment failed for user " + userId + " in event " + eventId);
             }
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error processing enrollment request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\":false,\"message\":\"Server error\"}");
+            response.getWriter().write("{\"success\":false,\"message\":\"Server error occurred during enrollment\"}");
         }
     }
 }

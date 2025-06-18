@@ -108,16 +108,31 @@ public class EventDAO {
                     "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
                     "WHERE e.isactive = true GROUP BY e.event_id ORDER BY e.date";
         
+        logger.info("EventDAO: Executing SQL to get active events: " + sql);
+
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            logger.info("EventDAO: Connection established, executing query");
+            ResultSet rs = stmt.executeQuery();
+            logger.info("EventDAO: Query executed, processing results");
+
+            int count = 0;
             while (rs.next()) {
-                Event event = mapResultSetToEvent(rs);
-                events.add(event);
+                count++;
+                try {
+                    Event event = mapResultSetToEvent(rs);
+                    events.add(event);
+                    logger.info("EventDAO: Mapped event: " + event.getEventId() + " - " + event.getTitle());
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "EventDAO: Error mapping event from ResultSet", e);
+                }
             }
+
+            logger.info("EventDAO: Processed " + count + " rows, returning " + events.size() + " events");
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error getting active events", e);
+            logger.log(Level.SEVERE, "EventDAO: Error getting active events", e);
+            e.printStackTrace(); // Print stack trace for more detailed error information
         }
         
         return events;
@@ -425,23 +440,78 @@ public class EventDAO {
     }
 
     public boolean enrollUserInEvent(int userId, int eventId) {
-    // Implementation to enroll a user in an event
-    // Connect to database, execute SQL, etc.
-    try {
-        // Example implementation:
-        // connection = getConnection();
-        // String sql = "INSERT INTO event_enrollments (user_id, event_id) VALUES (?, ?)";
-        // PreparedStatement statement = connection.prepareStatement(sql);
-        // statement.setInt(1, userId);
-        // statement.setInt(2, eventId);
-        // int rowsInserted = statement.executeUpdate();
-        // return rowsInserted > 0;
-        
-        // Placeholder return until implemented
-        return true;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+        // Validate input IDs
+        if (!SecurityUtils.isValidUserId(userId) || !SecurityUtils.isValidUserId(eventId)) {
+            logger.warning("Invalid user ID or event ID for enrollment");
+            return false;
+        }
+
+        // First check if the event exists and has available slots
+        Event event = getEventById(eventId);
+        if (event == null) {
+            logger.warning("Cannot enroll: Event with ID " + eventId + " not found");
+            return false;
+        }
+
+        // Check if event is active
+        if (!event.isActive()) {
+            logger.warning("Cannot enroll: Event with ID " + eventId + " is not active");
+            return false;
+        }
+
+        // Check if event is full
+        if (event.getMaxParticipants() > 0 && event.getCurrentParticipants() >= event.getMaxParticipants()) {
+            logger.warning("Cannot enroll: Event with ID " + eventId + " is full");
+            return false;
+        }
+
+        // Check if user is already enrolled
+        String checkSql = "SELECT * FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+
+            // Check for existing enrollment
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, userId);
+                checkStmt.setInt(2, eventId);
+
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next()) {
+                    // User is already enrolled
+                    conn.rollback();
+                    logger.info("User " + userId + " is already enrolled in event " + eventId);
+                    return false;
+                }
+
+                // Insert new enrollment
+                String insertSql = "INSERT INTO mod4db.eventregistration (user_id, event_id, status, registration_date) VALUES (?, ?, ?, ?)";
+
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                    insertStmt.setInt(1, userId);
+                    insertStmt.setInt(2, eventId);
+                    insertStmt.setString(3, "confirmed");
+                    insertStmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+
+                    int rowsInserted = insertStmt.executeUpdate();
+
+                    if (rowsInserted > 0) {
+                        conn.commit();
+                        logger.info("Successfully enrolled user " + userId + " in event " + eventId);
+                        return true;
+                    } else {
+                        conn.rollback();
+                        logger.warning("Failed to enroll user in event");
+                        return false;
+                    }
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error while enrolling user in event", e);
+            return false;
+        }
     }
-}
 }

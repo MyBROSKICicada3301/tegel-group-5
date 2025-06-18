@@ -107,3 +107,5 @@ function keepSessionAlive() {
 if (document.cookie.includes('JSESSIONID')) {
     keepSessionAlive();
 }
+
+

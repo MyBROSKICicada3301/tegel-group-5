@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details | Tegel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffb56b;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .navbar-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+        }
+
+        .event-details-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .event-title {
+            color: #ff8c1a;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #ff8c1a;
+            padding-bottom: 15px;
+        }
+
+        .event-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #ff8c1a;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .info-value {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .description-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .description-title {
+            color: #ff8c1a;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .enrollment-section {
+            background: linear-gradient(135deg, #ff8c1a, #ffb56b);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .enrollment-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .enrollment-info {
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        .btn-enroll {
+            background: white;
+            color: #ff8c1a;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px;
+        }
+
+        .btn-enroll:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            color: #e67e22;
+        }
+
+        .btn-back {
+            background: linear-gradient(45deg, #6c757d, #868e96);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(45deg, #5a6268, #6c757d);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer {
+            background: #000;
+            color: white;
+            padding: 20px;
+        }
+
+        .footer img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .event-details-card {
+                padding: 25px;
+            }
+            
+            .event-title {
+                font-size: 28px;
+            }
+            
+            .event-info {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html" style="padding:0;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+            </ul>
+            <div id="authButtons">
+                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                <a href="login.html" class="btn btn-light">Login</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <a href="events.html" class="btn-back">← Back to Events</a>
+    
+    <div id="eventContent">
+        <div class="loading">Loading event details...</div>
+    </div>
+</main>
+
+<script>
+    // Dummy events for testing (same as in events.html)
+    const dummyEvents = [
+        {
+            eventId: 1,
+            id: 1,
+            title: "Group Game",
+            description: "Join us for an exciting evening of team-building games and friendly competition. We'll have board games, video games, and interactive group activities that will bring everyone together for a fun-filled experience. This event is perfect for both new and existing members to get to know each other better while having a great time.",
+            date: "2025-01-15",
+            location: "Tegel Community Center",
+            maxParticipants: 25,
+            currentParticipants: 8,
+            duration: "18:00 - 22:00"
+        },
+        {
+            eventId: 2,
+            id: 2,
+            title: "Outdoor Trek",
+            description: "Experience the beautiful nature around Enschede with a guided hiking adventure. We'll explore scenic trails, enjoy fresh air, and capture amazing photos while building lasting memories with fellow Tegel members. Bring comfortable hiking shoes and water. Light snacks will be provided during our rest stops.",
+            date: "2025-01-22",
+            location: "Lonnekerberg Trail, Enschede",
+            maxParticipants: 15,
+            currentParticipants: 12,
+            duration: "09:00 - 16:00"
+        },
+        {
+            eventId: 3,
+            id: 3,
+            title: "Module Ending Party",
+            description: "Celebrate the successful completion of another academic module with an unforgettable party! Dancing, great food, drinks, and the perfect opportunity to unwind and socialize with friends after all the hard work. DJ, photo booth, and surprise activities included. Come ready to party and celebrate your achievements!",
+            date: "2025-02-05",
+            location: "Inter-Actief Main Hall",
+            maxParticipants: 50,
+            currentParticipants: 23,
+            duration: "20:00 - 02:00"
+        }
+    ];
+
+    function getEventIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('eventId');
+    }
+
+    function loadEventDetails() {
+        const eventId = getEventIdFromURL();
+        
+        if (!eventId) {
+            document.getElementById('eventContent').innerHTML = `
+                <div class="error">
+                    <h3>Error</h3>
+                    <p>No event ID provided. Please select an event from the events page.</p>
+                    <a href="events.html" class="btn btn-enroll">Go to Events</a>
+                </div>
+            `;
+            return;
+        }
+
+        fetch(`/tegel_webapp/events/${eventId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Event not found');
+                }
+                return response.json();
+            })
+            .then(event => {
+                displayEventDetails(event);
+            })
+            .catch(error => {
+                console.error('Error loading event details from server, using dummy data:', error);
+                
+                // Try to find dummy event
+                const dummyEvent = dummyEvents.find(e => 
+                    e.eventId == eventId || e.id == eventId
+                );
+                
+                if (dummyEvent) {
+                    displayEventDetails(dummyEvent);
+                } else {
+                    document.getElementById('eventContent').innerHTML = `
+                        <div class="error">
+                            <h3>Error</h3>
+                            <p>Event not found. The event might not exist or there was a server error.</p>
+                            <a href="events.html" class="btn btn-enroll">Go to Events</a>
+                        </div>
+                    `;
+                }
+            });
+    }
+
+    function displayEventDetails(event) {
+        let duration = 'Duration not specified';
+        if (event.startTime && event.endTime) {
+            duration = `${event.startTime} - ${event.endTime}`;
+        } else if (event.duration) {
+            duration = event.duration;
+        }
+
+        // Format date for display
+        let displayDate = event.date;
+        if (event.date) {
+            const eventDate = new Date(event.date);
+            displayDate = eventDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        const enrollmentStatus = event.currentParticipants >= event.maxParticipants ? 'full' : 'available';
+        const enrollmentText = enrollmentStatus === 'full' ? 'Event Full' : 'Spots Available';
+        
+        document.getElementById('eventContent').innerHTML = `
+            <div class="event-details-card">
+                <h1 class="event-title">${event.title}</h1>
+                
+                <div class="event-info">
+                    <div class="info-section">
+                        <div class="info-label">📅 Date</div>
+                        <div class="info-value">${displayDate}</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">📍 Location</div>
+                        <div class="info-value">${event.location || 'Location TBA'}</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">⏰ Duration</div>
+                        <div class="info-value">${duration}</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-label">👥 Participants</div>
+                        <div class="info-value">
+                            ${event.currentParticipants || 0} / ${event.maxParticipants || 'Unlimited'} enrolled
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="description-section">
+                    <h3 class="description-title">Event Description</h3>
+                    <p class="info-value">${event.description || 'No detailed description available for this event.'}</p>
+                </div>
+                
+                <div class="enrollment-section">
+                    <h3 class="enrollment-title">Ready to Join?</h3>
+                    <p class="enrollment-info">${enrollmentText}</p>
+                    ${enrollmentStatus === 'available' ? 
+                        `<button class="btn-enroll" onclick="enrollInEvent(${event.id || event.eventId})">
+                            Enroll Now
+                        </button>` :
+                        `<button class="btn-enroll" disabled style="opacity: 0.6; cursor: not-allowed;">
+                            Event Full
+                        </button>`
+                    }
+                    <button class="btn-enroll" onclick="window.location.href='events.html'">
+                        Browse Other Events
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function enrollInEvent(eventId) {
+        // Check if user is logged in (you might want to implement this check)
+        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        
+        if (!isLoggedIn) {
+            alert('Please log in to enroll in events.');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Send enrollment request
+        fetch('/events/enroll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                eventId: eventId,
+                userId: localStorage.getItem('userId') // Assuming you store user ID in localStorage
+            })
+        })
+        .then(response => response.json())
+        .then data => {
+            if (data.success) {
+                alert('Successfully enrolled in the event!');
+                loadEventDetails(); // Reload to update participant count
+            } else {
+                alert(data.message || 'Failed to enroll in the event.');
+            }
+        })
+        .catch(error => {
+            console.error('Error enrolling in event:', error);
+            alert('An error occurred while enrolling. Please try again.');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadEventDetails);
+</script>
+
+<footer class="footer">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="social-links">
+            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
+            </a>
+            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
+            </a>
+        </div>
+        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
+        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
+    </div>
+</footer>
+
+<script src="js/session-manager.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Tegel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffb56b;
+            margin: 0;
+            padding: 0;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .navbar-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .hero-section {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(45deg, #4CAF50 0%, #2E7D32 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            margin-bottom: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><defs><pattern id="hexagons" patternUnits="userSpaceOnUse" width="100" height="87"><polygon points="50,0 93.3,25 93.3,75 50,100 6.7,75 6.7,25" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23hexagons)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .content-card h3 {
+            color: #b4afaa;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ff8c1a;
+            padding-bottom: 10px;
+        }
+
+        .content-card p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .event-date {
+            color: #ff8c1a;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .event-title {
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .newsletter-card {
+            grid-column: 1 / -1;
+        }
+
+        .footer {
+            background: #000;
+            color: white;
+            padding: 25px 0;
+            margin-top: auto;
+        }
+
+        .footer img {
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        .footer a {
+            text-decoration: none;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            
+            .content-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html" style="padding:0;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+            </ul>
+            <div id="authButtons">
+                <a href="signup.html" class="btn btn-light me-2" id="signupBtn">Sign Up</a>
+                <a href="login.html" class="btn btn-light" id="loginBtn">Login</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid">
+    <div class="hero-section">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Admin/member/user</h1>
+            <p class="hero-subtitle">No slideshow yet☠️</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content-grid">
+            <div class="content-card">
+                <h3>ABOUT</h3>
+                <p>S.G.V. Tegel is a close-knit group of friends from Enschede, actively engaged in the study association Inter-Actief and broader university activities.</p>
+            </div>
+            
+            <div class="content-card">
+                <h3>YOUR EVENTS</h3>
+                <div class="event-date">May 16, Thu</div>
+                <div class="event-title">Lunch Lecture | Nord Security</div>
+            </div>
+        </div>
+        
+        <div class="content-card newsletter-card" style="margin-top: 30px;">
+            <h3>Newsletter</h3>
+            <div class="event-date">Jun 5, Sat</div>
+            <div class="event-title">Module End | Aspen Valley</div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="social-links">
+            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
+            </a>
+            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
+            </a>
+        </div>
+        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
+        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
+    </div>
+</footer>
+
+<script src="js/session-manager.js"></script>
+
+</body>
+</html>

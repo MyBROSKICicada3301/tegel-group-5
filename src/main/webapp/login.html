@@ -207,6 +207,44 @@
 
 <script src="js/session-manager.js"></script>
 <script>
+    // Check for error parameters in URL and display appropriate message
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+
+        if (error) {
+            const errorMessages = {
+                'wrong_password': 'Enter a valid Username or Password',
+                'user_not_found': 'Enter a valid Username or Password',
+                'invalid_email': 'Enter a valid Username or Password',
+                'missing': 'Please enter both email and password.',
+                'security': 'Security issue detected. Please try again.',
+                'server': 'Server error. Please try again later.',
+                'invalid': 'Invalid login credentials. Please try again.'
+            };
+
+            const message = errorMessages[error] || 'Login failed. Please try again.';
+
+            // Create a dismissible alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            // Insert the alert before the form
+            const loginForm = document.getElementById('loginForm');
+            loginForm.parentNode.insertBefore(alertDiv, loginForm);
+
+            // Focus on password field if it was a wrong password error
+            if (error === 'wrong_password') {
+                document.getElementById('password').focus();
+            }
+        }
+    };
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -222,8 +260,11 @@
         .then(response => {
             if (response.redirected) {
                 window.location.href = response.url;
-            } else {
-                alert('Invalid email or password');
+            }
+            // Client-side validation - the server should handle most cases
+            else {
+                console.error('Login failed: Server returned non-redirect response');
+                alert('Login failed. Please try again.');
             }
         })
         .catch(error => {

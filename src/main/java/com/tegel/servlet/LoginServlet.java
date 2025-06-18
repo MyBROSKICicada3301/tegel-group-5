@@ -22,14 +22,14 @@ public class LoginServlet extends HttpServlet {
     private UserDAO userDAO = new UserDAO();
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         System.out.println("doPost called in /login");
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        
+
         try {
             // Validate inputs
             if (email == null || password == null || email.trim().isEmpty() || password.isEmpty()) {
@@ -37,31 +37,31 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect("login.html?error=invalid");
                 return;
             }
-            
+
             // Sanitize email
             email = SecurityUtils.sanitizeInput(email).toLowerCase().trim();
-            
+
             if (!SecurityUtils.isValidEmail(email)) {
                 logger.warning("Login attempt with invalid email format: " + email);
                 response.sendRedirect("login.html?error=invalid");
                 return;
             }
-            
+
             // Get user from database
             User user = userDAO.getUserByEmail(email);
-            
+
             if (user != null && SecurityUtils.verifyPassword(password, user.getPasswordHash())) {
                 // Successful login
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
                 session.setAttribute("userId", user.getUserId());
                 session.setAttribute("userRole", user.getRole());
-                
+
                 // Set session timeout (30 minutes)
                 session.setMaxInactiveInterval(1800);
-                
+
                 logger.info("Successful login for user: " + email);
-                
+
                 // Redirect based on role
                 if ("admin".equals(user.getRole())) {
                     response.sendRedirect("adminindex.html");
@@ -72,7 +72,7 @@ public class LoginServlet extends HttpServlet {
                 logger.warning("Failed login attempt for email: " + email);
                 response.sendRedirect("login.html?error=invalid");
             }
-            
+
         } catch (SecurityException e) {
             logger.severe("Security violation during login: " + e.getMessage());
             response.sendRedirect("login.html?error=invalid");

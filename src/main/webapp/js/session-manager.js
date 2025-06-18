@@ -7,13 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to check if user is logged in by checking for session
 function checkLoginStatus() {
+    debug.log("SessionManager", "Checking login status...");
     fetch('/tegel_webapp/check-session', {
         method: 'GET',
         credentials: 'include'
     })
     .then(response => response.json())
     .then(data => {
+        debug.log("SessionManager", "Login status response:", data);
         if(data.loggedIn) {
+            debug.log("SessionManager", "User is logged in with role:", data.role);
             // User is logged in, update navigation buttons
             const authButtons = document.getElementById('authButtons');
             if (authButtons) {
@@ -25,14 +28,15 @@ function checkLoginStatus() {
                 // Add click event listener to sign out button
                 document.getElementById('signoutBtn').addEventListener('click', function(e) {
                     e.preventDefault();
+                    debug.log("SessionManager", "Sign out button clicked");
                     signOut();
                 });
 
                 // Add click event for account button
                 document.getElementById('accountBtn').addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Redirect to account page or show account info
-                    alert('Account functionality coming soon!');
+                    debug.log("SessionManager", "Account button clicked, redirecting to account.html");
+                    window.location.href = 'account.html';
                 });
             }
 
@@ -45,15 +49,17 @@ function checkLoginStatus() {
                 });
             }
         } else {
+            debug.log("SessionManager", "User is not logged in");
             // User is not logged in
             // If trying to access protected pages, redirect to login
             if (isProtectedPage()) {
+                debug.log("SessionManager", "Redirecting to login from protected page");
                 window.location.href = 'login.html';
             }
         }
     })
     .catch(error => {
-        console.error('Error checking login status:', error);
+        debug.error('SessionManager', 'Error checking login status:', error);
     });
 }
 
@@ -64,7 +70,8 @@ function isProtectedPage() {
         '/admin',
         '/admin.html',
         '/adminindex.html',
-        '/admin-create.html'
+        '/admin-create.html',
+        '/account.html'
     ];
 
     const currentPath = window.location.pathname;
@@ -86,7 +93,7 @@ function signOut() {
         window.location.href = 'index.html';
     })
     .catch(error => {
-        console.error('Error signing out:', error);
+        debug.error('SessionManager', 'Error signing out:', error);
     });
 }
 
@@ -98,7 +105,7 @@ function keepSessionAlive() {
             method: 'GET',
             credentials: 'include'
         }).catch(error => {
-            console.error('Error keeping session alive:', error);
+            debug.error('SessionManager', 'Error keeping session alive:', error);
         });
     }, 60000); // 60,000 ms = 1 minute
 }
@@ -107,5 +114,3 @@ function keepSessionAlive() {
 if (document.cookie.includes('JSESSIONID')) {
     keepSessionAlive();
 }
-
-

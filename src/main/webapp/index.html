@@ -36,7 +36,6 @@
         .hero-section {
             position: relative;
             height: 400px;
-            background: linear-gradient(45deg, #4CAF50 0%, #2E7D32 100%);
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 40px;
@@ -66,13 +65,18 @@
         }
 
         .hero-background {
-            position: absolute;
-            top: 0;
-            left: 0;
+            display: none; /* Hide the hexagon background pattern */
+        }
+
+        .carousel-inner, .carousel-item {
+            height: 100%;
+            width: 100%;
+        }
+
+        .carousel-item img {
             width: 100%;
             height: 100%;
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400"><defs><pattern id="hexagons" patternUnits="userSpaceOnUse" width="100" height="87"><polygon points="50,0 93.3,25 93.3,75 50,100 6.7,75 6.7,25" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23hexagons)"/></svg>');
-            opacity: 0.3;
+            object-fit: cover;
         }
 
         .content-grid {
@@ -119,10 +123,63 @@
         .event-title {
             color: #333;
             margin-top: 5px;
+            font-weight: 600;
+            font-size: 18px;
         }
 
         .newsletter-card {
             grid-column: 1 / -1;
+            background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+            overflow: hidden;
+        }
+
+        .newsletter-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .newsletter-item:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .newsletter-item:last-child {
+            border-bottom: none;
+        }
+
+        .newsletter-view-btn {
+            background: #ff8c1a;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .newsletter-view-btn:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .newsletter-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #666;
         }
 
         .footer {
@@ -207,12 +264,45 @@
 </nav>
 
 <main class="container-fluid">
-    <div class="hero-section">
-        <div class="hero-background"></div>
-        <div class="hero-content">
-            <h1 class="hero-title">Admin/member/user</h1>
-            <p class="hero-subtitle">No slideshow yet☠️</p>
+    <div id="heroSlideshow" class="carousel slide hero-section" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="images/slideshow/uni1.jpg" class="d-block w-100 h-100" style="object-fit: cover;" alt="University Image 1">
+                <div class="carousel-caption hero-content">
+                    <h1 class="hero-title">Welcome to Tegel</h1>
+                    <p class="hero-subtitle">Your student group at the University of Twente</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="images/slideshow/uni2.jpg" class="d-block w-100 h-100" style="object-fit: cover;" alt="University Image 2">
+                <div class="carousel-caption hero-content">
+                    <h1 class="hero-title">Join Our Events</h1>
+                    <p class="hero-subtitle">Connect with the community</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="images/slideshow/uni3.jpg" class="d-block w-100 h-100" style="object-fit: cover;" alt="University Image 3">
+                <div class="carousel-caption hero-content">
+                    <h1 class="hero-title">Stay Updated</h1>
+                    <p class="hero-subtitle">With our latest newsletters</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="images/slideshow/uni4.jpg" class="d-block w-100 h-100" style="object-fit: cover;" alt="University Image 4">
+                <div class="carousel-caption hero-content">
+                    <h1 class="hero-title">S.G.V. Tegel</h1>
+                    <p class="hero-subtitle">A community that feels like home</p>
+                </div>
+            </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroSlideshow" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroSlideshow" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
 
     <div class="container">
@@ -231,8 +321,14 @@
         
         <div class="content-card newsletter-card" style="margin-top: 30px;">
             <h3>Newsletter</h3>
-            <div class="event-date">Jun 5, Sat</div>
-            <div class="event-title">Module End | Aspen Valley</div>
+            <div id="newsletterContent">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <p class="text-center mt-2">Loading newsletters from database...</p>
+            </div>
         </div>
     </div>
 </main>
@@ -252,7 +348,145 @@
     </div>
 </footer>
 
+<script src="js/debug-utils.js"></script>
 <script src="js/session-manager.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Run path analysis to help debug URL issues
+        const pathAnalysis = debug.analyzePaths();
+        debug.info("System", "Path analysis complete", pathAnalysis);
+
+        // Test multiple URL variations to find which works
+        debug.testUrlVariations(window.location.origin, [
+            '/newsletters',
+            '/tegel-webapp/newsletters',
+            pathAnalysis.contextPath + '/newsletters',
+            '/api/newsletters',
+            '/services/newsletters'
+        ]);
+
+        // Load newsletters when the page loads
+        loadNewsletters();
+    });
+
+    // Function to load the latest newsletters from the mod4db.newsletter schema
+    function loadNewsletters() {
+        debug.info("Newsletter", "Fetching newsletters from the database...");
+
+        // Determine the absolute base URL for API calls
+        const baseUrl = window.location.origin;
+        // Get the context path based on current URL
+        const fullPath = window.location.pathname;
+        const pathParts = fullPath.split('/');
+        const contextPath = '/' + (pathParts[1] || '');
+
+        debug.info("Newsletter", `Using context path: ${contextPath}`);
+
+        // Construct the API URL for newsletters
+        const apiUrl = baseUrl + contextPath + '/newsletters';
+        debug.info("Newsletter", `Full request URL: ${apiUrl}`);
+
+        // Get the container where newsletters will be displayed
+        const newsletterContainer = document.getElementById('newsletterContent');
+
+        // Make a request to the newsletter servlet
+        fetch(apiUrl)
+            .then(response => {
+                debug.info("Newsletter", `Response received with status: ${response.status} ${response.statusText}`);
+                debug.info("Newsletter", "Full response object:", response);
+
+                // Check response headers
+                let headers = {};
+                response.headers.forEach((value, name) => {
+                    headers[name] = value;
+                });
+                debug.info("Newsletter", "Response headers:", headers);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load newsletters. Server returned ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                debug.info("Newsletter", "Newsletter data received:", data);
+
+                // Check if newsletters array exists and is not empty
+                if (data.newsletters && data.newsletters.length > 0) {
+                    debug.info("Newsletter", `Found ${data.newsletters.length} newsletters`);
+                    displayNewsletters(data.newsletters);
+                } else {
+                    debug.warn("Newsletter", "No newsletters found in response");
+                    newsletterContainer.innerHTML = `
+                        <div class="alert alert-info" role="alert">
+                            No newsletters are currently available.
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                debug.error("Newsletter", "Error loading newsletters:", error);
+
+                // Try to determine the root cause of the error
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    debug.error("Newsletter", "Network error - server might be down or CORS issue");
+                }
+
+                newsletterContainer.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <h5>Error Loading Newsletters</h5>
+                        <p>Could not load newsletters from the database. Please try again later.</p>
+                        <small class="d-block mt-2">Technical details: ${error.message}</small>
+                    </div>
+                `;
+            });
+    }
+
+    // Function to display newsletter previews
+    function displayNewsletters(newsletters) {
+        const newsletterContainer = document.getElementById('newsletterContent');
+        let html = '';
+
+        // Sort newsletters by publish date, newest first
+        newsletters.sort((a, b) => {
+            return new Date(b.publishDate) - new Date(a.publishDate);
+        });
+
+        // Generate HTML for each newsletter preview
+        newsletters.forEach(newsletter => {
+            // Format the date for display
+            let formattedDate = 'Date not available';
+            if (newsletter.publishDate) {
+                const date = new Date(newsletter.publishDate);
+                formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+
+            // Create a preview of the content (first 150 characters)
+            let contentPreview = newsletter.content || 'No content available';
+            contentPreview = contentPreview.substring(0, 150) + (contentPreview.length > 150 ? '...' : '');
+
+            html += `
+                <div class="newsletter-item">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="mb-0">${newsletter.title || 'Untitled Newsletter'}</h5>
+                        <small class="text-muted">${formattedDate}</small>
+                    </div>
+                    <p class="mb-2">${contentPreview}</p>
+                    <div class="text-end">
+                        <a href="newsletter.html?id=${newsletter.newsletterId}" class="newsletter-view-btn">Read More</a>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Update the container with all newsletter previews
+        newsletterContainer.innerHTML = html;
+        debug.info("Newsletter", "Newsletters displayed successfully");
+    }
+</script>
 
 </body>
 </html>

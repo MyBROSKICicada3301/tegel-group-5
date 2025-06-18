@@ -438,62 +438,106 @@
         try {
             console.log("Starting enrollment process for event ID:", eventId);
 
-            // Check if user is logged in
-            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-
-            if (!isLoggedIn) {
-                alert('Please log in to enroll in events.');
-                window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
-                return;
-            }
-
-            // Get user ID from localStorage
-            const userId = localStorage.getItem('userId');
-            if (!userId) {
-                alert('User information not found. Please log in again.');
-                window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
-                return;
-            }
-
-            console.log("User ID:", userId, "Event ID:", eventId);
-
-            // Create request payload
-            const payload = {
-                eventId: parseInt(eventId, 10),
-                userId: parseInt(userId, 10)
-            };
-
-            console.log("Sending enrollment request with payload:", payload);
-
-            // Send enrollment request to server
-            fetch('/tegel_webapp/events/enroll', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+            // Check if user is logged in by asking the server
+            fetch('/tegel_webapp/check-session', {
+                method: 'GET',
+                credentials: 'include'
             })
-            .then(function(response) {
-                console.log("Response received:", response.status);
-                return response.json();
-            })
-            .then(function(responseData) {
-                console.log("Response data:", responseData);
-                if (responseData.success) {
-                    alert('Successfully enrolled in the event!');
-                    loadEventDetails(); // Reload to update participant count
+            .then(response => response.json())
+            .then(sessionData => {
+                if (sessionData.loggedIn) {
+                    // Get userId from localStorage
+                    let userId = localStorage.getItem('userId');
+                    console.log("User is logged in. Using localStorage userId:", userId);
+
+                    // If userId is not in localStorage but user is logged in,
+                    // we need to get the userId from session and store it
+                    if (!userId) {
+                        console.log("User ID not found in localStorage. Fetching from session...");
+
+                        // Create a temporary endpoint call to get the userId from session
+                        return fetch('/tegel_webapp/user-info', {
+                            method: 'GET',
+                            credentials: 'include'
+                        })
+                        .then(response => response.json())
+                        .then(userData => {
+                            if (userData && userData.userId) {
+                                console.log("Retrieved userId from session:", userData.userId);
+
+                                // Store userId in localStorage for future use
+                                localStorage.setItem('userId', userData.userId);
+                                localStorage.setItem('userLoggedIn', 'true');
+
+                                // Continue with enrollment using the newly retrieved userId
+                                return enrollWithUserId(eventId, userData.userId);
+                            } else {
+                                throw new Error("Could not retrieve user ID from session");
+                            }
+                        });
+                    } else {
+                        // Continue with enrollment using the userId from localStorage
+                        return enrollWithUserId(eventId, userId);
+                    }
                 } else {
-                    alert(responseData.message || 'Failed to enroll in the event.');
+                    console.log("Server reports user is not logged in");
+                    throw new Error("Not logged in");
                 }
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.error("Error during enrollment:", error);
-                alert('An error occurred while enrolling. Please try again later.');
+                if (error.message === "Not logged in") {
+                    alert('Please log in to enroll in events.');
+                    window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
+                } else if (error.message.includes("User ID")) {
+                    alert('Your login session is incomplete. Please log in again.');
+                    // Clear potentially corrupt login data
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userLoggedIn');
+                    window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
+                } else {
+                    alert('An error occurred while enrolling. Please try again later.');
+                }
             });
         } catch (error) {
             console.error("Exception in enrollInEvent:", error);
             alert('An unexpected error occurred. Please try again later.');
         }
+    }
+
+    // Helper function to send the actual enrollment request
+    function enrollWithUserId(eventId, userId) {
+        // Create request payload
+        const payload = {
+            eventId: parseInt(eventId, 10),
+            userId: parseInt(userId, 10)
+        };
+
+        console.log("Sending enrollment request with payload:", payload);
+
+        // Send enrollment request to server
+        return fetch('/tegel_webapp/events/enroll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log("Enrollment response received:", response.status);
+            return response.json();
+        })
+        .then(responseData => {
+            console.log("Response data:", responseData);
+            if (responseData.success) {
+                alert('Successfully enrolled in the event!');
+                loadEventDetails(); // Reload to update participant count
+            } else {
+                alert(responseData.message || 'Failed to enroll in the event.');
+            }
+            return responseData;
+        });
     }
 
     // Initialize on page load

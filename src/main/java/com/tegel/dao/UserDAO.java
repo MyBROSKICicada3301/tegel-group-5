@@ -229,33 +229,110 @@ public class UserDAO {
         return null;
     }
     
-    private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        try {
-            User user = new User();
-            user.setUserId(rs.getInt("user_id"));
-            user.setEmail(rs.getString("email"));
-            user.setPasswordHash(rs.getString("passwordhash"));
-            user.setPhoneNumber(rs.getString("phonenumber"));
-
-            Date dateOfBirth = rs.getDate("dateofbirth");
-            if (dateOfBirth != null) {
-                user.setDateOfBirth(dateOfBirth.toLocalDate());
-            }
-
-            Timestamp createDate = rs.getTimestamp("createdate");
-            if (createDate != null) {
-                user.setCreateDate(createDate.toLocalDateTime());
-            }
-
-            user.setDietRes(rs.getString("dietres"));
-            user.setRole(rs.getString("role"));
-            user.setFullName(rs.getString("full_name"));
-            user.setNickName(rs.getString("nick_name"));
-
-            return user;
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error mapping ResultSet to User", e);
-            throw new SQLException("Error mapping user data", e);
+    // Get user by ID
+    public User getUserById(int userId) {
+        // Validate user ID
+        if (!SecurityUtils.isValidUserId(userId)) {
+            logger.warning("Invalid userId provided: " + userId);
+            return null;
         }
+
+        String sql = "SELECT * FROM mod4db.users WHERE user_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return mapResultSetToUser(rs);
+            } else {
+                logger.warning("No user found with ID: " + userId);
+                return null;
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error retrieving user by ID: " + userId, e);
+            return null;
+        }
+    }
+
+    // Update existing user
+    public boolean updateUser(User user) {
+        // Input validation before database operation
+        if (user == null || !SecurityUtils.isValidUserId(user.getUserId())) {
+            logger.warning("Invalid user data for update");
+            return false;
+        }
+
+        String sql = "UPDATE mod4db.users SET " +
+                    "email = ?, " +
+                    "password_hash = ?, " +
+                    "phone_number = ?, " +
+                    "date_of_birth = ?, " +
+                    "diet_res = ?, " +
+                    "full_name = ?, " +
+                    "nick_name = ? " +
+                    "WHERE user_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Sanitize inputs before database call
+            stmt.setString(1, SecurityUtils.sanitizeInput(user.getEmail().toLowerCase().trim()));
+            stmt.setString(2, user.getPasswordHash()); // Already hashed, don't sanitize
+            stmt.setString(3, user.getPhoneNumber() != null ?
+                SecurityUtils.sanitizeInput(user.getPhoneNumber()) : null);
+            stmt.setDate(4, user.getDateOfBirth() != null ?
+                Date.valueOf(user.getDateOfBirth()) : null);
+            stmt.setString(5, user.getDietRes() != null ?
+                SecurityUtils.sanitizeTextArea(user.getDietRes()) : null);
+            stmt.setString(6, SecurityUtils.sanitizeInput(user.getFullName()));
+            stmt.setString(7, user.getNickName() != null ?
+                SecurityUtils.sanitizeInput(user.getNickName()) : null);
+            stmt.setInt(8, user.getUserId());
+
+            int rowsUpdated = stmt.executeUpdate();
+            boolean success = rowsUpdated > 0;
+
+            if (success) {
+                logger.info("User updated successfully: " + user.getUserId());
+            } else {
+                logger.warning("No user updated with ID: " + user.getUserId());
+            }
+
+            return success;
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error updating user: " + user.getUserId(), e);
+            return false;
+        }
+    }
+
+    // Helper method to map ResultSet to User object
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getInt("user_id"));
+        user.setEmail(rs.getString("email"));
+        user.setPasswordHash(rs.getString("passwordhash"));
+        user.setPhoneNumber(rs.getString("phonenumber"));
+
+        Date dateOfBirth = rs.getDate("dateofbirth");
+        if (dateOfBirth != null) {
+            user.setDateOfBirth(dateOfBirth.toLocalDate());
+        }
+
+        Timestamp createDate = rs.getTimestamp("createdate");
+        if (createDate != null) {
+            user.setCreateDate(createDate.toLocalDateTime());
+        }
+
+        user.setDietRes(rs.getString("dietres"));
+        user.setRole(rs.getString("role"));
+        user.setFullName(rs.getString("full_name"));
+        user.setNickName(rs.getString("nick_name"));
+
+        return user;
     }
 }

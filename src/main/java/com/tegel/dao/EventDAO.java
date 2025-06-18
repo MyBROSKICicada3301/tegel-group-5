@@ -485,13 +485,12 @@ public class EventDAO {
                 }
 
                 // Insert new enrollment
-                String insertSql = "INSERT INTO mod4db.eventregistration (user_id, event_id, status, registration_date) VALUES (?, ?, ?, ?)";
+                String insertSql = "INSERT INTO mod4db.eventregistration (user_id, event_id, status) VALUES (?, ?, ?)";
 
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setInt(1, userId);
                     insertStmt.setInt(2, eventId);
                     insertStmt.setString(3, "confirmed");
-                    insertStmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
 
                     int rowsInserted = insertStmt.executeUpdate();
 
@@ -513,5 +512,42 @@ public class EventDAO {
             logger.log(Level.SEVERE, "Database error while enrolling user in event", e);
             return false;
         }
+    }
+
+    /**
+     * Get all events a user has enrolled in
+     * @param userId The ID of the user
+     * @return A list of events the user has enrolled in
+     */
+    public List<Event> getEnrolledEventsByUserId(int userId) {
+        // Validate user ID
+        if (!SecurityUtils.isValidUserId(userId)) {
+            logger.warning("Invalid userId for enrolled events: " + userId);
+            return new ArrayList<>();
+        }
+
+        List<Event> events = new ArrayList<>();
+        String sql = "SELECT e.* FROM mod4db.event e " +
+                    "JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
+                    "WHERE er.user_id = ? AND er.status = 'confirmed' " +
+                    "ORDER BY e.date";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                events.add(mapResultSetToEvent(rs));
+            }
+
+            logger.info("Retrieved " + events.size() + " enrolled events for user: " + userId);
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error retrieving enrolled events for user: " + userId, e);
+        }
+
+        return events;
     }
 }

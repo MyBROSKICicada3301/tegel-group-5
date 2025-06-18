@@ -1,6 +1,7 @@
 package com.tegel.servlet;
 
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,7 +26,15 @@ public class EventServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            System.out.println("Session received with ID: " + session.getId());
+            System.out.println("Session user attribute: " + session.getAttribute("user"));
+        } else {
+            System.out.println("No session received in this request.");
+        }
+
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         

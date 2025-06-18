@@ -30,6 +30,7 @@ public class EventManagementServlet extends HttpServlet {
     private Gson gson;
     
     public EventManagementServlet() {
+
         // Configure Gson with custom serializers for LocalDate and LocalDateTime
         this.gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> 
@@ -107,7 +108,7 @@ public class EventManagementServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
+
         if (!isAuthorized(request, response)) return;
         
         response.setContentType("application/json");

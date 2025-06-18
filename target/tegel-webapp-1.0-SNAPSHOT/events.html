@@ -197,10 +197,27 @@
     ];
 
     function loadEvents() {
+        console.log('Loading events...');
         fetch('/tegel_webapp/events')
-            .then(response => response.json())
-            .then(events => {
-                displayEvents(events);
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.text(); // Get response as text first for debugging
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                try {
+                    const events = JSON.parse(text);
+                    console.log('Parsed events:', events);
+                    if (!Array.isArray(events)) {
+                        console.error('Events is not an array:', events);
+                        throw new Error('Expected array of events');
+                    }
+                    displayEvents(events);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    displayEvents(dummyEvents);
+                }
             })
             .catch(error => {
                 console.error('Error loading events from server, using dummy data:', error);

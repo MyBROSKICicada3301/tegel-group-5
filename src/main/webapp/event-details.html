@@ -199,11 +199,11 @@
             .event-details-card {
                 padding: 25px;
             }
-            
+
             .event-title {
                 font-size: 28px;
             }
-            
+
             .event-info {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -239,18 +239,17 @@
 
 <main class="container">
     <a href="events.html" class="btn-back">← Back to Events</a>
-    
+
     <div id="eventContent">
         <div class="loading">Loading event details...</div>
     </div>
 </main>
 
 <script>
-    // Dummy events for testing (same as in events.html)
+    // Dummy events for testing when backend is unavailable
     const dummyEvents = [
         {
             eventId: 1,
-            id: 1,
             title: "Group Game",
             description: "Join us for an exciting evening of team-building games and friendly competition. We'll have board games, video games, and interactive group activities that will bring everyone together for a fun-filled experience. This event is perfect for both new and existing members to get to know each other better while having a great time.",
             date: "2025-01-15",
@@ -261,7 +260,6 @@
         },
         {
             eventId: 2,
-            id: 2,
             title: "Outdoor Trek",
             description: "Experience the beautiful nature around Enschede with a guided hiking adventure. We'll explore scenic trails, enjoy fresh air, and capture amazing photos while building lasting memories with fellow Tegel members. Bring comfortable hiking shoes and water. Light snacks will be provided during our rest stops.",
             date: "2025-01-22",
@@ -272,7 +270,6 @@
         },
         {
             eventId: 3,
-            id: 3,
             title: "Module Ending Party",
             description: "Celebrate the successful completion of another academic module with an unforgettable party! Dancing, great food, drinks, and the perfect opportunity to unwind and socialize with friends after all the hard work. DJ, photo booth, and surprise activities included. Come ready to party and celebrate your achievements!",
             date: "2025-02-05",
@@ -283,14 +280,17 @@
         }
     ];
 
+    // Extract event ID from URL query parameters
     function getEventIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get('eventId');
     }
 
+    // Load event details from server or use dummy data as fallback
     function loadEventDetails() {
         const eventId = getEventIdFromURL();
-        
+
+        // Show error if no event ID is provided
         if (!eventId) {
             document.getElementById('eventContent').innerHTML = `
                 <div class="error">
@@ -302,31 +302,45 @@
             return;
         }
 
+        console.log(`Attempting to load details for event ID: ${eventId}`);
+
+        // Display loading indicator
+        document.getElementById('eventContent').innerHTML = `
+            <div class="loading">Loading event details for Event #${eventId}...</div>
+        `;
+
+        // Attempt to fetch event details from server
         fetch(`/tegel_webapp/events/${eventId}`)
             .then(response => {
+                console.log(`Server response for event ${eventId}:`, response.status, response.statusText);
                 if (!response.ok) {
-                    throw new Error('Event not found');
+                    throw new Error(`Event not found (Status ${response.status})`);
                 }
                 return response.json();
             })
             .then(event => {
-                displayEventDetails(event);
+                console.log('Event data received:', event);
+                if (event && event.eventId) {
+                    displayEventDetails(event);
+                } else {
+                    throw new Error('Invalid event data received');
+                }
             })
             .catch(error => {
-                console.error('Error loading event details from server, using dummy data:', error);
-                
-                // Try to find dummy event
-                const dummyEvent = dummyEvents.find(e => 
-                    e.eventId == eventId || e.id == eventId
-                );
-                
+                console.error(`Error loading event ${eventId}:`, error);
+
+                // Try to find dummy event as fallback
+                const dummyEvent = dummyEvents.find(e => e.eventId == eventId);
+
                 if (dummyEvent) {
+                    console.log('Using dummy event data:', dummyEvent);
                     displayEventDetails(dummyEvent);
                 } else {
                     document.getElementById('eventContent').innerHTML = `
                         <div class="error">
-                            <h3>Error</h3>
-                            <p>Event not found. The event might not exist or there was a server error.</p>
+                            <h3>Error Loading Event #${eventId}</h3>
+                            <p>Could not find event with ID ${eventId}. The event might not exist or there was a server error.</p>
+                            <p>Technical details: ${error.message}</p>
                             <a href="events.html" class="btn btn-enroll">Go to Events</a>
                         </div>
                     `;
@@ -334,6 +348,7 @@
             });
     }
 
+    // Display event details in the UI
     function displayEventDetails(event) {
         let duration = 'Duration not specified';
         if (event.startTime && event.endTime) {
@@ -345,56 +360,65 @@
         // Format date for display
         let displayDate = event.date;
         if (event.date) {
-            const eventDate = new Date(event.date);
-            displayDate = eventDate.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
+            try {
+                const eventDate = new Date(event.date);
+                displayDate = eventDate.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.warn('Error formatting date:', e);
+                // Keep the original date format if parsing fails
+            }
         }
 
-        const enrollmentStatus = event.currentParticipants >= event.maxParticipants ? 'full' : 'available';
+        // Check if event is full
+        const maxParticipants = event.maxParticipants || 0;
+        const currentParticipants = event.currentParticipants || 0;
+        const enrollmentStatus = maxParticipants > 0 && currentParticipants >= maxParticipants ? 'full' : 'available';
         const enrollmentText = enrollmentStatus === 'full' ? 'Event Full' : 'Spots Available';
-        
+
+        // Update the UI with event details
         document.getElementById('eventContent').innerHTML = `
             <div class="event-details-card">
-                <h1 class="event-title">${event.title}</h1>
-                
+                <h1 class="event-title">${event.title || 'Unnamed Event'}</h1>
+
                 <div class="event-info">
                     <div class="info-section">
                         <div class="info-label">📅 Date</div>
-                        <div class="info-value">${displayDate}</div>
+                        <div class="info-value">${displayDate || 'Date not specified'}</div>
                     </div>
-                    
+
                     <div class="info-section">
                         <div class="info-label">📍 Location</div>
-                        <div class="info-value">${event.location || 'Location TBA'}</div>
+                        <div class="info-value">${event.location || 'Location not specified'}</div>
                     </div>
-                    
+
                     <div class="info-section">
                         <div class="info-label">⏰ Duration</div>
                         <div class="info-value">${duration}</div>
                     </div>
-                    
+
                     <div class="info-section">
                         <div class="info-label">👥 Participants</div>
                         <div class="info-value">
-                            ${event.currentParticipants || 0} / ${event.maxParticipants || 'Unlimited'} enrolled
+                            ${currentParticipants} / ${maxParticipants > 0 ? maxParticipants : 'Unlimited'} enrolled
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="description-section">
                     <h3 class="description-title">Event Description</h3>
-                    <p class="info-value">${event.description || 'No detailed description available for this event.'}</p>
+                    <p class="info-value">${event.description || 'No description available for this event.'}</p>
                 </div>
-                
+
                 <div class="enrollment-section">
                     <h3 class="enrollment-title">Ready to Join?</h3>
                     <p class="enrollment-info">${enrollmentText}</p>
-                    ${enrollmentStatus === 'available' ? 
-                        `<button class="btn-enroll" onclick="enrollInEvent(${event.id || event.eventId})">
+                    ${enrollmentStatus === 'available' ?
+                        `<button class="btn-enroll" onclick="enrollInEvent(${event.eventId})">
                             Enroll Now
                         </button>` :
                         `<button class="btn-enroll" disabled style="opacity: 0.6; cursor: not-allowed;">
@@ -409,43 +433,74 @@
         `;
     }
 
+    // Enroll current user in an event
     function enrollInEvent(eventId) {
-        // Check if user is logged in (you might want to implement this check)
-        const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-        
-        if (!isLoggedIn) {
-            alert('Please log in to enroll in events.');
-            window.location.href = 'login.html';
-            return;
-        }
+        try {
+            console.log("Starting enrollment process for event ID:", eventId);
 
-        // Send enrollment request
-        fetch('/events/enroll', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                eventId: eventId,
-                userId: localStorage.getItem('userId') // Assuming you store user ID in localStorage
-            })
-        })
-        .then(response => response.json())
-        .then data => {
-            if (data.success) {
-                alert('Successfully enrolled in the event!');
-                loadEventDetails(); // Reload to update participant count
-            } else {
-                alert(data.message || 'Failed to enroll in the event.');
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                alert('Please log in to enroll in events.');
+                window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error enrolling in event:', error);
-            alert('An error occurred while enrolling. Please try again.');
-        });
+
+            // Get user ID from localStorage
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('User information not found. Please log in again.');
+                window.location.href = 'login.html?redirect=event-details.html?eventId=' + eventId;
+                return;
+            }
+
+            console.log("User ID:", userId, "Event ID:", eventId);
+
+            // Create request payload
+            const payload = {
+                eventId: parseInt(eventId, 10),
+                userId: parseInt(userId, 10)
+            };
+
+            console.log("Sending enrollment request with payload:", payload);
+
+            // Send enrollment request to server
+            fetch('/tegel_webapp/events/enroll', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(function(response) {
+                console.log("Response received:", response.status);
+                return response.json();
+            })
+            .then(function(responseData) {
+                console.log("Response data:", responseData);
+                if (responseData.success) {
+                    alert('Successfully enrolled in the event!');
+                    loadEventDetails(); // Reload to update participant count
+                } else {
+                    alert(responseData.message || 'Failed to enroll in the event.');
+                }
+            })
+            .catch(function(error) {
+                console.error("Error during enrollment:", error);
+                alert('An error occurred while enrolling. Please try again later.');
+            });
+        } catch (error) {
+            console.error("Exception in enrollInEvent:", error);
+            alert('An unexpected error occurred. Please try again later.');
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', loadEventDetails);
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Event details page loaded');
+        loadEventDetails();
+    });
 </script>
 
 <footer class="footer">

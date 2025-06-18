@@ -57,8 +57,8 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("userId", user.getUserId());
                 session.setAttribute("userRole", user.getRole());
 
-                // Set session timeout (30 minutes)
-                session.setMaxInactiveInterval(1800);
+                // Set session timeout (2 minutes)
+                session.setMaxInactiveInterval(120);
 
                 logger.info("Successful login for user: " + email);
 

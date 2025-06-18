@@ -229,7 +229,7 @@
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
             </ul>
-            <div>
+            <div id="authButtons">
                 <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
                 <a href="login.html" class="btn btn-light">Login</a>
             </div>
@@ -431,7 +431,7 @@
             })
         })
         .then(response => response.json())
-        .then(data => {
+        .then data => {
             if (data.success) {
                 alert('Successfully enrolled in the event!');
                 loadEventDetails(); // Reload to update participant count
@@ -462,6 +462,8 @@
         <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
     </div>
 </footer>
+
+<script src="js/session-manager.js"></script>
 
 </body>
 </html>

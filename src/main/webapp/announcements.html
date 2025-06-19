@@ -34,6 +34,45 @@
             color: #333;
             font-size: 1.2rem;
         }
+        .announcement-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .announcement-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        .announcement-title {
+            color: #ff8c1a;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .announcement-date {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .announcement-content {
+            color: #333;
+            font-size: 1rem;
+            white-space: pre-line;
+        }
+        .no-announcements {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            font-style: italic;
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
         @media (max-width: 768px) {
             .announcements-section {
                 padding: 20px 10px;
@@ -114,20 +153,27 @@
 <main class="container my-4">
     <div class="row justify-content-center mb-4">
         <div class="col-lg-8 col-md-10">
-            <form class="row g-2 mb-3" role="search" aria-label="Search announcements">
+            <form id="searchForm" class="row g-2 mb-3" role="search" aria-label="Search announcements">
                 <div class="col-12 col-md-8">
-                    <input class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
+                    <input id="searchInput" class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
                 </div>
                 <div class="col-12 col-md-4">
-                    <input class="form-control" type="date" aria-label="Search by date">
+                    <input id="dateInput" class="form-control" type="date" aria-label="Search by date">
                 </div>
                 <div class="col-12 d-flex justify-content-end">
                     <button class="btn btn-outline-warning mt-2" type="submit">Search</button>
+                    <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2" type="button">Reset</button>
                 </div>
             </form>
             <div class="announcements-section">
                 <h1>Announcements</h1>
-                <p>No announcements yet. Stay tuned!</p>
+                <div id="announcements-container">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -152,9 +198,131 @@
     // Debug code to check if script is loaded
     console.log("Announcements page loaded");
 
+    // Fetch announcements from the server
+    function fetchAnnouncements(searchTerm = "", dateFilter = "") {
+        let url = '/tegel_webapp/announcement';  // Updated to include context path
+
+        // Add query parameters if provided
+        if (searchTerm) {
+            url += `?search=${encodeURIComponent(searchTerm)}`;
+        } else if (dateFilter) {
+            url += `?date=${encodeURIComponent(dateFilter)}`;
+        }
+
+        console.log(`[DEBUG] Fetching announcements from URL: ${url}`);
+
+        fetch(url)
+            .then(response => {
+                console.log(`[DEBUG] Announcement response status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok (Status: ${response.status})`);
+                }
+                return response.json();
+            })
+            .then(announcements => {
+                console.log(`[DEBUG] Received ${announcements.length} announcements`);
+                displayAnnouncements(announcements);
+            })
+            .catch(error => {
+                console.error('Error fetching announcements:', error);
+                displayError('Failed to load announcements. Please try again later.');
+            });
+    }
+
+    // Display announcements in the container
+    function displayAnnouncements(announcements) {
+        const container = document.getElementById('announcements-container');
+        container.innerHTML = ''; // Clear loading spinner or previous results
+
+        if (!announcements || announcements.length === 0) {
+            container.innerHTML = '<div class="no-announcements">No announcements found. Stay tuned!</div>';
+            return;
+        }
+
+        // Loop through announcements and create HTML for each
+        announcements.forEach(announcement => {
+            const announcementElement = document.createElement('div');
+            announcementElement.className = 'announcement-card';
+
+            // Format date for display
+            const createdDate = new Date(announcement.createdAt);
+            const formattedDate = createdDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Create announcement HTML
+            announcementElement.innerHTML = `
+                <div class="announcement-title">${announcement.title}</div>
+                <div class="announcement-date">${formattedDate}</div>
+                <div class="announcement-content">${announcement.content}</div>
+            `;
+
+            container.appendChild(announcementElement);
+        });
+    }
+
+    // Display error message
+    function displayError(message) {
+        const container = document.getElementById('announcements-container');
+        container.innerHTML = `<div class="alert alert-danger" role="alert">${message}</div>`;
+    }
+
+    // Handle search form submission
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent normal form submission
+
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const dateFilter = document.getElementById('dateInput').value;
+
+        // Show loading spinner
+        document.getElementById('announcements-container').innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `;
+
+        // Fetch filtered announcements
+        if (searchTerm) {
+            fetchAnnouncements(searchTerm, "");
+        } else if (dateFilter) {
+            fetchAnnouncements("", dateFilter);
+        } else {
+            fetchAnnouncements();
+        }
+    });
+
+    // Reset search form
+    document.getElementById('resetSearch').addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateInput').value = '';
+
+        // Show loading spinner
+        document.getElementById('announcements-container').innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `;
+
+        // Fetch all announcements
+        fetchAnnouncements();
+    });
+
     // Ensure session is checked on page load
     document.addEventListener('DOMContentLoaded', function() {
         console.log("DOM fully loaded");
+
+        // Fetch announcements on page load
+        fetchAnnouncements();
+
         // Force a check of the session status
         fetch('/tegel_webapp/check-session', {
             method: 'GET',
@@ -205,6 +373,8 @@
         });
     }
 </script>
+<script src="js/debug-utils.js"></script>
 <script src="js/session-manager.js"></script>
+<script src="js/auth-scripts.js"></script>
 </body>
 </html>

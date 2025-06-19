@@ -15,4 +15,24 @@
         <session-timeout>2</session-timeout>
     </session-config>
     
+    <!-- Newsletter servlet mapping -->
+    <servlet>
+        <servlet-name>NewsletterServlet</servlet-name>
+        <servlet-class>com.tegel.servlet.NewsletterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewsletterServlet</servlet-name>
+        <url-pattern>/newsletters/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Announcement servlet mapping -->
+    <servlet>
+        <servlet-name>AnnouncementServlet</servlet-name>
+        <servlet-class>com.tegel.servlet.AnnouncementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AnnouncementServlet</servlet-name>
+        <url-pattern>/announcement</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -550,4 +550,64 @@ public class EventDAO {
 
         return events;
     }
+
+    /**
+     * De-enroll a user from an event
+     * @param userId The ID of the user
+     * @param eventId The ID of the event
+     * @return true if the de-enrollment was successful, false otherwise
+     */
+    public boolean deEnrollUserFromEvent(int userId, int eventId) {
+        // Validate input IDs
+        if (!SecurityUtils.isValidUserId(userId) || !SecurityUtils.isValidUserId(eventId)) {
+            logger.warning("Invalid user ID or event ID for de-enrollment");
+            return false;
+        }
+
+        // Check if the user is currently enrolled
+        String checkSql = "SELECT * FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
+        String deleteSql = "DELETE FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+
+            // Check if the user is enrolled
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, userId);
+                checkStmt.setInt(2, eventId);
+
+                ResultSet rs = checkStmt.executeQuery();
+                if (!rs.next()) {
+                    // User is not enrolled
+                    conn.rollback();
+                    logger.warning("User " + userId + " is not enrolled in event " + eventId);
+                    return false;
+                }
+
+                // User is enrolled, proceed with de-enrollment
+                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+                    deleteStmt.setInt(1, userId);
+                    deleteStmt.setInt(2, eventId);
+
+                    int rowsDeleted = deleteStmt.executeUpdate();
+
+                    if (rowsDeleted > 0) {
+                        conn.commit();
+                        logger.info("Successfully de-enrolled user " + userId + " from event " + eventId);
+                        return true;
+                    } else {
+                        conn.rollback();
+                        logger.warning("Failed to de-enroll user from event");
+                        return false;
+                    }
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error while de-enrolling user from event", e);
+            return false;
+        }
+    }
 }

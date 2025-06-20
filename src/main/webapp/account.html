@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | Tegel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
+            background: #ffb56b;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+        }
+
+        .navbar-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+        }
+
+        .account-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #ff8c1a;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #ff8c1a;
+            padding-bottom: 10px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #ff8c1a;
+            margin-right: 30px;
+        }
+
+        .tab-content {
+            padding: 25px 0;
+        }
+
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #ff8c1a;
+            background: none;
+            font-weight: bold;
+        }
+
+        .nav-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ff8c1a;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: bold;
+            width: 150px;
+            color: #555;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .btn-update {
+            background: #ff8c1a;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-update:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .event-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+            border-left: 4px solid #ff8c1a;
+        }
+
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .event-info {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            background: #000;
+            color: white;
+            padding: 20px;
+        }
+
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #198754;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #d1e7dd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html" style="padding:0;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+            </ul>
+            <div id="authButtons">
+                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                <a href="login.html" class="btn btn-light">Login</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div id="accountContent">
+        <!-- User Profile Section -->
+        <div class="account-section">
+            <h2 class="section-title">My Profile</h2>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileInitials">
+                    <!-- Will be filled with user's initials via JavaScript -->
+                </div>
+                <div>
+                    <h3 id="userName">Loading...</h3>
+                    <p id="userEmail" class="text-muted">Loading...</p>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab"
+                        data-bs-target="#details-tab-pane" type="button" role="tab"
+                        aria-controls="details-tab-pane" aria-selected="true">Personal Details</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="events-tab" data-bs-toggle="tab"
+                        data-bs-target="#events-tab-pane" type="button" role="tab"
+                        aria-controls="events-tab-pane" aria-selected="false">My Events</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Personal Details Tab -->
+                <div class="tab-pane fade show active" id="details-tab-pane" role="tabpanel"
+                    aria-labelledby="details-tab" tabindex="0">
+                    <div class="info-row">
+                        <div class="info-label">Full Name:</div>
+                        <div class="info-value" id="fullNameValue">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Email:</div>
+                        <div class="info-value" id="emailValue">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Phone Number:</div>
+                        <div class="info-value" id="phoneValue">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Date of Birth:</div>
+                        <div class="info-value" id="dobValue">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Dietary Restrictions:</div>
+                        <div class="info-value" id="dietValue">Loading...</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Member Since:</div>
+                        <div class="info-value" id="memberSinceValue">Loading...</div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-update" id="editProfileBtn">Edit Profile</button>
+                    </div>
+                </div>
+
+                <!-- My Events Tab -->
+                <div class="tab-pane fade" id="events-tab-pane" role="tabpanel" aria-labelledby="events-tab" tabindex="0">
+                    <div id="enrolledEvents" class="mt-3">
+                        <div class="loading">Loading your events...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="social-links">
+            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
+            </a>
+            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
+            </a>
+        </div>
+        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
+        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
+    </div>
+</footer>
+
+<script src="js/session-manager.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Account page loaded, initializing...");
+
+        // Load user profile data
+        loadUserProfile();
+
+        // Load enrolled events
+        loadEnrolledEvents();
+
+        // Edit profile button functionality
+        document.getElementById('editProfileBtn').addEventListener('click', function() {
+            showEditProfileForm();
+        });
+    });
+
+    // User data storage for edit form
+    let currentUserData = {};
+
+    function loadUserProfile() {
+        console.log("Attempting to load user profile data...");
+        fetch('/tegel_webapp/user-info', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log("User info response status:", response.status);
+            if (!response.ok) {
+                throw new Error('Not logged in or server error: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("User profile data received:", data);
+            // Store current user data for edit form
+            currentUserData = data;
+
+            // Update user information in the UI
+            document.getElementById('userName').textContent = data.fullName || 'No Name';
+            document.getElementById('userEmail').textContent = data.email || 'No Email';
+
+            // Update profile details
+            document.getElementById('fullNameValue').textContent = data.fullName || 'Not provided';
+            document.getElementById('emailValue').textContent = data.email || 'Not provided';
+            document.getElementById('phoneValue').textContent = data.phoneNumber || 'Not provided';
+
+            // Format and display date of birth
+            let dob = 'Not provided';
+            if (data.dateOfBirth) {
+                const date = new Date(data.dateOfBirth);
+                dob = date.toLocaleDateString();
+            }
+            document.getElementById('dobValue').textContent = dob;
+
+            document.getElementById('dietValue').textContent = data.dietRes || 'None';
+
+            // Format and display member since date
+            let memberSince = 'Unknown';
+            if (data.createDate) {
+                const date = new Date(data.createDate);
+                memberSince = date.toLocaleDateString();
+            }
+            document.getElementById('memberSinceValue').textContent = memberSince;
+
+            // Generate initials for avatar
+            const initials = getInitials(data.fullName);
+            document.getElementById('profileInitials').textContent = initials;
+        })
+        .catch(error => {
+            console.error('Error loading user profile:', error);
+            // Redirect to login if not authenticated
+            window.location.href = 'login.html';
+        });
+    }
+
+    function loadEnrolledEvents() {
+        console.log("Attempting to load enrolled events...");
+        fetch('/tegel_webapp/user-events', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log("Enrolled events response status:", response.status);
+            if (!response.ok) {
+                throw new Error('Not logged in or server error: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Enrolled events data received:", data);
+            const eventsContainer = document.getElementById('enrolledEvents');
+
+            if (data.events && data.events.length > 0) {
+                // Clear loading message
+                eventsContainer.innerHTML = '';
+
+                // Add events to the container
+                data.events.forEach(event => {
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'event-card';
+
+                    // Format date for display
+                    let eventDate = 'Date not specified';
+                    if (event.date) {
+                        const date = new Date(event.date);
+                        eventDate = date.toLocaleDateString();
+                    }
+
+                    eventCard.innerHTML = `
+                        <h3 class="event-title">${event.title}</h3>
+                        <p class="event-info"><strong>Date:</strong> ${eventDate}</p>
+                        <p class="event-info"><strong>Location:</strong> ${event.location || 'Not specified'}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <a href="event-details.html?eventId=${event.eventId}" class="btn btn-sm btn-update">View Details</a>
+                            <button class="btn btn-sm btn-danger" onclick="deEnrollFromEvent(${event.eventId})">De-enroll</button>
+                        </div>
+                    `;
+
+                    eventsContainer.appendChild(eventCard);
+                });
+            } else {
+                eventsContainer.innerHTML = '<p>You have not enrolled in any events yet.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading enrolled events:', error);
+            const eventsContainer = document.getElementById('enrolledEvents');
+            eventsContainer.innerHTML = '<p>Could not load events. Please try again later.</p>';
+        });
+    }
+
+    // Helper function to get initials from name
+    function getInitials(name) {
+        if (!name) return '?';
+
+        const names = name.split(' ');
+        if (names.length === 1) return names[0].charAt(0).toUpperCase();
+
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
+
+    function showEditProfileForm() {
+        const detailsPane = document.getElementById('details-tab-pane');
+        const currentContent = detailsPane.innerHTML;
+
+        // Format date of birth for input field (YYYY-MM-DD)
+        let dobFormatted = '';
+        if (currentUserData.dateOfBirth) {
+            const date = new Date(currentUserData.dateOfBirth);
+            dobFormatted = date.toISOString().split('T')[0];
+        }
+
+        // Create edit form
+        const formHTML = `
+            <form id="editProfileForm" class="mt-3">
+                <div id="formFeedback"></div>
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="fullName" name="fullName"
+                        value="${currentUserData.fullName || ''}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="nickName" class="form-label">Nickname</label>
+                    <input type="text" class="form-control" id="nickName" name="nickName"
+                        value="${currentUserData.nickName || ''}">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" value="${currentUserData.email || ''}" disabled>
+                    <div class="form-text">Email cannot be changed.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                        value="${currentUserData.phoneNumber || ''}">
+                </div>
+                <div class="mb-3">
+                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
+                        value="${dobFormatted}">
+                </div>
+                <div class="mb-3">
+                    <label for="dietRes" class="form-label">Dietary Restrictions</label>
+                    <textarea class="form-control" id="dietRes" name="dietRes" rows="2">${currentUserData.dietRes || ''}</textarea>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-update">Save Changes</button>
+                </div>
+            </form>
+        `;
+
+        // Replace content with form
+        detailsPane.innerHTML = formHTML;
+
+        // Add event listeners
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            detailsPane.innerHTML = currentContent;
+            // Reattach edit button event listener
+            document.getElementById('editProfileBtn').addEventListener('click', showEditProfileForm);
+        });
+
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProfileChanges();
+        });
+    }
+
+    function saveProfileChanges() {
+        const formData = {
+            fullName: document.getElementById('fullName').value,
+            nickName: document.getElementById('nickName').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            dateOfBirth: document.getElementById('dateOfBirth').value,
+            dietRes: document.getElementById('dietRes').value
+        };
+
+        // Basic form validation
+        if (!formData.fullName.trim()) {
+            showFormFeedback('Please enter your full name.', 'error');
+            return;
+        }
+
+        console.log("Sending profile update with data:", formData);
+
+        fetch('/tegel_webapp/update-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData),
+            credentials: 'include'
+        })
+        .then(response => {
+            console.log("Update profile response status:", response.status);
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Profile update response:", data);
+            if (data.success) {
+                showFormFeedback('Profile updated successfully!', 'success');
+
+                // Reload profile data after short delay to show the success message
+                setTimeout(() => {
+                    loadUserProfile();
+                    // Return to profile view
+                    document.getElementById('details-tab-pane').innerHTML = generateProfileViewHTML();
+                    // Reattach edit button event listener
+                    document.getElementById('editProfileBtn').addEventListener('click', showEditProfileForm);
+                }, 1500);
+            } else {
+                showFormFeedback(data.message || 'Failed to update profile', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            showFormFeedback('An error occurred while updating your profile. Please try again.', 'error');
+        });
+    }
+
+    function showFormFeedback(message, type) {
+        const feedbackElement = document.getElementById('formFeedback');
+        feedbackElement.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+    }
+
+    function generateProfileViewHTML() {
+        return `
+            <div class="info-row">
+                <div class="info-label">Full Name:</div>
+                <div class="info-value" id="fullNameValue">${currentUserData.fullName || 'Not provided'}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Email:</div>
+                <div class="info-value" id="emailValue">${currentUserData.email || 'Not provided'}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Phone Number:</div>
+                <div class="info-value" id="phoneValue">${currentUserData.phoneNumber || 'Not provided'}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Date of Birth:</div>
+                <div class="info-value" id="dobValue">${currentUserData.dateOfBirth ? new Date(currentUserData.dateOfBirth).toLocaleDateString() : 'Not provided'}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Dietary Restrictions:</div>
+                <div class="info-value" id="dietValue">${currentUserData.dietRes || 'None'}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Member Since:</div>
+                <div class="info-value" id="memberSinceValue">${currentUserData.createDate ? new Date(currentUserData.createDate).toLocaleDateString() : 'Unknown'}</div>
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-update" id="editProfileBtn">Edit Profile</button>
+            </div>
+        `;
+    }
+
+    /**
+     * De-enroll user from an event
+     * @param {number} eventId - The ID of the event to de-enroll from
+     */
+    function deEnrollFromEvent(eventId) {
+        console.log("Attempting to de-enroll from event ID:", eventId);
+
+        if (!confirm("Are you sure you want to de-enroll from this event?")) {
+            return; // User cancelled the action
+        }
+
+        // Get userId from localStorage
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.error("User ID not found in localStorage");
+            alert("Could not de-enroll: Your session information is missing. Please try logging in again.");
+            return;
+        }
+
+        // Create the request payload
+        const payload = {
+            userId: parseInt(userId, 10),
+            eventId: parseInt(eventId, 10)
+        };
+
+        // Send the de-enrollment request
+        fetch('/tegel_webapp/events/enroll', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert("You have been successfully de-enrolled from this event.");
+                // Reload enrolled events to update the list
+                loadEnrolledEvents();
+            } else {
+                alert(data.message || "Failed to de-enroll from the event. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error during de-enrollment:", error);
+            alert("An error occurred while de-enrolling. Please try again later.");
+        });
+    }
+</script>
+
+</body>
+</html>

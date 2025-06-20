@@ -127,6 +127,32 @@
     </style>
 </head>
 <body>
+    <!-- Admin-only event creation form -->
+    <div class="admin-only container my-4" style="display:none">
+        <div class="card p-4">
+            <h3>Create New Event</h3>
+            <form id="adminEventCreateForm">
+                <div class="mb-3">
+                    <label for="eventTitle" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="eventTitle" name="title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="eventDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="eventDescription" name="description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="eventDate" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="eventDate" name="date" required>
+                </div>
+                <div class="mb-3">
+                    <label for="eventTime" class="form-label">Time</label>
+                    <input type="time" class="form-control" id="eventTime" name="time" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Event</button>
+            </form>
+            <div id="adminEventCreateMsg" class="mt-2"></div>
+        </div>
+    </div>
 
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
@@ -153,6 +179,17 @@
 </nav>
 
 <main class="container my-4">
+    <div class="mb-4">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="eventSearchInput" placeholder="Search events by name, location...">
+                    <button class="btn btn-primary" type="button" onclick="searchEvents()">Search</button>
+                    <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row g-4" id="eventsContainer">
         <!-- Events will be loaded here -->
     </div>
@@ -291,6 +328,21 @@
     function selectEvent(eventId) {
         // Redirect to event details page with event ID as parameter
         window.location.href = `event-details.html?eventId=${eventId}`;
+    }
+
+    function searchEvents() {
+        const query = document.getElementById('eventSearchInput').value.toLowerCase();
+        const filteredEvents = dummyEvents.filter(event => {
+            return event.title.toLowerCase().includes(query) ||
+                   event.location.toLowerCase().includes(query) ||
+                   (event.description && event.description.toLowerCase().includes(query));
+        });
+        displayEvents(filteredEvents);
+    }
+
+    function resetEventSearch() {
+        document.getElementById('eventSearchInput').value = '';
+        displayEvents(dummyEvents);
     }
 
     document.addEventListener('DOMContentLoaded', loadEvents);

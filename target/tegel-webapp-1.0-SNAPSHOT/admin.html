@@ -137,6 +137,11 @@
 <main>
     <div class="admin-card mb-4">
         <h2>User Management</h2>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="userSearchInput" placeholder="Search users by name or email...">
+            <button class="btn btn-primary" type="button" onclick="searchUsers()">Search</button>
+            <button class="btn btn-secondary" type="button" onclick="resetUserSearch()">Reset</button>
+        </div>
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
@@ -157,7 +162,11 @@
     <div class="admin-card mb-4">
         <h2>Event Management</h2>
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">All Events</h5>
+            <div class="input-group" style="max-width: 600px;">
+                <input type="text" class="form-control" id="eventSearchInput" placeholder="Search events by name, location...">
+                <button class="btn btn-primary" type="button" onclick="searchEvents()">Search</button>
+                <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset</button>
+            </div>
             <button class="btn btn-success" onclick="showCreateEventModal()">
                 <i class="bi bi-plus-circle"></i> Create New Event
             </button>
@@ -351,17 +360,53 @@
     let users = [];
     let events = [];
 
-    // Load users from database
+    // Load users from database with improved error handling
     function loadUsers() {
-        fetch('/tegel_webapp/admin/users')
-            .then(response => response.json())
-            .then(data => {
-                users = data;
-                renderUsers();
-            })
-            .catch(error => {
-                console.error('Error loading users:', error);
-            });
+        // Use the user-info endpoint instead of trying to access AdminServlet directly
+        fetch('/tegel_webapp/user-info?action=getAllUsers', {
+            method: 'GET',
+            credentials: 'include' // Important: Include credentials for session cookies
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('Admin privileges required to access user data');
+                } else {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Process the response data
+            if (!Array.isArray(data)) {
+                console.warn('Server did not return an array of users:', data);
+                throw new Error('Invalid user data format');
+            }
+            users = data;
+            renderUsers();
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            // Use fallback dummy data based on your actual database content
+            users = [
+                { userId: 34, fullName: 'Admin', email: 'admin@email.com', role: 'admin' },
+                { userId: 35, fullName: 'Member', email: 'member@email.com', role: 'member' },
+                { userId: 36, fullName: 'User', email: 'user@email.com', role: 'user' },
+                { userId: 37, fullName: 'Cyril Shibu', email: 'cyrilshibu@gmail.com', role: 'member' },
+                { userId: 38, fullName: 'Ethan', email: 'nethan@gmail.com', role: 'member' }
+            ];
+            renderUsers();
+
+            // Show a discreet notification instead of an intrusive alert
+            const userTable = document.getElementById('userTableBody').closest('.table-responsive');
+            if (userTable) {
+                const notification = document.createElement('div');
+                notification.className = 'alert alert-warning mt-3';
+                notification.innerHTML = `<strong>Note:</strong> Using sample data. Server error: ${error.message}`;
+                userTable.parentNode.insertBefore(notification, userTable);
+            }
+        });
     }
 
     // Load events from database (admin view - all events)
@@ -421,7 +466,18 @@
     function renderEvents() {
         const tbody = document.getElementById('eventTableBody');
         tbody.innerHTML = '';
-        events.forEach(event => {
+
+        // Sort events by date (latest on top)
+        const sortedEvents = [...events].sort((a, b) => {
+            // Handle events without dates
+            if (!a.date) return 1;  // No date goes to the bottom
+            if (!b.date) return -1; // No date goes to the bottom
+
+            // Sort in descending order (newest first)
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        sortedEvents.forEach(event => {
             const tr = document.createElement('tr');
             const eventDate = event.date ? new Date(event.date).toLocaleDateString() : 'TBA';
             const statusBadge = event.isActive ? 
@@ -435,9 +491,14 @@
                 <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
                 <td>${statusBadge}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
-                    <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
-                    <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                            ${event.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -533,7 +594,7 @@
                 method: 'DELETE'
             })
             .then(response => response.json())
-            .then data => {
+            .then((data) => {
                 if (data.success) {
                     alert('Event deleted successfully!');
                     events = events.filter(e => e.eventId !== eventId);
@@ -551,6 +612,34 @@
 
     function viewEventDetails(eventId) {
         window.open(`event-details.html?eventId=${eventId}`, '_blank');
+    }
+
+    // Toggle event status (active/inactive)
+    function toggleEventStatus(eventId, newStatus) {
+        const action = newStatus ? 'activate' : 'deactivate';
+        if (confirm(`Are you sure you want to ${action} this event?`)) {
+            fetch(`/tegel_webapp/admin/events/${eventId}/status`, {
+                method: 'PUT',
+                body: JSON.stringify({ isActive: newStatus }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Event ${action}d successfully!`);
+                    events.find(e => e.eventId === eventId).isActive = newStatus;
+                    renderEvents();
+                } else {
+                    alert('Failed to update event status.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating event status:', error);
+                alert('Error updating event status. Please try again.');
+            });
+        }
     }
 
     // Existing user management functions
@@ -611,17 +700,123 @@
         }
     }
 
-    // Initial load
-    document.addEventListener('DOMContentLoaded', function() {
-        loadUsers();
-        loadEvents();
-    });
-</script>
+    // Search and filter users
+    function searchUsers() {
+        const query = document.getElementById('userSearchInput').value.toLowerCase();
+        const filteredUsers = users.filter(user => {
+            return user.fullName.toLowerCase().includes(query) || user.email.toLowerCase().includes(query);
+        });
+        renderUserTable(filteredUsers);
+    }
 
-<script>
+    function resetUserSearch() {
+        document.getElementById('userSearchInput').value = '';
+        renderUsers();
+    }
+
+    function renderUserTable(usersToRender) {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+        usersToRender.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.fullName || user.email}</td>
+                <td>${user.email}</td>
+                <td>
+                    <select class="form-select btn-role" data-id="${user.userId}">
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm me-2" onclick="viewUser(${user.userId})">View</button>
+                    <button class="btn btn-delete btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Add event listeners for role change
+        document.querySelectorAll('.btn-role').forEach(select => {
+            select.addEventListener('change', function() {
+                const userId = parseInt(this.getAttribute('data-id'));
+                const newRole = this.value;
+                updateUserRole(userId, newRole);
+            });
+        });
+    }
+
+    // Search and filter events
+    function searchEvents() {
+        const query = document.getElementById('eventSearchInput').value.toLowerCase();
+        const filteredEvents = events.filter(event => {
+            return event.title.toLowerCase().includes(query) ||
+                   (event.location && event.location.toLowerCase().includes(query));
+        });
+        renderEventTable(filteredEvents);
+    }
+
+    function resetEventSearch() {
+        document.getElementById('eventSearchInput').value = '';
+        renderEvents();
+    }
+
+    function renderEventTable(eventsToRender) {
+        const tbody = document.getElementById('eventTableBody');
+        tbody.innerHTML = '';
+        eventsToRender.forEach(event => {
+            const tr = document.createElement('tr');
+            const eventDate = event.date ? new Date(event.date).toLocaleDateString() : 'TBA';
+            const statusBadge = event.isActive ?
+                '<span class="badge bg-success">Active</span>' :
+                '<span class="badge bg-secondary">Inactive</span>';
+
+            tr.innerHTML = `
+                <td>${event.title}</td>
+                <td>${eventDate}</td>
+                <td>${event.location || 'TBA'}</td>
+                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                            ${event.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Helper function to ensure admin navigation
+    function ensureAdminNavigation() {
+        // Update Home link for admins
+        const homeLinks = document.querySelectorAll('a.nav-link[href="index.html"]');
+        homeLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+
+        // Update logo link for admins
+        const logoLinks = document.querySelectorAll('a.navbar-brand[href="index.html"]');
+        logoLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+
+        // Also update any other index.html links
+        const otherIndexLinks = document.querySelectorAll('a[href="index.html"]:not(.nav-link):not(.navbar-brand)');
+        otherIndexLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+    }
+
     // Manual session check implementation for admin.html
     document.addEventListener('DOMContentLoaded', function() {
         console.log("Admin page loaded");
+        ensureAdminNavigation(); // Always update links on page load
+
+        // Load users and events data immediately
+        loadUsers();
+        loadEvents();
+
         // Force a check of the session status
         fetch('/tegel_webapp/check-session', {
             method: 'GET',
@@ -681,8 +876,19 @@
             console.error('Error signing out:', error);
         });
     }
+
+    // Only allow admins to access this page
+    fetch('/tegel_webapp/check-session', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.loggedIn || data.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+    });
 </script>
 <script src="js/session-manager.js"></script>
-
 </body>
 </html>

@@ -175,6 +175,24 @@
                     </div>
                 </div>
             </div>
+            <!-- Admin-only announcement creation form -->
+            <div class="admin-only container my-4" style="display:none">
+                <div class="card p-4">
+                    <h3>Create New Announcement</h3>
+                    <form id="adminAnnouncementCreateForm">
+                        <div class="mb-3">
+                            <label for="announcementTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="announcementTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="announcementContent" class="form-label">Content</label>
+                            <textarea class="form-control" id="announcementContent" name="content" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Announcement</button>
+                    </form>
+                    <div id="adminAnnouncementCreateMsg" class="mt-2"></div>
+                </div>
+            </div>
         </div>
     </div>
 </main>
@@ -371,6 +389,78 @@
         .catch(error => {
             console.error('Error signing out:', error);
         });
+    }
+
+    // Admin functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if user is admin
+        fetch('/tegel_webapp/check-admin', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Admin check response:", data);
+            if(data.isAdmin) {
+                // Show admin announcement creation form
+                document.querySelector('.admin-only').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking admin status:', error);
+        });
+
+        // Handle admin announcement creation
+        document.getElementById('adminAnnouncementCreateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('announcementTitle').value.trim();
+            const content = document.getElementById('announcementContent').value.trim();
+
+            // Basic client-side validation
+            if (!title || !content) {
+                displayAdminMessage('Title and content are required.', 'danger');
+                return;
+            }
+
+            // Send announcement data to server
+            fetch('/tegel_webapp/announcement', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, content }),
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Announcement creation response:", data);
+                if(data.success) {
+                    displayAdminMessage('Announcement created successfully!', 'success');
+                    // Clear form fields
+                    document.getElementById('announcementTitle').value = '';
+                    document.getElementById('announcementContent').value = '';
+                    // Optionally, refresh announcements list
+                    fetchAnnouncements();
+                } else {
+                    displayAdminMessage('Failed to create announcement. Please try again.', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating announcement:', error);
+                displayAdminMessage('Error creating announcement. Please try again later.', 'danger');
+            });
+        });
+    });
+
+    // Display message in admin announcement creation form
+    function displayAdminMessage(message, type) {
+        const msgDiv = document.getElementById('adminAnnouncementCreateMsg');
+        msgDiv.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
+        // Auto-dismiss message after 3 seconds
+        setTimeout(() => {
+            msgDiv.innerHTML = '';
+        }, 3000);
     }
 </script>
 <script src="js/debug-utils.js"></script>

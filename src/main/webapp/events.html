@@ -128,29 +128,48 @@
 </head>
 <body>
     <!-- Admin-only event creation form -->
-    <div class="admin-only container my-4" style="display:none">
-        <div class="card p-4">
-            <h3>Create New Event</h3>
-            <form id="adminEventCreateForm">
-                <div class="mb-3">
-                    <label for="eventTitle" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="eventTitle" name="title" required>
+    <!-- Modal for creating events -->
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createEventModalLabel">Create New Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="eventDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="eventDescription" name="description" rows="3" required></textarea>
+                <div class="modal-body">
+                    <form id="adminEventCreateForm">
+                        <div class="mb-3">
+                            <label for="eventTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="eventTitle" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="eventDescription" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="eventDate" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventTime" class="form-label">Time</label>
+                            <input type="time" class="form-control" id="eventTime" name="time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="eventLocation" name="location" value="Tegel Community Center" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maxParticipants" class="form-label">Maximum Participants</label>
+                            <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" value="50" required>
+                        </div>
+                        <div id="adminEventCreateMsg" class="mt-2"></div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="eventDate" class="form-label">Date</label>
-                    <input type="date" class="form-control" id="eventDate" name="date" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitEventBtn">Create Event</button>
                 </div>
-                <div class="mb-3">
-                    <label for="eventTime" class="form-label">Time</label>
-                    <input type="time" class="form-control" id="eventTime" name="time" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Create Event</button>
-            </form>
-            <div id="adminEventCreateMsg" class="mt-2"></div>
+            </div>
         </div>
     </div>
 
@@ -177,6 +196,11 @@
         </div>
     </div>
 </nav>
+
+<!-- Admin-only create event button -->
+<div class="admin-only container my-3" style="display:none">
+    <button id="showCreateEventFormBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
+</div>
 
 <main class="container my-4">
     <div class="mb-4">
@@ -346,6 +370,104 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadEvents);
+
+    // Admin event creation functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle event creation form submission via the submit button in modal
+        const submitEventBtn = document.getElementById('submitEventBtn');
+        if (submitEventBtn) {
+            submitEventBtn.addEventListener('click', function() {
+                const title = document.getElementById('eventTitle').value;
+                const description = document.getElementById('eventDescription').value;
+                const date = document.getElementById('eventDate').value;
+                const time = document.getElementById('eventTime').value;
+                const location = document.getElementById('eventLocation').value;
+                const maxParticipants = document.getElementById('maxParticipants').value;
+
+                // Form validation
+                const form = document.getElementById('adminEventCreateForm');
+                if (!form.checkValidity()) {
+                    // Trigger browser's native validation UI
+                    form.reportValidity();
+                    return;
+                }
+
+                const eventData = {
+                    title: title,
+                    description: description,
+                    date: date,
+                    startTime: time,
+                    maxParticipants: parseInt(maxParticipants),
+                    location: location
+                };
+
+                debug.log('EventCreation', 'Creating event with data:', eventData);
+
+                // Send the request to create the event
+                fetch('/tegel_webapp/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(eventData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to create event');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    debug.log('EventCreation', 'Event created successfully:', data);
+
+                    // Show success message
+                    const msgElement = document.getElementById('adminEventCreateMsg');
+                    msgElement.className = 'alert alert-success';
+                    msgElement.textContent = 'Event created successfully!';
+
+                    // Reset the form
+                    document.getElementById('adminEventCreateForm').reset();
+
+                    // Reload events to show the new event
+                    loadEvents();
+
+                    // Close the modal after a short delay
+                    setTimeout(() => {
+                        // Hide the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
+                        modal.hide();
+
+                        // Clear the message after closing
+                        msgElement.textContent = '';
+                        msgElement.className = '';
+                    }, 1500);
+                })
+                .catch(error => {
+                    debug.error('EventCreation', 'Error creating event:', error);
+
+                    // Show error message
+                    const msgElement = document.getElementById('adminEventCreateMsg');
+                    msgElement.className = 'alert alert-danger';
+                    msgElement.textContent = 'Failed to create event: ' + error.message;
+                });
+            });
+        }
+
+        // Reset the form and error messages when the modal is closed
+        const createEventModal = document.getElementById('createEventModal');
+        if (createEventModal) {
+            createEventModal.addEventListener('hidden.bs.modal', function() {
+                const form = document.getElementById('adminEventCreateForm');
+                if (form) form.reset();
+
+                const msgElement = document.getElementById('adminEventCreateMsg');
+                if (msgElement) {
+                    msgElement.textContent = '';
+                    msgElement.className = '';
+                }
+            });
+        }
+    });
 </script>
 
 <footer class="footer">
@@ -369,3 +491,4 @@
 
 </body>
 </html>
+

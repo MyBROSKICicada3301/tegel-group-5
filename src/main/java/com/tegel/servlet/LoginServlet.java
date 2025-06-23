@@ -90,4 +90,11 @@ public class LoginServlet extends HttpServlet {
             response.sendRedirect("login.html?error=server");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Redirect GET requests to the login page
+        response.sendRedirect("login.html");
+    }
 }

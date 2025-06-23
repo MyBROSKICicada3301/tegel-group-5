@@ -177,4 +177,11 @@ public class SignupServlet extends HttpServlet {
                 !email.trim().isEmpty() && password != null && !password.trim().isEmpty() &&
                 dob != null && !dob.trim().isEmpty() && phone != null && !phone.trim().isEmpty();
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Redirect GET requests to the login page
+        response.sendRedirect("signup.html");
+    }
 }

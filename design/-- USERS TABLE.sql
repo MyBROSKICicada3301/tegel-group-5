@@ -73,3 +73,11 @@ CREATE TABLE Task (
     FOREIGN KEY (relatedEvent) REFERENCES Event(event_ID),
     FOREIGN KEY (CreatedBy) REFERENCES Users(user_ID)
 );
+
+CREATE TABLE images (
+                        id SERIAL PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL,
+                        content_type VARCHAR(100) NOT NULL,
+                        data BYTEA NOT NULL,
+                        upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

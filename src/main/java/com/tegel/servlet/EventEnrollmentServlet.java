@@ -45,6 +45,16 @@ public class EventEnrollmentServlet extends HttpServlet {
             // Extract event ID and user ID
             int eventId = jsonObject.get("eventId").getAsInt();
             int userId = jsonObject.get("userId").getAsInt();
+            boolean wantsFoodOption = false;
+            String dietaryRestrictions = null;
+
+            if (jsonObject.has("wantsFoodOption")) {
+                wantsFoodOption = jsonObject.get("wantsFoodOption").getAsBoolean();
+            }
+
+            if (jsonObject.has("dietaryRestrictions")) {
+                dietaryRestrictions = jsonObject.get("dietaryRestrictions").getAsString();
+            }
 
             logger.info("Enrollment request received for user " + userId + " in event " + eventId);
 

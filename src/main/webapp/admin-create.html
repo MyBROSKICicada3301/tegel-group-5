@@ -208,6 +208,29 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="eventPrice" class="form-label">Event Price (€)</label>
+                        <input type="number" class="form-control" id="eventPrice" name="price"
+                               min="0" step="0.01" placeholder="0.00">
+                        <div class="form-text">Set to 0 for free events</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Food Options</label>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                            <label class="form-check-label" for="hasFoodOption">
+                                <strong>This event includes food options</strong>
+                            </label>
+                            <div class="form-text">Enables participants to select food options during enrollment</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="mb-3">
                 <label for="eventDescription" class="form-label">Event Description</label>

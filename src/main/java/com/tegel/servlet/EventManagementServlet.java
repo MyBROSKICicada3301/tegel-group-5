@@ -278,6 +278,29 @@ public class EventManagementServlet extends HttpServlet {
             String image = request.getParameter("image");
             String maxParticipantsStr = request.getParameter("maxParticipants");
             String isActiveStr = request.getParameter("isActive");
+            String priceStr = request.getParameter("price");
+            String hasFoodOptionStr = request.getParameter("hasFoodOption");
+
+            // parse the price
+            double price = 0.0;
+            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                try {
+                    price = Double.parseDouble(priceStr);
+                    if (price < 0 || price > 10000) {
+                        throw new SecurityException("Invalid price value (0-10000)");
+                    }
+                } catch (NumberFormatException e) {
+                    logger.warning("Invalid price format: " + priceStr);
+                    return null;
+                }
+            }
+
+            // parse the hasFoodOption
+            boolean hasFoodOption = false; // Default to false
+            if (hasFoodOptionStr != null) {
+                hasFoodOption = Boolean.parseBoolean(hasFoodOptionStr);
+            }
+
             
             // Validate required fields
             if (title == null || title.trim().isEmpty()) {
@@ -362,6 +385,8 @@ public class EventManagementServlet extends HttpServlet {
             event.setImage(image);
             event.setMaxParticipants(maxParticipants);
             event.setActive(isActive);
+            event.setHasFoodOption(hasFoodOption);
+            event.setPrice(price);
             
             return event;
             

@@ -15,12 +15,15 @@ public class Event {
     private int createdBy;
     private LocalDateTime createdAt;
     private boolean isActive;
+    private boolean hasFoodOption;
+    private double price;
     
     // Constructors
     public Event() {}
     
     public Event(String title, String description, LocalDate date, String location, 
-                 String image, int maxParticipants, int createdBy, boolean isActive) {
+                 String image, int maxParticipants, int createdBy, boolean isActive,
+                 boolean hasFoodOption, double price) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -30,6 +33,8 @@ public class Event {
         this.createdBy = createdBy;
         this.isActive = isActive;
         this.currentParticipants = 0;
+        this.hasFoodOption = hasFoodOption;
+        this.price = price;
     }
     
     // Getters and Setters
@@ -65,4 +70,10 @@ public class Event {
     
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public boolean isHasFoodOption() { return hasFoodOption; }
+    public void setHasFoodOption(boolean hasFoodOption) { this.hasFoodOption = hasFoodOption; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price;}
 }

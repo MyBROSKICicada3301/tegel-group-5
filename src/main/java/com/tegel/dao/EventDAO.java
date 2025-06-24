@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import com.tegel.model.Event;
 import com.tegel.util.SecurityUtils;
 
+import static com.tegel.dao.DatabaseManager.getConnection;
+
 public class EventDAO {
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
     
@@ -34,7 +36,7 @@ public class EventDAO {
         
         String sql = "INSERT INTO mod4db.event (title, description, date, location, image, maxparticipants, createdby, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
             
             try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -110,7 +112,7 @@ public class EventDAO {
         
         logger.info("EventDAO: Executing SQL to get active events: " + sql);
 
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             logger.info("EventDAO: Connection established, executing query");
@@ -142,7 +144,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
         String sql = "SELECT * FROM mod4db.event ORDER BY date";
         
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             
@@ -170,7 +172,7 @@ public class EventDAO {
                     "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
                     "WHERE e.event_id = ? GROUP BY e.event_id";
         
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, eventId);
@@ -200,7 +202,7 @@ public class EventDAO {
         
         String sql = "UPDATE mod4db.event SET title = ?, description = ?, date = ?, location = ?, image = ?, maxparticipants = ?, isactive = ? WHERE event_id = ?";
         
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
             
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -253,7 +255,7 @@ public class EventDAO {
         
         String sql = "DELETE FROM mod4db.event WHERE event_id = ?";
         
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
             
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -292,7 +294,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
         String sql = "SELECT * FROM mod4db.event WHERE createdby = ? ORDER BY date DESC";
         
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, creatorId);
@@ -315,7 +317,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
         String sql = "SELECT * FROM mod4db.event WHERE isactive = ? AND date >= ? ORDER BY date";
         
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setBoolean(1, true);
@@ -344,7 +346,7 @@ public class EventDAO {
         
         String sql = "SELECT COUNT(*) FROM mod4db.eventregistration WHERE event_id = ? AND status = ?";
         
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, eventId);
@@ -468,7 +470,7 @@ public class EventDAO {
         // Check if user is already enrolled
         String checkSql = "SELECT * FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
 
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
 
             // Check for existing enrollment
@@ -532,7 +534,7 @@ public class EventDAO {
                     "WHERE er.user_id = ? AND er.status = 'confirmed' " +
                     "ORDER BY e.date";
 
-        try (Connection conn = DatabaseManager.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userId);
@@ -568,7 +570,7 @@ public class EventDAO {
         String checkSql = "SELECT * FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
         String deleteSql = "DELETE FROM mod4db.eventregistration WHERE user_id = ? AND event_id = ?";
 
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
 
             // Check if the user is enrolled
@@ -607,6 +609,52 @@ public class EventDAO {
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database error while de-enrolling user from event", e);
+            return false;
+        }
+    }
+    public boolean enrollUserInEventWithDetails(int userId, int eventId,
+                                                String registrationData,
+                                                String status,
+                                                String specialRequests,
+                                                boolean wantsFoodOption) {
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+
+            // First check if user is already enrolled
+            String checkSql = "SELECT 1 FROM mod4db.eventregistration WHERE event_id = ? AND user_id = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, eventId);
+                checkStmt.setInt(2, userId);
+
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next()) {
+                    // User is already enrolled
+                    conn.commit();
+                    return true;
+                }
+
+                // User is not enrolled, proceed with insert
+                String insertSql = "INSERT INTO mod4db.eventregistration (event_id, user_id, registrationdata, status, specialrequests, \"wantsFoodOption\") " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
+
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                    insertStmt.setInt(1, eventId);
+                    insertStmt.setInt(2, userId);
+                    insertStmt.setString(3, registrationData);
+                    insertStmt.setString(4, status);
+                    insertStmt.setString(5, specialRequests);
+                    insertStmt.setBoolean(6, wantsFoodOption);
+
+                    int affectedRows = insertStmt.executeUpdate();
+                    conn.commit();
+                    return affectedRows > 0;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.severe("Error enrolling user with details: " + e.getMessage());
             return false;
         }
     }

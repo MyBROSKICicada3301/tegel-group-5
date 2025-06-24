@@ -26,10 +26,10 @@ public class EventEnrollmentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
             // Parse JSON data from request body
             StringBuilder buffer = new StringBuilder();
@@ -45,22 +45,42 @@ public class EventEnrollmentServlet extends HttpServlet {
             // Extract event ID and user ID
             int eventId = jsonObject.get("eventId").getAsInt();
             int userId = jsonObject.get("userId").getAsInt();
+
+            // Extract food preference data
             boolean wantsFoodOption = false;
             String dietaryRestrictions = null;
+            String specialRequests = null;
 
             if (jsonObject.has("wantsFoodOption")) {
                 wantsFoodOption = jsonObject.get("wantsFoodOption").getAsBoolean();
             }
 
-            if (jsonObject.has("dietaryRestrictions")) {
+            if (jsonObject.has("dietaryRestrictions") && !jsonObject.get("dietaryRestrictions").isJsonNull()) {
                 dietaryRestrictions = jsonObject.get("dietaryRestrictions").getAsString();
+            }
+
+            if (jsonObject.has("specialRequests") && !jsonObject.get("specialRequests").isJsonNull()) {
+                specialRequests = jsonObject.get("specialRequests").getAsString();
             }
 
             logger.info("Enrollment request received for user " + userId + " in event " + eventId);
 
-            // Attempt to enroll user in event
-            boolean success = eventDAO.enrollUserInEvent(userId, eventId);
-            
+            // Create registration data string to store dietary restrictions
+            String registrationData = null;
+            if (wantsFoodOption && dietaryRestrictions != null && !dietaryRestrictions.isEmpty()) {
+                registrationData = "Dietary restrictions: " + dietaryRestrictions;
+            }
+
+            // Attempt to enroll user with all details
+            boolean success = eventDAO.enrollUserInEventWithDetails(
+                    userId,
+                    eventId,
+                    registrationData,
+                    "confirmed",
+                    specialRequests,
+                    wantsFoodOption
+            );
+
             // Return appropriate response
             if (success) {
                 response.getWriter().write("{\"success\":true,\"message\":\"Enrollment successful\"}");

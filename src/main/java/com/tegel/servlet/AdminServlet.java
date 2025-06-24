@@ -77,6 +77,8 @@ public class AdminServlet extends HttpServlet {
             String maxParticipantsStr = request.getParameter("maxParticipants");
             String image = request.getParameter("image");
             String isActiveStr = request.getParameter("isActive");
+            String priceStr = request.getParameter("price");
+            String hasFoodOptionStr = request.getParameter("hasFoodOption");
             
             // Validate required fields
             if (title == null || title.trim().isEmpty() || dateStr == null) {
@@ -99,7 +101,22 @@ public class AdminServlet extends HttpServlet {
             
             event.setImage(image != null ? image.trim() : "");
             event.setActive(isActiveStr != null && "on".equals(isActiveStr));
-            event.setCreatedBy((Integer) session.getAttribute("userId"));
+            // set price, default to 0
+            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                try {
+                    double price = Double.parseDouble(priceStr);
+                    event.setPrice(price);
+                } catch (NumberFormatException e) {
+                    event.setPrice(0.0);
+                }
+            } else {
+                event.setPrice(0.0); // Default price
+            }
+            logger.info("hasFoodOptionStr received: " + hasFoodOptionStr);
+            logger.info("hasFoodOption value calculated: " + "on".equals(hasFoodOptionStr));
+            event.setHasFoodOption("on".equals(hasFoodOptionStr));
+            logger.info("Event hasFoodOption after setting: " + event.isHasFoodOption());
+
             event.setCreatedBy((Integer) session.getAttribute("userId"));
             
             com.tegel.dao.EventDAO eventDAO = new com.tegel.dao.EventDAO();

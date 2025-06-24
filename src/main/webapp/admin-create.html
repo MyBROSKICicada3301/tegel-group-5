@@ -316,7 +316,17 @@
     function createEvent() {
         const form = document.getElementById('createEventForm');
         const formData = new FormData(form);
-        
+
+        // handle checkboxes
+        const hasFoodOption = document.getElementById('hasFoodOption').checked;
+        const isActive = document.getElementById('isActive').checked;
+        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
+        formData.set('isActive', isActive ? 'on' : 'off');
+
+        // Debug logs
+        console.log('Food option checked:', hasFoodOption);
+        console.log('Food option value in form:', formData.get('hasFoodOption'));
+
         // Validate required fields
         if (!formData.get('title') || !formData.get('date')) {
             showAlert('Please fill in all required fields.', 'danger');
@@ -338,6 +348,7 @@
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating...';
+
 
         fetch('/tegel_webapp/admin/events', {
             method: 'POST',

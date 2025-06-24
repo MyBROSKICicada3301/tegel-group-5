@@ -19,7 +19,7 @@ import com.tegel.util.SecurityUtils;
 import static com.tegel.dao.DatabaseManager.getConnection;
 
 public class EventDAO {
-    private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
+    public static final Logger logger = Logger.getLogger(EventDAO.class.getName());
     
     public boolean createEvent(Event event) {
         // Input validation before database operation
@@ -27,6 +27,7 @@ public class EventDAO {
             logger.warning("Attempted to create null event");
             return false;
         }
+        System.out.println("event food: " + event.isHasFoodOption());
         
         // Validate required fields and format
         if (!isValidEventData(event)) {
@@ -34,7 +35,12 @@ public class EventDAO {
             return false;
         }
         
-        String sql = "INSERT INTO mod4db.event (title, description, date, location, image, maxparticipants, createdby, isactive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO mod4db.event (title, description, date, location, image, " +
+                "maxparticipants, createdby, isactive, price, hasfoodoption) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Debug the hasFoodOption value before SQL execution
+        logger.info("Setting hasFoodOption to: " + event.isHasFoodOption());
         
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -53,6 +59,8 @@ public class EventDAO {
                 stmt.setInt(6, event.getMaxParticipants());
                 stmt.setInt(7, event.getCreatedBy());
                 stmt.setBoolean(8, event.isActive());
+                stmt.setDouble(9, event.getPrice());
+                stmt.setBoolean(10, event.isHasFoodOption());
                 
                 int rowsAffected = stmt.executeUpdate();
                 
@@ -200,7 +208,8 @@ public class EventDAO {
             return false;
         }
         
-        String sql = "UPDATE mod4db.event SET title = ?, description = ?, date = ?, location = ?, image = ?, maxparticipants = ?, isactive = ? WHERE event_id = ?";
+        String sql = "UPDATE mod4db.event SET title = ?, description = ?, date = ?, location = ?, " +
+                "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ? WHERE event_id = ?";
         
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -218,7 +227,9 @@ public class EventDAO {
                     SecurityUtils.sanitizeInput(event.getImage()) : null);
                 stmt.setInt(6, event.getMaxParticipants());
                 stmt.setBoolean(7, event.isActive());
-                stmt.setInt(8, event.getEventId());
+                stmt.setDouble(8, event.getPrice());
+                stmt.setBoolean(9, event.isHasFoodOption());
+                stmt.setInt(10, event.getEventId());
                 
                 int rowsAffected = stmt.executeUpdate();
                 
@@ -433,6 +444,8 @@ public class EventDAO {
             }
             
             event.setActive(rs.getBoolean("isactive"));
+            event.setPrice(rs.getDouble("price"));
+            event.setHasFoodOption(rs.getBoolean("hasfoodoption"));
             
             return event;
         } catch (Exception e) {

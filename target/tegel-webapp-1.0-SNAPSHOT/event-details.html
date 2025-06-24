@@ -41,7 +41,6 @@
     <div id="eventContent">
         <div class="loading">Loading event details...</div>
     </div>
-    <!-- Add this modal to your event-details.html page -->
     <div class="modal fade" id="enrollmentModal" tabindex="-1" aria-labelledby="enrollmentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -50,33 +49,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="enrollmentForm">
-                        <input type="hidden" id="modalEventId">
-
-                        <div id="foodOptionSection" style="display: none;">
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="wantsFoodOption">
-                                    <label class="form-check-label" for="wantsFoodOption">
-                                        I would like food at this event
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div id="dietarySection" style="display: none;">
-                                <div class="mb-3">
-                                    <label for="dietaryRestrictions" class="form-label">Dietary Restrictions</label>
-                                    <input type="text" class="form-control" id="dietaryRestrictions"
-                                           placeholder="Vegetarian, vegan, allergies, etc.">
-                                </div>
-                            </div>
+                    <input type="hidden" id="modalEventId" value="">
+                    <div class="mb-3" id="foodOptionSection">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="wantsFoodOption">
+                            <label class="form-check-label" for="wantsFoodOption">
+                                I would like food at this event
+                            </label>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="specialRequests" class="form-label">Special Requests/Notes for Organizers</label>
-                            <textarea class="form-control" id="specialRequests" rows="3"></textarea>
+                        <div id="dietarySection" style="display:none;" class="mt-3">
+                            <label for="dietaryRestrictions" class="form-label">Dietary Restrictions</label>
+                            <textarea class="form-control" id="dietaryRestrictions" rows="2"
+                                      placeholder="Enter any dietary restrictions or preferences"></textarea>
+                            <small class="text-muted">Leave blank to use the dietary restrictions from your profile</small>
                         </div>
-                    </form>
+                    </div>
+                    <div class="mb-3">
+                        <label for="specialRequests" class="form-label">Special Notes or Requests</label>
+                        <textarea class="form-control" id="specialRequests" rows="3"
+                                  placeholder="Any special requests or notes for the organizers?"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -645,49 +637,56 @@
     }
 
     function submitEnrollment(eventId) {
-        const userId = localStorage.getItem('userId');
         const wantsFoodOption = document.getElementById('wantsFoodOption').checked;
-        const dietaryRestrictions = document.getElementById('dietaryRestrictions').value;
-        const specialRequests = document.getElementById('specialRequests').value;
+        const dietaryRestrictions = document.getElementById('dietaryRestrictions').value.trim();
+        const specialRequests = document.getElementById('specialRequests').value.trim();
 
-        const enrollmentData = {
+        // Get user ID from localStorage or session
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert('You must be logged in to enroll in events');
+            return;
+        }
+
+        // Create payload with all enrollment details
+        const payload = {
             eventId: parseInt(eventId, 10),
             userId: parseInt(userId, 10),
             wantsFoodOption: wantsFoodOption,
-            dietaryRestrictions: dietaryRestrictions || null,
-            specialRequests: specialRequests || null
+            dietaryRestrictions: dietaryRestrictions,
+            specialRequests: specialRequests
         };
 
-        console.log("Submitting enrollment with data:", enrollmentData);
+        console.log("Sending enrollment request with payload:", payload);
 
+        // Send enrollment request to server
         fetch('/tegel_webapp/events/enroll', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(enrollmentData),
+            body: JSON.stringify(payload),
             credentials: 'include'
         })
             .then(response => response.json())
-            .then(data => {
-                // Close the modal
-                bootstrap.Modal.getInstance(document.getElementById('enrollmentModal')).hide();
+            .then(responseData => {
+                if (responseData.success) {
+                    // Close the modal
+                    bootstrap.Modal.getInstance(document.getElementById('enrollmentModal')).hide();
 
-                if (data.success) {
-                    // Show success message
-                    alert('Successfully enrolled in the event!');
-                    // Reload event details to update enrollment status
-                    loadEventDetails();
+                    // Refresh the page to show updated enrollment status
+                    window.location.reload();
                 } else {
-                    alert('Error: ' + data.message);
+                    alert(responseData.message || 'Failed to enroll in the event');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                bootstrap.Modal.getInstance(document.getElementById('enrollmentModal')).hide();
-                alert('An error occurred during enrollment. Please try again later.');
+                console.error("Error during enrollment:", error);
+                alert('An error occurred during enrollment. Please try again.');
             });
     }
+
 </script>
 
 <footer class="footer">

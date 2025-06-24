@@ -34,6 +34,9 @@ public class EventDAO {
             logger.warning("Invalid event data provided for creation");
             return false;
         }
+
+        // manually set hasFoodOption to alway true for debbugging purposes
+        event.setHasFoodOption(true);
         
         String sql = "INSERT INTO mod4db.event (title, description, date, location, image, " +
                 "maxparticipants, createdby, isactive, price, hasfoodoption) " +
@@ -626,9 +629,9 @@ public class EventDAO {
         }
     }
     public boolean enrollUserInEventWithDetails(int userId, int eventId,
-                                                String registrationData,
+                                                String dietaryRestrictions,
                                                 String status,
-                                                String specialRequests,
+                                                String specialNotes,
                                                 boolean wantsFoodOption) {
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -646,16 +649,31 @@ public class EventDAO {
                     return true;
                 }
 
-                // User is not enrolled, proceed with insert
-                String insertSql = "INSERT INTO mod4db.eventregistration (event_id, user_id, registrationdata, status, specialrequests, \"wantsFoodOption\") " +
+                // If dietaryRestrictions is empty, get it from user table
+                if (dietaryRestrictions == null || dietaryRestrictions.trim().isEmpty()) {
+                    String userSql = "SELECT dietres FROM mod4db.users WHERE user_id = ?";
+                    try (PreparedStatement userStmt = conn.prepareStatement(userSql)) {
+                        userStmt.setInt(1, userId);
+                        ResultSet userRs = userStmt.executeQuery();
+                        if (userRs.next()) {
+                            String userDietRes = userRs.getString("dietres");
+                            if (userDietRes != null && !userDietRes.trim().isEmpty()) {
+                                dietaryRestrictions = userDietRes;
+                                logger.info("Using dietary restrictions from user profile: " + dietaryRestrictions);
+                            }
+                        }
+                    }
+                }
+                // user is not enrolled, proceed to insert
+                String insertSql = "INSERT INTO mod4db.eventregistration (event_id, user_id, dietaryrestrictions, status, specialrequests, \"wantsFoodOption\") " +
                         "VALUES (?, ?, ?, ?, ?, ?)";
 
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                     insertStmt.setInt(1, eventId);
                     insertStmt.setInt(2, userId);
-                    insertStmt.setString(3, registrationData);
+                    insertStmt.setString(3, dietaryRestrictions);
                     insertStmt.setString(4, status);
-                    insertStmt.setString(5, specialRequests);
+                    insertStmt.setString(5, specialNotes); // specialrequests column for notes
                     insertStmt.setBoolean(6, wantsFoodOption);
 
                     int affectedRows = insertStmt.executeUpdate();

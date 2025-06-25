@@ -253,6 +253,18 @@
             }
         }
 
+        // Format price for display
+        let priceDisplay = 'Free';
+        if (event.price && event.price > 0) {
+            priceDisplay = `€${event.price.toFixed(2)}`;
+        }
+
+        // Food option display
+        let foodOptionDisplay = 'No food provided';
+        if (event.hasFoodOption) {
+            foodOptionDisplay = 'Food will be provided';
+        }
+
         // Check if event is full
         const maxParticipants = event.maxParticipants || 0;
         const currentParticipants = event.currentParticipants || 0;
@@ -289,6 +301,17 @@
                                     ${currentParticipants} / ${maxParticipants > 0 ? maxParticipants : 'Unlimited'} enrolled
                                 </div>
                             </div>
+
+                            <div class="info-section">
+                                <div class="info-label">💰 Price</div>
+                                <div class="info-value">${priceDisplay}</div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-label">🍽️ Food</div>
+                                <div class="info-value">${foodOptionDisplay}</div>
+                            </div>
+
                         </div>
 
                         <div class="description-section">
@@ -355,6 +378,17 @@
                         <div class="info-value">
                             ${currentParticipants} / ${maxParticipants > 0 ? maxParticipants : 'Unlimited'} enrolled
                         </div>
+
+                    <div class="info-section">
+                        <div class="info-label">💰 Price</div>
+                        <div class="info-value">${priceDisplay}</div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-label">🍽️ Food</div>
+                        <div class="info-value">${foodOptionDisplay}</div>
+                    </div>
+
                     </div>
                 </div>
 

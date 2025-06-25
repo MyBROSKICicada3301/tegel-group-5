@@ -7,6 +7,7 @@ import com.tegel.model.Newsletter;
 import com.tegel.util.LocalDateTimeAdapter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@WebServlet("/newsletter")
 public class NewsletterServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(NewsletterServlet.class.getName());
     private final NewsletterDAO newsletterDAO = new NewsletterDAO();
@@ -31,28 +33,28 @@ public class NewsletterServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-        logger.info("NewsletterServlet receiving request with pathInfo: " + pathInfo);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
         try {
-            // Get a specific newsletter by ID
-            if (pathInfo != null && !pathInfo.equals("/")) {
-                String idStr = pathInfo.substring(1); // Remove the leading '/'
-                logger.info("Fetching newsletter with ID: " + idStr);
+            // Check for a specific newsletter ID
+            String idStr = request.getParameter("id");
 
+            if (idStr != null && !idStr.isEmpty()) {
                 try {
-                    int newsletterId = Integer.parseInt(idStr);
-                    Newsletter newsletter = newsletterDAO.getNewsletterById(newsletterId);
+                    int id = Integer.parseInt(idStr);
+                    logger.info("Fetching newsletter with ID: " + id);
+
+                    Newsletter newsletter = newsletterDAO.getNewsletterById(id);
 
                     if (newsletter != null) {
-                        logger.info("Found newsletter: " + newsletter.getTitle());
-                        out.print(gson.toJson(newsletter));
+                        Map<String, Object> responseData = new HashMap<>();
+                        responseData.put("newsletter", newsletter);
+                        out.print(gson.toJson(responseData));
                     } else {
-                        logger.warning("Newsletter not found with ID: " + newsletterId);
+                        logger.warning("Newsletter not found with ID: " + id);
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         Map<String, String> errorResponse = new HashMap<>();
                         errorResponse.put("error", "Newsletter not found");
@@ -65,10 +67,9 @@ public class NewsletterServlet extends HttpServlet {
                     errorResponse.put("error", "Invalid newsletter ID format");
                     out.print(gson.toJson(errorResponse));
                 }
-            }
-            // Get latest newsletters
-            else {
-                int limit = 10; // Change default limit to show more newsletters
+            } else {
+                // Get latest newsletters
+                int limit = 10; // Default limit
                 String limitParam = request.getParameter("limit");
                 if (limitParam != null && !limitParam.isEmpty()) {
                     try {

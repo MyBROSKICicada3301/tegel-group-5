@@ -6,7 +6,6 @@
     <title>Admin Dashboard | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -132,6 +131,29 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="eventPrice" class="form-label">Event Price (€)</label>
+                                <input type="number" class="form-control" id="eventPrice" name="price"
+                                       min="0" step="0.01" value="0.00">
+                                <small class="form-text text-muted">Set to 0 for free events</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Food Options</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                                    <label class="form-check-label" for="hasFoodOption">
+                                        <strong>This event includes food options</strong>
+                                    </label>
+                                    <div class="form-text">Enables participants to select food options during enrollment</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="mb-3">
                         <label for="eventDescription" class="form-label">Description</label>
@@ -205,6 +227,29 @@
                             <div class="mb-3">
                                 <label for="editMaxParticipants" class="form-label">Max Participants</label>
                                 <input type="number" class="form-control" id="editMaxParticipants" name="maxParticipants" min="0" max="10000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="eventPrice" class="form-label">Event Price (€)</label>
+                                <input type="number" class="form-control" id="eventPrice" name="price"
+                                       min="0" step="0.01" value="0.00">
+                                <small class="form-text text-muted">Set to 0 for free events</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Food Options</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                                    <label class="form-check-label" for="hasFoodOption">
+                                        <strong>This event includes food options</strong>
+                                    </label>
+                                    <div class="form-text">Enables participants to select food options during enrollment</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -457,6 +502,8 @@
         document.getElementById('editEventDescription').value = event.description || '';
         document.getElementById('editEventImage').value = event.image || '';
         document.getElementById('editIsActive').checked = event.isActive;
+        document.getElementById('editEventPrice').value = event.price || 0;
+        document.getElementById('editHasFoodOption').checked = event.hasFoodOption || false;
 
         // Set minimum date to today for future events
         document.getElementById('editEventDate').min = new Date().toISOString().split('T')[0];

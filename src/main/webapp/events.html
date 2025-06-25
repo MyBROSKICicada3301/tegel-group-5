@@ -45,6 +45,21 @@
                             <label for="maxParticipants" class="form-label">Maximum Participants</label>
                             <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" value="50" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="eventPrice" class="form-label">Event Price (€)</label>
+                            <input type="number" class="form-control" id="eventPrice" name="price"
+                                   min="0" step="0.01" value="0.00">
+                            <small class="form-text text-muted">Set to 0 for free events</small>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                                <label class="form-check-label" for="hasFoodOption">
+                                    This event includes food options
+                                </label>
+                                <div class="form-text">Enables participants to select food options during enrollment</div>
+                            </div>
+                        </div>
                         <div id="adminEventCreateMsg" class="mt-2"></div>
                     </form>
                 </div>
@@ -173,16 +188,16 @@
     function displayEvents(events) {
         const container = document.getElementById('eventsContainer');
         container.innerHTML = '';
-        
+
         if (events.length === 0) {
             container.innerHTML = '<div class="col-12"><p class="text-center">No events available.</p></div>';
             return;
         }
-        
+
         events.forEach(event => {
             const eventCard = document.createElement('div');
             eventCard.className = 'col-lg-4 col-md-6';
-            
+
             // Calculate duration or use provided duration
             let duration = 'Duration not specified';
             if (event.startTime && event.endTime) {
@@ -190,19 +205,19 @@
             } else if (event.duration) {
                 duration = event.duration;
             }
-            
+
             // Format date for display
             let displayDate = event.date;
             if (event.date) {
                 const eventDate = new Date(event.date);
-                displayDate = eventDate.toLocaleDateString('en-US', { 
-                    weekday: 'short', 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
+                displayDate = eventDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
                 });
             }
-            
+
             eventCard.innerHTML = `
                 <div class="card event-tile h-100">
                     <div class="card-body d-flex flex-column">
@@ -247,6 +262,7 @@
         displayEvents(filteredEvents);
     }
 
+
     function resetEventSearch() {
         document.getElementById('eventSearchInput').value = '';
         displayEvents(dummyEvents);
@@ -257,83 +273,67 @@
     // Admin event creation functionality
     document.addEventListener('DOMContentLoaded', function() {
         // Handle event creation form submission via the submit button in modal
-        const submitEventBtn = document.getElementById('submitEventBtn');
-        if (submitEventBtn) {
-            submitEventBtn.addEventListener('click', function() {
-                const title = document.getElementById('eventTitle').value;
-                const description = document.getElementById('eventDescription').value;
-                const date = document.getElementById('eventDate').value;
-                const time = document.getElementById('eventTime').value;
-                const location = document.getElementById('eventLocation').value;
-                const maxParticipants = document.getElementById('maxParticipants').value;
+        document.getElementById('submitEventBtn').addEventListener('click', function() {
+            const form = document.getElementById('adminEventCreateForm');
 
-                // Form validation
-                const form = document.getElementById('adminEventCreateForm');
-                if (!form.checkValidity()) {
-                    // Trigger browser's native validation UI
-                    form.reportValidity();
-                    return;
-                }
+            // Form validation
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
 
-                const eventData = {
-                    title: title,
-                    description: description,
-                    date: date,
-                    startTime: time,
-                    maxParticipants: parseInt(maxParticipants),
-                    location: location
-                };
+            // Create FormData from the form
+            const formData = new FormData(form);
 
-                debug.log('EventCreation', 'Creating event with data:', eventData);
-
-                // Send the request to create the event
-                fetch('/tegel_webapp/events', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(eventData)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to create event');
-                    }
-                    return response.json();
-                })
+            // Send the request to create the event
+            fetch('/tegel_webapp/admin/events', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
                 .then(data => {
-                    debug.log('EventCreation', 'Event created successfully:', data);
-
-                    // Show success message
-                    const msgElement = document.getElementById('adminEventCreateMsg');
-                    msgElement.className = 'alert alert-success';
-                    msgElement.textContent = 'Event created successfully!';
-
-                    // Reset the form
-                    document.getElementById('adminEventCreateForm').reset();
-
-                    // Reload events to show the new event
-                    loadEvents();
-
-                    // Close the modal after a short delay
-                    setTimeout(() => {
-                        // Hide the modal
+                    if (data.eventId || data.success) {
+                        // Close the modal
                         const modal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
                         modal.hide();
 
-                        // Clear the message after closing
-                        msgElement.textContent = '';
-                        msgElement.className = '';
-                    }, 1500);
+                        // Show success notification
+                        showNotification('Event created successfully!', 'success');
+
+                        // Reset form
+                        form.reset();
+
+                        // Reload events list
+                        loadEvents();
+                    } else {
+                        showNotification(data.error || 'Failed to create event.', 'danger');
+                    }
                 })
                 .catch(error => {
-                    debug.error('EventCreation', 'Error creating event:', error);
-
-                    // Show error message
-                    const msgElement = document.getElementById('adminEventCreateMsg');
-                    msgElement.className = 'alert alert-danger';
-                    msgElement.textContent = 'Failed to create event: ' + error.message;
+                    console.error('Error creating event:', error);
+                    showNotification('Error creating event. Please try again.', 'danger');
                 });
-            });
+        });
+
+// Add this notification function
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show`;
+            notification.setAttribute('role', 'alert');
+            notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+            // Insert at the top of the main content
+            const mainContent = document.querySelector('main');
+            mainContent.insertBefore(notification, mainContent.firstChild);
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
         }
 
         // Reset the form and error messages when the modal is closed

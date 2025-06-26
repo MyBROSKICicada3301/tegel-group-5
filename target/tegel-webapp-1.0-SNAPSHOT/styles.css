@@ -1,411 +1,4 @@
-html, body {
-    height: 100%;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    font-family: 'Segoe UI', sans-serif;
-    background: #ffb56b;
-    margin: 0;
-    padding: 0;
-}
-
-main {
-    flex: 1;
-    padding: 40px 20px;
-}
-
-.navbar-brand {
-    font-family: 'Courier New', cursive;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.page-header {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.page-title {
-    font-size: 48px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
-}
-
-.page-subtitle {
-    font-size: 20px;
-    color: rgba(255,255,255,0.9);
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-}
-
-.content-section {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    margin-bottom: 40px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.content-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
-}
-
-.section-title {
-    color: #ff8c1a;
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    text-align: center;
-    border-bottom: 3px solid #ff8c1a;
-    padding-bottom: 15px;
-}
-
-.about-text {
-    font-size: 18px;
-    line-height: 1.8;
-    color: #333;
-    margin-bottom: 25px;
-    text-align: justify;
-}
-
-.highlight-text {
-    background: linear-gradient(120deg, #ff8c1a 0%, #ffb56l 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-.photo-gallery {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin: 40px 0;
-}
-
-.photo-container {
-    position: relative;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
-}
-
-.photo-container:hover {
-    transform: scale(1.05);
-}
-
-.photo-container img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    border-radius: 15px;
-}
-
-.photo-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.7));
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-.photo-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.photo-description {
-    font-size: 14px;
-    opacity: 0.9;
-}
-
-.members-section {
-    background: linear-gradient(45deg, #4CAF50 0%, #2E7D32 100%);
-    color: white;
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    margin: 40px 0;
-}
-
-.members-title {
-    font-size: 36px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.members-description {
-    font-size: 18px;
-    line-height: 1.6;
-    opacity: 0.95;
-}
-
-.footer {
-    background: #000;
-    color: white;
-    padding: 25px 0;
-    margin-top: auto;
-}
-
-.footer img {
-    width: 28px;
-    height: 28px;
-    margin-right: 15px;
-    filter: brightness(0) invert(1);
-}
-
-.footer a {
-    text-decoration: none;
-}
-
-.social-links {
-    display: flex;
-    align-items: center;
-}
-
-.address-text {
-    color: #ccc;
-    font-size: 14px;
-}
-
-.footer-brand {
-    font-family: 'Courier New', cursive;
-    font-size: 24px;
-    color: #ff8c1a;
-    font-weight: bold;
-}
-
-/* Homepage-specific styles for index.html */
-.hero-section {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    margin-bottom: 40px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-}
-.hero-section .carousel-inner,
-.hero-section .carousel-item,
-.hero-section img {
-    height: 400px;
-    border-radius: 20px;
-}
-.hero-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #fff;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
-}
-.hero-title {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-}
-.hero-subtitle {
-    font-size: 22px;
-    font-weight: 400;
-    margin-bottom: 0;
-}
-
-.content-grid {
-    display: flex;
-    gap: 30px;
-    margin: 40px 0 0 0;
-    flex-wrap: wrap;
-}
-.content-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    padding: 32px 28px;
-    flex: 1 1 320px;
-    min-width: 280px;
-    margin-bottom: 30px;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.content-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.13);
-}
-.newsletter-card {
-    margin-top: 30px;
-    background: linear-gradient(120deg, #ffb56b 0%, #ff8c1a 100%);
-    color: #fff;
-    box-shadow: 0 8px 25px rgba(255,140,26,0.12);
-}
-.newsletter-card h3 {
-    color: #fff;
-}
-.event-date {
-    color: #ff8c1a;
-    font-weight: bold;
-    font-size: 18px;
-    margin-bottom: 6px;
-}
-.event-title {
-    font-size: 20px;
-    font-weight: 500;
-    color: #333;
-}
-
-/* Event Details Page Styles */
-.btn-back {
-    display: inline-block;
-    color: #333;
-    text-decoration: none;
-    margin-bottom: 30px;
-    font-size: 18px;
-    transition: color 0.3s;
-}
-
-.btn-back:hover {
-    color: #ff8c1a;
-}
-
-#eventContent {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.event-details-card {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    margin-bottom: 40px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-}
-
-.event-title {
-    font-size: 42px;
-    color: #333;
-    margin-bottom: 30px;
-    font-weight: bold;
-}
-
-.event-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
-    margin-bottom: 40px;
-    padding: 30px;
-    background: #f8f9fa;
-    border-radius: 15px;
-}
-
-.info-section {
-    text-align: left;
-}
-
-.info-label {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.info-value {
-    font-size: 16px;
-    color: #333;
-}
-
-.description-section {
-    margin: 40px 0;
-    padding-top: 40px;
-    border-top: 2px solid #f0f0f0;
-}
-
-.description-title {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.enrollment-section {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 40px;
-    border-top: 2px solid #f0f0f0;
-}
-
-.enrollment-title {
-    font-size: 32px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-.enrollment-info {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.btn-enroll {
-    background: #ff8c1a;
-    color: white;
-    padding: 15px 40px;
-    border: none;
-    border-radius: 30px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-enroll:hover {
-    background: #e67a00;
-    transform: translateY(-2px);
-}
-
-.btn-enroll:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Event Card Select Button */
-.btn-select {
-    background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
-    color: white;
-    padding: 12px 0;
-    border: none;
-    border-radius: 15px;
-    font-size: 18px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-shadow: 0 4px 15px rgba(255, 140, 26, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.btn-select:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 140, 26, 0.4);
-    background: linear-gradient(135deg, #ffb56b 0%, #ff8c1a 100%);
-    color: white;
-}
-
-.btn-select:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(255, 140, 26, 0.3);
-}
+/* Remove the stray bracket at the top */
 
 /* Event Card Styles */
 .event-tile {
@@ -423,8 +16,8 @@ main {
 /* Navbar Styles */
 .navbar {
     padding: 20px 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    background: rgba(252,125,4,1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: rgba(252, 125, 4, 1);
 }
 
 .navbar-brand img {
@@ -438,7 +31,7 @@ main {
 }
 
 .navbar .nav-link {
-    font-size: 22px;  /* Increased from 18px to 22px */
+    font-size: 22px;
     padding: 12px 20px !important;
     margin: 0 5px;
     border-radius: 8px;
@@ -458,7 +51,223 @@ main {
 
 .navbar .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* General Page Styles - Add these for white boxes */
+.page-header {
+    background: white;
+    padding: 40px;
+    margin-bottom: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.page-title {
+    font-size: 42px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.page-subtitle {
+    font-size: 18px;
+    color: #666;
+}
+
+.content-section {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.about-text {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.highlight-text {
+    font-weight: 500;
+    color: #ff8c1a;
+}
+
+/* Card styles */
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* Photo Gallery */
+.photo-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 40px 0;
+}
+
+.photo-container {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.photo-container img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.photo-container:hover img {
+    transform: scale(1.05);
+}
+
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: white;
+}
+
+.photo-title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.photo-description {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Login Form Styling */
+.login-card {
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-card h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(255, 140, 26, 0.3);
+}
+
+/* Footer styles */
+.footer {
+    background-color: #f8f9fa;
+    padding: 30px 0;
+    margin-top: 80px;
+}
+
+.social-links a {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.address-text {
+    color: #666;
+    font-size: 14px;
+}
+
+.footer-brand {
+    height: 40px;
+}
+
+/* Event Styles */
+.event-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.event-title {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.event-description {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.event-date, .event-duration {
+    color: #ff8c1a;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.event-location, .event-participants {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.btn-select {
+    background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-select:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 140, 26, 0.3);
+    color: white;
 }
 
 /* Account Page Styles */
@@ -467,7 +276,7 @@ main {
     border-radius: 25px;
     padding: 40px;
     margin: 40px 0;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header {
@@ -587,14 +396,14 @@ main {
     background: white;
     border-radius: 15px;
     padding: 25px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     border: 1px solid #eee;
 }
 
 .enrolled-event-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .enrolled-event-date {
@@ -622,6 +431,18 @@ main {
     padding: 40px;
     color: #666;
     font-size: 18px;
+}
+
+/* Main body styling */
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+}
+
+main {
+    min-height: 70vh;
 }
 
 /* Media queries for responsiveness */
@@ -705,21 +526,76 @@ main {
         padding: 10px 15px;
     }
 }
+
 @media (max-width: 992px) {
     .hero-section, .hero-section .carousel-inner, .hero-section .carousel-item, .hero-section img {
         height: 250px;
     }
+
     .hero-title {
         font-size: 32px;
     }
+
     .hero-subtitle {
         font-size: 16px;
     }
+
     .content-grid {
         flex-direction: column;
         gap: 20px;
     }
+
     .content-card {
         padding: 20px 14px;
     }
+}
+
+/* Form styles */
+.form-control {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.form-control:focus {
+    border-color: #ff8c1a;
+    box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-text {
+    color: #888;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Error and success messages */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Additional styling for admin pages */
+.admin-only {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }

@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Announcements | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo"
+                 style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
@@ -20,9 +22,11 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
+                </li>
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
+                </li>
             </ul>
             <div id="authButtons">
                 <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
@@ -35,16 +39,21 @@
 <main class="container my-4">
     <div class="row justify-content-center mb-4">
         <div class="col-lg-8 col-md-10">
-            <form id="searchForm" class="row g-2 mb-3" role="search" aria-label="Search announcements">
+            <form id="searchForm" class="row g-2 mb-3" role="search"
+                  aria-label="Search announcements">
                 <div class="col-12 col-md-8">
-                    <input id="searchInput" class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
+                    <input id="searchInput" class="form-control" type="search"
+                           placeholder="Search announcements..." aria-label="Search announcements">
                 </div>
                 <div class="col-12 col-md-4">
-                    <input id="dateInput" class="form-control" type="date" aria-label="Search by date">
+                    <input id="dateInput" class="form-control" type="date"
+                           aria-label="Search by date">
                 </div>
                 <div class="col-12 d-flex justify-content-end">
                     <button class="btn btn-outline-warning mt-2" type="submit">Search</button>
-                    <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2" type="button">Reset</button>
+                    <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2"
+                            type="button">Reset
+                    </button>
                 </div>
             </form>
             <div class="announcements-section">
@@ -64,11 +73,13 @@
                     <form id="adminAnnouncementCreateForm">
                         <div class="mb-3">
                             <label for="announcementTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="announcementTitle" name="title" required>
+                            <input type="text" class="form-control" id="announcementTitle"
+                                   name="title" required>
                         </div>
                         <div class="mb-3">
                             <label for="announcementContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="announcementContent" name="content" rows="3" required></textarea>
+                            <textarea class="form-control" id="announcementContent" name="content"
+                                      rows="3" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Create Announcement</button>
                     </form>
@@ -83,14 +94,19 @@
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
         <div class="social-links">
             <a href="https://www.instagram.com/sgvtegel" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg"
+                     alt="Instagram"
+                     style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
             </a>
             <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg"
+                     alt="Gmail"
+                     style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
             </a>
         </div>
         <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
-        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
+        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
+             style="width: 90px; height: auto; filter: none; margin-right: 0;"/>
     </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -173,7 +189,7 @@
     }
 
     // Handle search form submission
-    document.getElementById('searchForm').addEventListener('submit', function(e) {
+    document.getElementById('searchForm').addEventListener('submit', function (e) {
         e.preventDefault(); // Prevent normal form submission
 
         const searchTerm = document.getElementById('searchInput').value.trim();
@@ -199,7 +215,7 @@
     });
 
     // Reset search form
-    document.getElementById('resetSearch').addEventListener('click', function() {
+    document.getElementById('resetSearch').addEventListener('click', function () {
         document.getElementById('searchInput').value = '';
         document.getElementById('dateInput').value = '';
 
@@ -217,7 +233,7 @@
     });
 
     // Ensure session is checked on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         console.log("DOM fully loaded");
 
         // Fetch announcements on page load
@@ -228,35 +244,35 @@
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Session check response:", data);
-            if(data.loggedIn) {
-                const authButtons = document.getElementById('authButtons');
-                if (authButtons) {
-                    authButtons.innerHTML = `
+            .then(response => response.json())
+            .then(data => {
+                console.log("Session check response:", data);
+                if (data.loggedIn) {
+                    const authButtons = document.getElementById('authButtons');
+                    if (authButtons) {
+                        authButtons.innerHTML = `
                         <a href="#" class="btn btn-light me-2" id="accountBtn">Account</a>
                         <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
                     `;
 
-                    // Add click event listener to sign out button
-                    document.getElementById('signoutBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        signOut();
-                    });
+                        // Add click event listener to sign out button
+                        document.getElementById('signoutBtn').addEventListener('click', function (e) {
+                            e.preventDefault();
+                            signOut();
+                        });
 
-                    // Add click event for account button
-                    document.getElementById('accountBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Redirect to account page
-                        window.location.href = 'account.html';
-                    });
+                        // Add click event for account button
+                        document.getElementById('accountBtn').addEventListener('click', function (e) {
+                            e.preventDefault();
+                            // Redirect to account page
+                            window.location.href = 'account.html';
+                        });
+                    }
                 }
-            }
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-        });
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+            });
     });
 
     function signOut() {
@@ -264,36 +280,36 @@
             method: 'POST',
             credentials: 'include'
         })
-        .then(() => {
-            // Redirect to home page after successful logout
-            window.location.href = 'index.html';
-        })
-        .catch(error => {
-            console.error('Error signing out:', error);
-        });
+            .then(() => {
+                // Redirect to home page after successful logout
+                window.location.href = 'index.html';
+            })
+            .catch(error => {
+                console.error('Error signing out:', error);
+            });
     }
 
     // Admin functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Check if user is admin
         fetch('/tegel_webapp/check-admin', {
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Admin check response:", data);
-            if(data.isAdmin) {
-                // Show admin announcement creation form
-                document.querySelector('.admin-only').style.display = 'block';
-            }
-        })
-        .catch(error => {
-            console.error('Error checking admin status:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log("Admin check response:", data);
+                if (data.isAdmin) {
+                    // Show admin announcement creation form
+                    document.querySelector('.admin-only').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking admin status:', error);
+            });
 
         // Handle admin announcement creation
-        document.getElementById('adminAnnouncementCreateForm').addEventListener('submit', function(e) {
+        document.getElementById('adminAnnouncementCreateForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const title = document.getElementById('announcementTitle').value.trim();
@@ -311,27 +327,27 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, content }),
+                body: JSON.stringify({title, content}),
                 credentials: 'include'
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Announcement creation response:", data);
-                if(data.success) {
-                    displayAdminMessage('Announcement created successfully!', 'success');
-                    // Clear form fields
-                    document.getElementById('announcementTitle').value = '';
-                    document.getElementById('announcementContent').value = '';
-                    // Optionally, refresh announcements list
-                    fetchAnnouncements();
-                } else {
-                    displayAdminMessage('Failed to create announcement. Please try again.', 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating announcement:', error);
-                displayAdminMessage('Error creating announcement. Please try again later.', 'danger');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Announcement creation response:", data);
+                    if (data.success) {
+                        displayAdminMessage('Announcement created successfully!', 'success');
+                        // Clear form fields
+                        document.getElementById('announcementTitle').value = '';
+                        document.getElementById('announcementContent').value = '';
+                        // Optionally, refresh announcements list
+                        fetchAnnouncements();
+                    } else {
+                        displayAdminMessage('Failed to create announcement. Please try again.', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating announcement:', error);
+                    displayAdminMessage('Error creating announcement. Please try again later.', 'danger');
+                });
         });
     });
 

@@ -2,28 +2,41 @@ package com.tegel.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Model class representing a Newsletter
+ */
 public class Newsletter {
-    private int newsletterId;
+    private int id;
     private String title;
     private String content;
-    private LocalDateTime publishDate;
+    private int createdBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime publishedAt;
+    private boolean isPublished;
 
+    // Default constructor
     public Newsletter() {
     }
 
-    public Newsletter(int newsletterId, String title, String content, LocalDateTime publishDate) {
-        this.newsletterId = newsletterId;
+    // Constructor with parameters
+    public Newsletter(int id, String title, String content, int createdBy,
+                     LocalDateTime createdAt, LocalDateTime publishedAt, boolean isPublished) {
+        this.id = id;
         this.title = title;
         this.content = content;
-        this.publishDate = publishDate;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
+        this.publishedAt = publishedAt;
+        this.isPublished = isPublished;
     }
 
-    public int getNewsletterId() {
-        return newsletterId;
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
-    public void setNewsletterId(int newsletterId) {
-        this.newsletterId = newsletterId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -42,11 +55,48 @@ public class Newsletter {
         this.content = content;
     }
 
-    public LocalDateTime getPublishDate() {
-        return publishDate;
+    public int getCreatedBy() {
+        return createdBy;
     }
 
-    public void setPublishDate(LocalDateTime publishDate) {
-        this.publishDate = publishDate;
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
+    }
+
+    public boolean isPublished() {
+        return isPublished;
+    }
+
+    public void setPublished(boolean published) {
+        isPublished = published;
+    }
+
+    @Override
+    public String toString() {
+        return "Newsletter{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + (content != null ? content.substring(0, Math.min(content.length(), 30)) + "..." : "null") + '\'' +
+                ", createdBy=" + createdBy +
+                ", createdAt=" + createdAt +
+                ", publishedAt=" + publishedAt +
+                ", isPublished=" + isPublished +
+                '}';
     }
 }

@@ -443,20 +443,42 @@
             .then(data => {
                 console.log("Profile update response:", data);
                 if (data.success) {
+                    // Update the currentUserData object with new values
+                    currentUserData = {
+                        ...currentUserData,
+                        fullName: formData.fullName,
+                        nickName: formData.nickName,
+                        email: formData.email,
+                        phoneNumber: formData.phoneNumber,
+                        dateOfBirth: formData.dateOfBirth,
+                        dietRes: formData.dietRes
+                    };
+
                     if (emailChanged) {
-                        showFormFeedback('Profile updated successfully! Please note that your email address has been changed.', 'success');
+                        showFormFeedback('Profile updated successfully! Your email address has been changed.', 'success');
+
+                        // Update header display immediately
+                        document.getElementById('userEmail').textContent = currentUserData.email;
+
+                        // Update any localStorage data or refresh session
+                        localStorage.removeItem('userId');  // Clear any stale data
+
+                        // Wait for a moment to show the success message, then refresh the page
+                        // This will fully sync client and server state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     } else {
                         showFormFeedback('Profile updated successfully!', 'success');
-                    }
 
-                    // Reload profile data after short delay to show the success message
-                    setTimeout(() => {
-                        loadUserProfile();
-                        // Return to profile view
-                        document.getElementById('details-tab-pane').innerHTML = generateProfileViewHTML();
-                        // Reattach edit button event listener
-                        document.getElementById('editProfileBtn').addEventListener('click', showEditProfileForm);
-                    }, 1500);
+                        // For non-email changes, just update the UI
+                        setTimeout(() => {
+                            // Return to profile view with updated data
+                            document.getElementById('details-tab-pane').innerHTML = generateProfileViewHTML();
+                            // Reattach edit button event listener
+                            document.getElementById('editProfileBtn').addEventListener('click', showEditProfileForm);
+                        }, 1500);
+                    }
                 } else {
                     showFormFeedback(data.message || 'Failed to update profile', 'error');
                 }
@@ -570,7 +592,7 @@
             }
         );
     }
-    
+
     function showCustomModal(title, message, confirmText, cancelText, confirmCallback) {
         // Create modal container
         const modalOverlay = document.createElement('div');

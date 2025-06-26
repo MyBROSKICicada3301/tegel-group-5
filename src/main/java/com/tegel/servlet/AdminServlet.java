@@ -79,6 +79,7 @@ public class AdminServlet extends HttpServlet {
             String isActiveStr = request.getParameter("isActive");
             String priceStr = request.getParameter("price");
             String hasFoodOptionStr = request.getParameter("hasFoodOption");
+            String isPublicStr = request.getParameter("isPublic");
             
             // Validate required fields
             if (title == null || title.trim().isEmpty() || dateStr == null) {
@@ -101,6 +102,12 @@ public class AdminServlet extends HttpServlet {
             
             event.setImage(image != null ? image.trim() : "");
             event.setActive(isActiveStr != null && "on".equals(isActiveStr));
+
+            // set public visibility
+            event.setPublic("on".equals(isPublicStr));
+            logger.info("isPublicStr received: " + isPublicStr);
+            logger.info("isPublic value set: " + event.isPublic());
+
             // set price, default to 0
             if (priceStr != null && !priceStr.trim().isEmpty()) {
                 try {

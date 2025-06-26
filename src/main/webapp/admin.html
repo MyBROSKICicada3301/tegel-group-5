@@ -215,7 +215,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -254,13 +254,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="eventDescription" class="form-label">Description</label>
                         <textarea class="form-control" id="eventDescription" name="description" rows="4" maxlength="2000"></textarea>
                         <small class="form-text text-muted">Max 2000 characters</small>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -270,7 +270,13 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <div class="form-check mt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
+                                    <label class="form-check-label" for="isPublic">
+                                        Make this event public
+                                    </label>
+                                </div>
+                                <div class="form-check mt-2">
                                     <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
                                     <label class="form-check-label" for="isActive">
                                         Active Event
@@ -809,32 +815,41 @@
     function createEvent() {
         const form = document.getElementById('createEventForm');
         const formData = new FormData(form);
-        
+
         // Validate required fields
         if (!formData.get('title') || !formData.get('date')) {
             alert('Please fill in all required fields.');
             return;
         }
 
+        // Handle checkboxes properly
+        const hasFoodOption = document.getElementById('hasFoodOption').checked;
+        const isActive = document.getElementById('isActive').checked;
+        const isPublic = document.getElementById('isPublic').checked;
+
+        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
+        formData.set('isActive', isActive ? 'on' : 'off');
+        formData.set('isPublic', isPublic ? 'on' : 'off');
+
         fetch('/tegel_webapp/admin/events', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.eventId) {
-                alert('Event created successfully!');
-                bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
-                form.reset();
-                loadEvents(); // Reload events
-            } else {
-                alert(data.error || 'Failed to create event.');
-            }
-        })
-        .catch(error => {
-            console.error('Error creating event:', error);
-            alert('Error creating event. Please try again.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.eventId) {
+                    alert('Event created successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
+                    form.reset();
+                    loadEvents(); // Reload events
+                } else {
+                    alert(data.error || 'Failed to create event.');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating event:', error);
+                alert('Error creating event. Please try again.');
+            });
     }
 
     function editEvent(eventId) {

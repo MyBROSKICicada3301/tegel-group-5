@@ -42,95 +42,77 @@
         <h1 class="page-title">Create New Event</h1>
         
         <div id="alertContainer"></div>
-        
+
+        <!-- Modify the form section in create-event.html -->
         <form id="createEventForm">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="eventTitle" class="form-label">Event Title <span class="required">*</span></label>
-                        <input type="text" class="form-control" id="eventTitle" name="title" required maxlength="100">
-                        <div class="form-text">Maximum 100 characters</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="eventDate" class="form-label">Event Date <span class="required">*</span></label>
-                        <input type="date" class="form-control" id="eventDate" name="date" required>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label for="eventTitle" class="form-label">Event Title *</label>
+                <input type="text" class="form-control" id="eventTitle" name="title" required maxlength="100">
             </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="eventLocation" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="eventLocation" name="location" maxlength="100" placeholder="e.g., Tegel Community Center">
-                        <div class="form-text">Maximum 100 characters</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="maxParticipants" class="form-label">Maximum Participants</label>
-                        <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" min="0" max="10000" placeholder="Leave empty for unlimited">
-                        <div class="form-text">0-10000 participants (empty = unlimited)</div>
-                    </div>
+
+            <div class="mb-3">
+                <label for="eventDate" class="form-label">Event Date *</label>
+                <input type="date" class="form-control" id="eventDate" name="date" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="eventLocation" class="form-label">Location</label>
+                <input type="text" class="form-control" id="eventLocation" name="location" value="Tegel Community Center" maxlength="100">
+            </div>
+
+            <div class="mb-3">
+                <label for="maxParticipants" class="form-label">Max Participants</label>
+                <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" min="0" value="50">
+                <small class="form-text text-muted">Leave empty for unlimited</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="eventPrice" class="form-label">Event Price (€)</label>
+                <input type="number" class="form-control" id="eventPrice" name="price" min="0" step="0.01" value="0.00">
+                <small class="form-text text-muted">Set to 0 for free events</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="eventDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="eventDescription" name="description" rows="4" maxlength="2000"></textarea>
+                <div class="text-muted d-flex justify-content-end">
+                    <small id="charCount">0/2000</small>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="eventPrice" class="form-label">Event Price (€)</label>
-                        <input type="number" class="form-control" id="eventPrice" name="price"
-                               min="0" step="0.01" placeholder="0.00">
-                        <div class="form-text">Set to 0 for free events</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">Food Options</label>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
-                            <label class="form-check-label" for="hasFoodOption">
-                                <strong>This event includes food options</strong>
-                            </label>
-                            <div class="form-text">Enables participants to select food options during enrollment</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <div class="mb-3">
-                <label for="eventDescription" class="form-label">Event Description</label>
-                <textarea class="form-control" id="eventDescription" name="description" rows="5" maxlength="2000" placeholder="Describe your event in detail..."></textarea>
-                <div class="form-text">Maximum 2000 characters. <span id="charCount">0/2000</span></div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="mb-3">
-                        <label for="eventImage" class="form-label">Event Image URL</label>
-                        <input type="url" class="form-control" id="eventImage" name="image" placeholder="https://example.com/image.jpg">
-                        <div class="form-text">Optional: URL to an image for this event</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label">Event Status</label>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
-                            <label class="form-check-label" for="isActive">
-                                <strong>Active Event</strong>
-                            </label>
-                            <div class="form-text">Unchecked events won't appear publicly</div>
-                        </div>
-                    </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                    <label class="form-check-label" for="hasFoodOption">
+                        This event includes food options
+                    </label>
+                    <div class="form-text">Enables participants to select food options during enrollment</div>
                 </div>
             </div>
-            
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-secondary me-3" onclick="resetForm()">Reset Form</button>
-                <button type="submit" class="btn btn-create">Create Event</button>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
+                    <label class="form-check-label" for="isPublic">
+                        Make this event public
+                    </label>
+                    <div class="form-text">Public events are visible to all users</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                    <label class="form-check-label" for="isActive">
+                        Active Event
+                    </label>
+                    <div class="form-text">Inactive events are not shown on the events page</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                <button type="submit" class="btn btn-primary">Create Event</button>
             </div>
         </form>
     </div>
@@ -188,12 +170,17 @@
         // handle checkboxes
         const hasFoodOption = document.getElementById('hasFoodOption').checked;
         const isActive = document.getElementById('isActive').checked;
+        const isPublic = document.getElementById('isPublic').checked;
         formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
         formData.set('isActive', isActive ? 'on' : 'off');
+        formData.set('isPublic', isPublic ? 'on' : 'off');
 
         // Debug logs
         console.log('Food option checked:', hasFoodOption);
         console.log('Food option value in form:', formData.get('hasFoodOption'));
+        console.log('Is public:', isPublic);
+        console.log('Is public value in form:', formData.get('isPublic'));
+
 
         // Validate required fields
         if (!formData.get('title') || !formData.get('date')) {

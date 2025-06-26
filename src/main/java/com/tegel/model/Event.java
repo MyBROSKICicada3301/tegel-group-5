@@ -17,13 +17,14 @@ public class Event {
     private boolean isActive;
     private boolean hasFoodOption;
     private double price;
+    private boolean isPublic;
     
     // Constructors
     public Event() {}
     
     public Event(String title, String description, LocalDate date, String location, 
                  String image, int maxParticipants, int createdBy, boolean isActive,
-                 boolean hasFoodOption, double price) {
+                 boolean hasFoodOption, double price, boolean isPublic) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -35,6 +36,7 @@ public class Event {
         this.currentParticipants = 0;
         this.hasFoodOption = hasFoodOption;
         this.price = price;
+        this.isPublic = isPublic;
     }
     
     // Getters and Setters
@@ -76,4 +78,7 @@ public class Event {
 
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price;}
+
+    public boolean isPublic() { return isPublic; }
+    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
 }

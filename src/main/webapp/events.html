@@ -34,10 +34,6 @@
                             <input type="date" class="form-control" id="eventDate" name="date" required>
                         </div>
                         <div class="mb-3">
-                            <label for="eventTime" class="form-label">Time</label>
-                            <input type="time" class="form-control" id="eventTime" name="time" required>
-                        </div>
-                        <div class="mb-3">
                             <label for="eventLocation" class="form-label">Location</label>
                             <input type="text" class="form-control" id="eventLocation" name="location" value="Tegel Community Center" required>
                         </div>
@@ -58,6 +54,23 @@
                                     This event includes food options
                                 </label>
                                 <div class="form-text">Enables participants to select food options during enrollment</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
+                                <label class="form-check-label" for="isPublic">
+                                    Make this event public
+                                </label>
+                                <div class="form-text">Public events are visible to all users</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                                <label class="form-check-label" for="isActive">
+                                    Active Event
+                                </label>
                             </div>
                         </div>
                         <div id="adminEventCreateMsg" class="mt-2"></div>
@@ -267,63 +280,80 @@
         document.getElementById('eventSearchInput').value = '';
         displayEvents(dummyEvents);
     }
+    function createEvent() {
+        const form = document.getElementById('adminEventCreateForm');
+        const formData = new FormData(form);
+
+        // Handle checkboxes
+        const hasFoodOption = document.getElementById('hasFoodOption').checked;
+        const isActive = document.getElementById('isActive').checked;
+        const isPublic = document.getElementById('isPublic').checked;
+
+        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
+        formData.set('isActive', isActive ? 'on' : 'off');
+        formData.set('isPublic', isPublic ? 'on' : 'off');
+
+        // Validate required fields
+        if (!formData.get('title') || !formData.get('date')) {
+            showMessage('Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        // Validate date is not in the past
+        const eventDate = new Date(formData.get('date'));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (eventDate < today) {
+            showMessage('Event date cannot be in the past.', 'danger');
+            return;
+        }
+
+        fetch('/tegel_webapp/admin/events', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.eventId || data.success) {
+                    showMessage('Event created successfully!', 'success');
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
+                        form.reset();
+                        loadEvents(); // Reload events if you have that function
+                    }, 1500);
+                } else {
+                    showMessage(data.error || 'Failed to create event.', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating event:', error);
+                showMessage('Error creating event. Please try again.', 'danger');
+            });
+    }
+
+    // Helper function to show messages
+    function showMessage(message, type) {
+        const msgContainer = document.getElementById('adminEventCreateMsg');
+        msgContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+        // Auto-dismiss success messages
+        if (type === 'success') {
+            setTimeout(() => {
+                msgContainer.innerHTML = '';
+            }, 3000);
+        }
+    }
 
     document.addEventListener('DOMContentLoaded', loadEvents);
 
     // Admin event creation functionality
     document.addEventListener('DOMContentLoaded', function() {
         // Handle event creation form submission via the submit button in modal
-        document.getElementById('submitEventBtn').addEventListener('click', function() {
-            const form = document.getElementById('adminEventCreateForm');
-
-            // Form validation
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Create FormData from the form
-            const formData = new FormData(form);
-
-            // Send the request to create the event
-            fetch('/tegel_webapp/admin/events', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.eventId || data.success) {
-                        // Close the modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
-                        modal.hide();
-
-                        // Show success notification
-                        showNotification('Event created successfully!', 'success');
-
-                        // Reset form
-                        form.reset();
-
-                        // Reload events list
-                        loadEvents();
-                    } else {
-                        showNotification(data.error || 'Failed to create event.', 'danger');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error creating event:', error);
-                    showNotification('Error creating event. Please try again.', 'danger');
-                });
+        document.getElementById('submitEventBtn').addEventListener('click', function(e) {
+           e.preventDefault()
+            createEvent();
         });
-
-// Add this notification function
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type} alert-dismissible fade show`;
-            notification.setAttribute('role', 'alert');
-            notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
 
             // Insert at the top of the main content
             const mainContent = document.querySelector('main');
@@ -334,7 +364,7 @@
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 500);
             }, 5000);
-        }
+
 
         // Reset the form and error messages when the modal is closed
         const createEventModal = document.getElementById('createEventModal');

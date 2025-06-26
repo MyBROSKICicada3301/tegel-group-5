@@ -7,12 +7,112 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
           rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #ffb56b 0%, #ff8c1a 100%);
+            margin: 0;
+            padding: 0;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px;
+        }
+        .navbar-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1100px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .admin-card h2 {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .table thead th {
+            background: #ff8c1a;
+            color: #fff;
+            border: none;
+        }
+        .table tbody tr {
+            background: rgba(255,255,255,0.85);
+        }
+        .btn-role {
+            min-width: 100px;
+        }
+        .btn-delete {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+            color: #fff;
+        }
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 25px 0;
+            backdrop-filter: blur(10px);
+        }
+        .footer img {
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+        .footer a {
+            text-decoration: none;
+        }
+        .social-links {
+            display: flex;
+            align-items: center;
+        }
+        .address-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+        .footer-brand {
+            font-family: 'Courier New', cursive;
+            font-size: 24px;
+            color: #ff8c1a;
+            font-weight: bold;
+        }
+        @media (max-width: 900px) {
+            .admin-card {
+                padding: 20px 5px;
+            }
+            .table-responsive {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.html" style="padding:0;">
+        <a class="navbar-brand" href="adminindex.html" style="padding:0;">
             <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -21,14 +121,14 @@
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white active" href="admin.html">User Management</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
             </ul>
             <div id="authButtons">
-                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
-                <a href="login.html" class="btn btn-light">Login</a>
+                <a href="account.html" class="btn btn-light me-2">Account</a>
+                <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
             </div>
         </div>
     </div>
@@ -305,18 +405,27 @@
 <script>
     let users = [];
     let events = [];
+    const contextPath = '/tegel_webapp'; // Define the application context path
 
-    // Load users from database with improved error handling
+    // Load users from database - completely rewritten
     function loadUsers() {
-        // Use the user-info endpoint instead of trying to access AdminServlet directly
-        fetch('/tegel_webapp/user-info?action=getAllUsers', {
+        console.log("Loading users...");
+
+        fetch(`${contextPath}/admin/users/all`, {
             method: 'GET',
-            credentials: 'include' // Important: Include credentials for session cookies
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            },
+            credentials: 'include' // Include credentials for session cookies
         })
         .then(response => {
+            console.log("User data response status:", response.status);
             if (!response.ok) {
                 if (response.status === 403) {
                     throw new Error('Admin privileges required to access user data');
+                } else if (response.status === 401) {
+                    throw new Error('You must be logged in to access this resource');
                 } else {
                     throw new Error(`Server error: ${response.status}`);
                 }
@@ -324,6 +433,7 @@
             return response.json();
         })
         .then(data => {
+            console.log("User data received:", data);
             // Process the response data
             if (!Array.isArray(data)) {
                 console.warn('Server did not return an array of users:', data);
@@ -334,51 +444,76 @@
         })
         .catch(error => {
             console.error('Error loading users:', error);
-            // Use fallback dummy data based on your actual database content
-            users = [
-                { userId: 34, fullName: 'Admin', email: 'admin@email.com', role: 'admin' },
-                { userId: 35, fullName: 'Member', email: 'member@email.com', role: 'member' },
-                { userId: 36, fullName: 'User', email: 'user@email.com', role: 'user' },
-                { userId: 37, fullName: 'Cyril Shibu', email: 'cyrilshibu@gmail.com', role: 'member' },
-                { userId: 38, fullName: 'Ethan', email: 'nethan@gmail.com', role: 'member' }
-            ];
-            renderUsers();
-
-            // Show a discreet notification instead of an intrusive alert
+            // Show error message to user
             const userTable = document.getElementById('userTableBody').closest('.table-responsive');
             if (userTable) {
                 const notification = document.createElement('div');
-                notification.className = 'alert alert-warning mt-3';
-                notification.innerHTML = `<strong>Note:</strong> Using sample data. Server error: ${error.message}`;
+                notification.className = 'alert alert-danger mt-3';
+                notification.innerHTML = `<strong>Error:</strong> Failed to load user data. ${error.message}`;
                 userTable.parentNode.insertBefore(notification, userTable);
+
+                // Also add retry button
+                const retryBtn = document.createElement('button');
+                retryBtn.className = 'btn btn-primary mt-2';
+                retryBtn.textContent = 'Retry';
+                retryBtn.onclick = function() {
+                    notification.remove();
+                    retryBtn.remove();
+                    loadUsers();
+                };
+                userTable.parentNode.insertBefore(retryBtn, userTable);
             }
         });
     }
 
     // Load events from database (admin view - all events)
     function loadEvents() {
-        fetch('/tegel_webapp/admin/events/all')
+        fetch(`${contextPath}/admin/events/all`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            events = data;
+            renderEvents();
+        })
+        .catch(error => {
+            console.error('Error loading events:', error);
+            // Fallback to public events endpoint
+            fetch(`${contextPath}/events`, {
+                method: 'GET',
+                credentials: 'include'
+            })
             .then(response => response.json())
             .then(data => {
                 events = data;
                 renderEvents();
             })
-            .catch(error => {
-                console.error('Error loading events:', error);
-                // Fallback to public events endpoint
-                fetch('/tegel_webapp/events')
-                    .then(response => response.json())
-                    .then(data => {
-                        events = data;
-                        renderEvents();
-                    })
-                    .catch(err => console.error('Error loading fallback events:', err));
-            });
+            .catch(err => console.error('Error loading fallback events:', err));
+        });
     }
 
     function renderUsers() {
         const tbody = document.getElementById('userTableBody');
+        if (!tbody) {
+            console.error('User table body element not found!');
+            return;
+        }
+
         tbody.innerHTML = '';
+
+        if (users.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="4" class="text-center">No users found</td>';
+            tbody.appendChild(tr);
+            return;
+        }
+
         users.forEach(user => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -409,6 +544,219 @@
         });
     }
 
+    // Existing user management functions
+    function updateUserRole(userId, newRole) {
+        fetch(`${contextPath}/admin/users/role/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRole }),
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const user = users.find(u => u.userId === userId);
+                if (user) {
+                    user.role = newRole;
+                    alert(`Role updated successfully.`);
+                }
+            } else {
+                alert('Failed to update role: ' + (data.error || 'Unknown error'));
+                loadUsers(); // Reload to reset the dropdown
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating role.');
+            loadUsers(); // Reload to reset the dropdown
+        });
+    }
+
+    function deleteUser(userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            fetch(`${contextPath}/admin/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    users = users.filter(u => u.userId !== userId);
+                    renderUsers();
+                    alert('User deleted successfully.');
+                } else {
+                    alert('Failed to delete user: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting user.');
+            });
+        }
+    }
+
+    function viewUser(userId) {
+        const user = users.find(u => u.userId === userId);
+        if (user) {
+            alert(`User Details:\n\nName: ${user.fullName || 'N/A'}\nEmail: ${user.email}\nRole: ${user.role}\nPhone: ${user.phoneNumber || 'N/A'}\nDiet: ${user.dietRes || 'None'}`);
+        }
+    }
+
+    // Search and filter users
+    function searchUsers() {
+        const query = document.getElementById('userSearchInput').value.toLowerCase();
+        const filteredUsers = users.filter(user => {
+            return (user.fullName && user.fullName.toLowerCase().includes(query)) ||
+                   user.email.toLowerCase().includes(query);
+        });
+        renderUserTable(filteredUsers);
+    }
+
+    function resetUserSearch() {
+        document.getElementById('userSearchInput').value = '';
+        renderUsers();
+    }
+
+    function renderUserTable(usersToRender) {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+
+        if (usersToRender.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="4" class="text-center">No users found</td>';
+            tbody.appendChild(tr);
+            return;
+        }
+
+        usersToRender.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.fullName || user.email}</td>
+                <td>${user.email}</td>
+                <td>
+                    <select class="form-select btn-role" data-id="${user.userId}">
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm me-2" onclick="viewUser(${user.userId})">View</button>
+                    <button class="btn btn-delete btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Add event listeners for role change
+        document.querySelectorAll('.btn-role').forEach(select => {
+            select.addEventListener('change', function() {
+                const userId = parseInt(this.getAttribute('data-id'));
+                const newRole = this.value;
+                updateUserRole(userId, newRole);
+            });
+        });
+    }
+
+    // Manual session check implementation for admin.html
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Admin page loaded");
+        ensureAdminNavigation(); // Always update links on page load
+
+        // Force a check of the session status
+        fetch(`${contextPath}/check-session`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Session check failed: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Session check response:", data);
+            if (data.loggedIn) {
+                const authButtons = document.getElementById('authButtons');
+                if (authButtons) {
+                    authButtons.innerHTML = `
+                        <a href="#" class="btn btn-light me-2" id="accountBtn">Account</a>
+                        <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
+                    `;
+
+                    // Add click event listener to sign out button
+                    document.getElementById('signoutBtn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        signOut();
+                    });
+
+                    // Add click event for account button
+                    document.getElementById('accountBtn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Redirect to account page
+                        window.location.href = 'account.html';
+                    });
+                }
+
+                // Redirect if not admin
+                if (data.role !== 'admin') {
+                    alert('This page is restricted to administrators only.');
+                    window.location.href = 'index.html';
+                } else {
+                    // User is admin, load data
+                    loadUsers();
+                    loadEvents();
+                }
+            } else {
+                // Not logged in, redirect to login page
+                alert('Please log in as an administrator to access this page.');
+                window.location.href = 'login.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking login status:', error);
+            alert('Failed to verify your login status. Please try logging in again.');
+            window.location.href = 'login.html';
+        });
+    });
+
+    function signOut() {
+        fetch(`${contextPath}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => {
+            // Redirect to home page after successful logout
+            window.location.href = 'index.html';
+        })
+        .catch(error => {
+            console.error('Error signing out:', error);
+            alert('Error signing out. You will be redirected to the login page.');
+            window.location.href = 'login.html';
+        });
+    }
+
+    // Helper function to ensure admin navigation
+    function ensureAdminNavigation() {
+        // Update Home link for admins
+        const homeLinks = document.querySelectorAll('a.nav-link[href="index.html"]');
+        homeLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+
+        // Update logo link for admins
+        const logoLinks = document.querySelectorAll('a.navbar-brand[href="index.html"]');
+        logoLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+
+        // Also update any other index.html links
+        const otherIndexLinks = document.querySelectorAll('a[href="index.html"]:not(.nav-link):not(.navbar-brand)');
+        otherIndexLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
+    }
+
+    // Keep event rendering functions
     function renderEvents() {
         const tbody = document.getElementById('eventTableBody');
         tbody.innerHTML = '';
@@ -592,13 +940,13 @@
 
     // Existing user management functions
     function updateUserRole(userId, newRole) {
-        const formData = new FormData();
-        formData.append('userId', userId);
-        formData.append('newRole', newRole);
-
-        fetch('/tegel_webapp/admin/updateRole', {
-            method: 'POST',
-            body: formData
+        fetch(`${contextPath}/admin/users/role/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRole }),
+            credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {
@@ -609,20 +957,22 @@
                     alert(`Role updated successfully.`);
                 }
             } else {
-                alert('Failed to update role.');
+                alert('Failed to update role: ' + (data.error || 'Unknown error'));
                 loadUsers(); // Reload to reset the dropdown
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Error updating role.');
+            loadUsers(); // Reload to reset the dropdown
         });
     }
 
     function deleteUser(userId) {
         if (confirm("Are you sure you want to delete this user?")) {
-            fetch(`/tegel_webapp/admin/user/${userId}`, {
-                method: 'DELETE'
+            fetch(`${contextPath}/admin/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include'
             })
             .then(response => response.json())
             .then(data => {
@@ -631,7 +981,7 @@
                     renderUsers();
                     alert('User deleted successfully.');
                 } else {
-                    alert('Failed to delete user.');
+                    alert('Failed to delete user: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
@@ -652,7 +1002,8 @@
     function searchUsers() {
         const query = document.getElementById('userSearchInput').value.toLowerCase();
         const filteredUsers = users.filter(user => {
-            return user.fullName.toLowerCase().includes(query) || user.email.toLowerCase().includes(query);
+            return (user.fullName && user.fullName.toLowerCase().includes(query)) ||
+                   user.email.toLowerCase().includes(query);
         });
         renderUserTable(filteredUsers);
     }
@@ -665,6 +1016,14 @@
     function renderUserTable(usersToRender) {
         const tbody = document.getElementById('userTableBody');
         tbody.innerHTML = '';
+
+        if (usersToRender.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td colspan="4" class="text-center">No users found</td>';
+            tbody.appendChild(tr);
+            return;
+        }
+
         usersToRender.forEach(user => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -761,19 +1120,23 @@
         console.log("Admin page loaded");
         ensureAdminNavigation(); // Always update links on page load
 
-        // Load users and events data immediately
-        loadUsers();
-        loadEvents();
-
         // Force a check of the session status
-        fetch('/tegel_webapp/check-session', {
+        fetch(`${contextPath}/check-session`, {
             method: 'GET',
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Session check failed: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("Session check response:", data);
-            if(data.loggedIn) {
+            if (data.loggedIn) {
                 const authButtons = document.getElementById('authButtons');
                 if (authButtons) {
                     authButtons.innerHTML = `
@@ -799,6 +1162,10 @@
                 if (data.role !== 'admin') {
                     alert('This page is restricted to administrators only.');
                     window.location.href = 'index.html';
+                } else {
+                    // User is admin, load data
+                    loadUsers();
+                    loadEvents();
                 }
             } else {
                 // Not logged in, redirect to login page
@@ -808,34 +1175,26 @@
         })
         .catch(error => {
             console.error('Error checking login status:', error);
+            alert('Failed to verify your login status. Please try logging in again.');
+            window.location.href = 'login.html';
         });
     });
 
     function signOut() {
-        fetch('/tegel_webapp/logout', {
+        fetch(`${contextPath}/logout`, {
             method: 'POST',
             credentials: 'include'
         })
-        .then(() => {
+        .then(response => {
             // Redirect to home page after successful logout
             window.location.href = 'index.html';
         })
         .catch(error => {
             console.error('Error signing out:', error);
+            alert('Error signing out. You will be redirected to the login page.');
+            window.location.href = 'login.html';
         });
     }
-
-    // Only allow admins to access this page
-    fetch('/tegel_webapp/check-session', {
-        method: 'GET',
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.loggedIn || data.role !== 'admin') {
-            window.location.href = 'login.html';
-        }
-    });
 </script>
 <script src="js/session-manager.js"></script>
 </body>

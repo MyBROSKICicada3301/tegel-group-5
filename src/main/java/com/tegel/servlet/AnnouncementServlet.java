@@ -7,7 +7,6 @@ import com.tegel.model.Announcement;
 import com.tegel.util.LocalDateTimeAdapter;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +23,6 @@ import java.util.logging.Logger;
 /**
  * Servlet for handling announcement-related operations
  */
-@WebServlet("/announcement")
 public class AnnouncementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(AnnouncementServlet.class.getName());
     private final AnnouncementDAO announcementDAO = new AnnouncementDAO();
@@ -91,16 +89,28 @@ public class AnnouncementServlet extends HttpServlet {
                 }
             } else {
                 // Get all announcements
-                announcements = announcementDAO.getAllAnnouncements();
+                try {
+                    announcements = announcementDAO.getAllAnnouncements();
+                    logger.info("Successfully retrieved " + announcements.size() + " announcements");
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Error retrieving all announcements", e);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    out.print("{\"error\": \"Database error: " + e.getMessage() + "\"}");
+                    return;
+                }
             }
 
-            // Return the list of announcements
-            out.print(gson.toJson(announcements));
+            // If we get here, we have a list of announcements (may be empty)
+            if (announcements.isEmpty()) {
+                out.print("[]"); // Return empty array if no announcements
+            } else {
+                out.print(gson.toJson(announcements));
+            }
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing announcement request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\": \"Server error occurred while retrieving announcements\"}");
+            out.print("{\"error\": \"Server error occurred while retrieving announcements: " + e.getMessage() + "\"}");
         }
     }
 

@@ -28,17 +28,35 @@ public class AnnouncementDAO {
         List<Announcement> announcements = new ArrayList<>();
         String sql = "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE ORDER BY postedat DESC";
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            logger.info("Database connection obtained, preparing SQL statement");
 
-            while (rs.next()) {
-                Announcement announcement = extractAnnouncementFromResultSet(rs);
-                announcements.add(announcement);
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                logger.info("Executing query: " + sql);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    logger.info("Query executed successfully, processing results");
+
+                    while (rs.next()) {
+                        Announcement announcement = extractAnnouncementFromResultSet(rs);
+                        announcements.add(announcement);
+                    }
+
+                    logger.info("Retrieved " + announcements.size() + " announcements successfully");
+                } catch (SQLException e) {
+                    logger.log(Level.SEVERE, "Error executing query: " + e.getMessage(), e);
+                    throw e;
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error preparing statement: " + e.getMessage(), e);
+                throw e;
             }
-
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error retrieving announcements", e);
+            logger.log(Level.SEVERE, "Database connection error: " + e.getMessage(), e);
+            // Log more detailed information about the error
+            logger.log(Level.SEVERE, "SQL State: " + e.getSQLState());
+            logger.log(Level.SEVERE, "Error Code: " + e.getErrorCode());
+            logger.log(Level.SEVERE, "Full Error: ", e);
         }
 
         return announcements;
@@ -209,11 +227,11 @@ public class AnnouncementDAO {
     }
 
     /**
-     * Helper method to extract an Announcement object from a ResultSet
+     * Extract announcement data from a ResultSet row
      *
-     * @param rs The ResultSet containing announcement data
-     * @return An Announcement object
-     * @throws SQLException If there's a database error
+     * @param rs The ResultSet positioned at the correct row
+     * @return Announcement object populated with data from ResultSet
+     * @throws SQLException if there is an error accessing ResultSet data
      */
     private Announcement extractAnnouncementFromResultSet(ResultSet rs) throws SQLException {
         Announcement announcement = new Announcement();
@@ -221,9 +239,10 @@ public class AnnouncementDAO {
         announcement.setTitle(rs.getString("title"));
         announcement.setContent(rs.getString("content"));
 
-        Timestamp postedAtTs = rs.getTimestamp("postedat");
-        if (postedAtTs != null) {
-            announcement.setCreatedAt(postedAtTs.toLocalDateTime());
+        // Convert SQL timestamp to LocalDateTime
+        Timestamp timestamp = rs.getTimestamp("postedat");
+        if (timestamp != null) {
+            announcement.setCreatedAt(timestamp.toLocalDateTime());
         }
 
         announcement.setPostedBy(rs.getInt("postedby"));

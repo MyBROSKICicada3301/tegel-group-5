@@ -22,7 +22,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>NewsletterServlet</servlet-name>
-        <url-pattern>/newsletters/*</url-pattern>
+        <url-pattern>/newsletter</url-pattern>
     </servlet-mapping>
 
     <!-- Announcement servlet mapping -->
@@ -33,6 +33,16 @@
     <servlet-mapping>
         <servlet-name>AnnouncementServlet</servlet-name>
         <url-pattern>/announcement</url-pattern>
+    </servlet-mapping>
+
+    <!-- Admin User Management servlet mapping -->
+    <servlet>
+        <servlet-name>AdminUserManagementServlet</servlet-name>
+        <servlet-class>com.tegel.servlet.AdminUserManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminUserManagementServlet</servlet-name>
+        <url-pattern>/admin/users/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

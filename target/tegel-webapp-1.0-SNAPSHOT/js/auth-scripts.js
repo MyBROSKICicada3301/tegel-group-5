@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Auth-scripts loaded, checking login status');
 
     // Function to update auth buttons
-    function updateAuthButtons(isLoggedIn) {
+    function updateAuthButtons(isLoggedIn, isAdmin) {
         const authButtons = document.getElementById('authButtons');
         if (!authButtons) {
             console.warn('Auth buttons container not found on this page');
@@ -34,7 +34,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (isLoggedIn) {
+            // Show admin link if user is an admin
+            const adminLink = isAdmin ?
+                `<a href="adminindex.html" class="btn btn-primary me-2">Admin Panel</a>` : '';
+
             authButtons.innerHTML = `
+                ${adminLink}
                 <a href="account.html" class="btn btn-light me-2">Account</a>
                 <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
             `;
@@ -69,13 +74,56 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log('Login status response:', data);
-            updateAuthButtons(data.loggedIn);
+            // Store user role for future reference
+            if (data.loggedIn) {
+                localStorage.setItem('userRole', data.role || 'user');
+                localStorage.setItem('userLoggedIn', 'true');
+                if (data.userId) {
+                    localStorage.setItem('userId', data.userId);
+                }
+            }
+            // Update UI based on login status and admin role
+            updateAuthButtons(data.loggedIn, data.role === 'admin');
+
+            // Check if current page requires admin privileges
+            checkAdminPageAccess(data.loggedIn, data.role === 'admin');
         })
         .catch(error => {
             console.error('Error checking login status:', error);
             // Assume not logged in if there's an error
-            updateAuthButtons(false);
+            updateAuthButtons(false, false);
+            checkAdminPageAccess(false, false);
         });
+    }
+
+    // Function to check and restrict access to admin pages
+    function checkAdminPageAccess(isLoggedIn, isAdmin) {
+        // Get current page path
+        const currentPath = window.location.pathname;
+        const isAdminPage = currentPath.includes('admin') &&
+                           !currentPath.endsWith('login.html') &&
+                           !currentPath.endsWith('signup.html');
+
+        if (isAdminPage) {
+            debug.log('Auth', 'Admin page access check', { isLoggedIn, isAdmin });
+
+            if (!isLoggedIn) {
+                debug.warn('Auth', 'Unauthorized access attempt: Not logged in', currentPath);
+                // Redirect to login page
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(currentPath);
+                return;
+            }
+
+            if (!isAdmin) {
+                debug.warn('Auth', 'Unauthorized access attempt: Not an admin', currentPath);
+                // Redirect to home page with unauthorized message
+                alert('You do not have permission to access this page.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            debug.info('Auth', 'Admin access granted', currentPath);
+        }
     }
 
     // Function to sign out
@@ -91,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Clear any stored user data
                 localStorage.removeItem('userId');
                 localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('userRole');
                 // Redirect to home page
                 window.location.href = 'index.html';
             } else {
@@ -106,6 +155,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Expose sign out function to global scope
     window.signOut = signOut;
+
+    // Expose function to check if current user is admin
+    window.isUserAdmin = function() {
+        return localStorage.getItem('userRole') === 'admin';
+    };
 
     // Check login status on page load
     checkLoginStatus();

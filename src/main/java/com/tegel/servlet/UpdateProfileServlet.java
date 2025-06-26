@@ -89,6 +89,20 @@ public class UpdateProfileServlet extends HttpServlet {
                 existingUser.setDietRes(SecurityUtils.sanitizeInput(jsonObject.get("dietRes").getAsString()));
             }
 
+            if (jsonObject.has("email")) {
+                String newEmail = SecurityUtils.sanitizeInput(jsonObject.get("email").getAsString());
+                // Only update if email is valid
+                if (newEmail != null && !newEmail.isEmpty() && newEmail.contains("@")) {
+                    existingUser.setEmail(newEmail);
+
+                    // Update email in session as well
+                    User sessionUser = (User) session.getAttribute("user");
+                    if (sessionUser != null) {
+                        sessionUser.setEmail(newEmail);
+                    }
+                }
+            }
+
             // Update user in database
             boolean success = userDAO.updateUser(existingUser);
 

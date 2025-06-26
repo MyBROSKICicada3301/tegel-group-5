@@ -8,6 +8,68 @@
           rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .event-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: white;
+        }
+
+        .event-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .event-header {
+            background-color: rgba(252,125,4,0.9);
+            color: white;
+            padding: 12px 15px;
+        }
+
+        .event-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .event-body {
+            padding: 15px;
+        }
+
+        .event-info {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .event-footer {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-update {
+            background-color: rgba(252,125,4,255);
+            color: white;
+        }
+
+        .btn-update:hover {
+            background-color: rgba(222,105,0,255);
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -203,54 +265,63 @@
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => {
-            console.log("Enrolled events response status:", response.status);
-            if (!response.ok) {
-                throw new Error('Not logged in or server error: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Enrolled events data received:", data);
-            const eventsContainer = document.getElementById('enrolledEvents');
+            .then(response => {
+                console.log("Enrolled events response status:", response.status);
+                if (!response.ok) {
+                    throw new Error('Not logged in or server error: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Enrolled events data received:", data);
+                const eventsContainer = document.getElementById('enrolledEvents');
 
-            if (data.events && data.events.length > 0) {
-                // Clear loading message
-                eventsContainer.innerHTML = '';
+                if (data.events && data.events.length > 0) {
+                    // Clear loading message
+                    eventsContainer.innerHTML = '';
 
-                // Add events to the container
-                data.events.forEach(event => {
-                    const eventCard = document.createElement('div');
-                    eventCard.className = 'event-card';
+                    // Create events grid
+                    const eventsGrid = document.createElement('div');
+                    eventsGrid.className = 'events-grid';
+                    eventsContainer.appendChild(eventsGrid);
 
-                    // Format date for display
-                    let eventDate = 'Date not specified';
-                    if (event.date) {
-                        const date = new Date(event.date);
-                        eventDate = date.toLocaleDateString();
-                    }
+                    // Add events to the container
+                    data.events.forEach(event => {
+                        const eventCard = document.createElement('div');
+                        eventCard.className = 'event-box';
 
-                    eventCard.innerHTML = `
+                        // Format date for display
+                        let eventDate = 'Date not specified';
+                        if (event.date) {
+                            const date = new Date(event.date);
+                            eventDate = date.toLocaleDateString();
+                        }
+
+                        eventCard.innerHTML = `
+                    <div class="event-header">
                         <h3 class="event-title">${event.title}</h3>
-                        <p class="event-info"><strong>Date:</strong> ${eventDate}</p>
-                        <p class="event-info"><strong>Location:</strong> ${event.location || 'Not specified'}</p>
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <a href="event-details.html?eventId=${event.eventId}" class="btn btn-sm btn-update">View Details</a>
-                            <button class="btn btn-sm btn-danger" onclick="deEnrollFromEvent(${event.eventId})">De-enroll</button>
-                        </div>
-                    `;
+                    </div>
+                    <div class="event-body">
+                        <p class="event-info"><i class="bi bi-calendar"></i> <strong>Date:</strong> ${eventDate}</p>
+                        <p class="event-info"><i class="bi bi-geo-alt"></i> <strong>Location:</strong> ${event.location || 'Not specified'}</p>
+                    </div>
+                    <div class="event-footer">
+                        <a href="event-details.html?eventId=${event.eventId}" class="btn btn-sm btn-update">View Details</a>
+                        <button class="btn btn-sm btn-danger" onclick="deEnrollFromEvent(${event.eventId})">De-enroll</button>
+                    </div>
+                `;
 
-                    eventsContainer.appendChild(eventCard);
-                });
-            } else {
-                eventsContainer.innerHTML = '<p>You have not enrolled in any events yet.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading enrolled events:', error);
-            const eventsContainer = document.getElementById('enrolledEvents');
-            eventsContainer.innerHTML = '<p>Could not load events. Please try again later.</p>';
-        });
+                        eventsGrid.appendChild(eventCard);
+                    });
+                } else {
+                    eventsContainer.innerHTML = '<p>You have not enrolled in any events yet.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading enrolled events:', error);
+                const eventsContainer = document.getElementById('enrolledEvents');
+                eventsContainer.innerHTML = '<p>Could not load events. Please try again later.</p>';
+            });
     }
 
     // Helper function to get initials from name

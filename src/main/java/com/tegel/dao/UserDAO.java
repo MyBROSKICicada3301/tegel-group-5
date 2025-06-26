@@ -268,10 +268,10 @@ public class UserDAO {
 
         String sql = "UPDATE mod4db.users SET " +
                     "email = ?, " +
-                    "password_hash = ?, " +
-                    "phone_number = ?, " +
-                    "date_of_birth = ?, " +
-                    "diet_res = ?, " +
+                    "passwordhash = ?, " +
+                    "phonenumber = ?, " +
+                    "dateofbirth = ?, " +
+                    "dietres = ?, " +
                     "full_name = ?, " +
                     "nick_name = ? " +
                     "WHERE user_id = ?";

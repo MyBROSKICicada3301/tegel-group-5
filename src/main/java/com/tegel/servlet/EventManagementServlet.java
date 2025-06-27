@@ -280,6 +280,7 @@ public class EventManagementServlet extends HttpServlet {
             String isActiveStr = request.getParameter("isActive");
             String priceStr = request.getParameter("price");
             String hasFoodOptionStr = request.getParameter("hasFoodOption");
+            String isPublicStr = request.getParameter("isPublic");
 
             // parse the price
             double price = 0.0;
@@ -299,6 +300,12 @@ public class EventManagementServlet extends HttpServlet {
             boolean hasFoodOption = false; // Default to false
             if (hasFoodOptionStr != null) {
                 hasFoodOption = Boolean.parseBoolean(hasFoodOptionStr);
+            }
+
+            // parse the isPublic
+            boolean isPublic = false; // Default to false
+            if (isPublicStr != null) {
+                isPublic = Boolean.parseBoolean(isPublicStr);
             }
 
             
@@ -398,27 +405,27 @@ public class EventManagementServlet extends HttpServlet {
             return null;
         }
     }
-    
-    private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response) 
+
+    private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"error\":\"No active session\"}");
             return false;
         }
-        
-        String userRole = (String) session.getAttribute("userRole");
+
+        String userRole = (String) session.getAttribute("role"); // Changed from "userRole" to "role"
         Integer userId = (Integer) session.getAttribute("userId");
-        
+
         if (!"admin".equals(userRole) || userId == null) {
             logger.warning("Unauthorized access attempt to event management by user: " + userId);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\":\"Admin access required\"}");
             return false;
         }
-        
+
         return true;
     }
 }

@@ -8,6 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
+/**
+ * Servlet to handle user logout functionality.
+ * Invalidates the current session and returns a success status.
+ */
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
 

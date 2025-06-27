@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import com.google.gson.JsonSyntaxException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,18 +20,17 @@ import com.tegel.util.LocalDateAdapter;
 import com.tegel.util.LocalDateTimeAdapter;
 
 /**
- * Servlet that provides admin functionality for user management
+ * Servlet that provides admin functionality for user management.
  * Handles retrieving all users, updating user roles, and other admin-specific user operations
  */
 public class AdminUserManagementServlet extends HttpServlet {
 
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     // Configure Gson with adapters for proper date/time serialization
-    private Gson gson = new GsonBuilder()
-        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-        .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -67,7 +67,8 @@ public class AdminUserManagementServlet extends HttpServlet {
 
         // Check if user has admin role
         if (userRole == null || !userRole.equalsIgnoreCase("admin")) {
-            System.out.println("Forbidden access: Not an admin role, role value: '" + userRole + "'");
+            System.out.println(
+                    "Forbidden access: Not an admin role, role value: '" + userRole + "'");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             out.print("{\"error\": \"Admin privileges required to access user data\"}");
             out.flush();
@@ -115,7 +116,7 @@ public class AdminUserManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"error\": \"Invalid request path\"}");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println("Error processing request: " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -125,9 +126,16 @@ public class AdminUserManagementServlet extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * Handles role update for a user by an admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
@@ -135,9 +143,10 @@ public class AdminUserManagementServlet extends HttpServlet {
         // Check admin permissions
         HttpSession session = request.getSession(false);
         String userRole = session != null ? (String) session.getAttribute("role") : null;
-        if (session == null || session.getAttribute("userId") == null ||
-            userRole == null || !userRole.equalsIgnoreCase("admin")) {
-            System.out.println("Forbidden access in doPut: Not an admin role, role value: '" + userRole + "'");
+        if (session == null || session.getAttribute("userId") == null || userRole == null ||
+                !userRole.equalsIgnoreCase("admin")) {
+            System.out.println(
+                    "Forbidden access in doPut: Not an admin role, role value: '" + userRole + "'");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             out.print("{\"error\": \"Admin privileges required\"}");
             out.flush();
@@ -167,10 +176,12 @@ public class AdminUserManagementServlet extends HttpServlet {
                         boolean success = userDAO.updateUserRole(userId, updatedUser.getRole());
 
                         if (success) {
-                            out.print("{\"success\": true, \"message\": \"User role updated successfully\"}");
+                            out.print(
+                                    "{\"success\": true, \"message\": \"User role updated successfully\"}");
                         } else {
                             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            out.print("{\"success\": false, \"error\": \"User not found or role update failed\"}");
+                            out.print(
+                                    "{\"success\": false, \"error\": \"User not found or role update failed\"}");
                         }
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -184,6 +195,8 @@ public class AdminUserManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"success\": false, \"error\": \"Invalid request path\"}");
             }
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"success\": false, \"error\": \"Server error: " + e.getMessage() + "\"}");
@@ -192,9 +205,16 @@ public class AdminUserManagementServlet extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * Handles user deletion by an admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
@@ -202,9 +222,11 @@ public class AdminUserManagementServlet extends HttpServlet {
         // Check admin permissions
         HttpSession session = request.getSession(false);
         String userRole = session != null ? (String) session.getAttribute("role") : null;
-        if (session == null || session.getAttribute("userId") == null ||
-            userRole == null || !userRole.equalsIgnoreCase("admin")) {
-            System.out.println("Forbidden access in doDelete: Not an admin role, role value: '" + userRole + "'");
+        if (session == null || session.getAttribute("userId") == null || userRole == null ||
+                !userRole.equalsIgnoreCase("admin")) {
+            System.out.println(
+                    "Forbidden access in doDelete: Not an admin role, role value: '" + userRole +
+                            "'");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             out.print("{\"error\": \"Admin privileges required\"}");
             out.flush();
@@ -224,7 +246,8 @@ public class AdminUserManagementServlet extends HttpServlet {
                     Integer currentUserId = (Integer) session.getAttribute("userId");
                     if (currentUserId != null && currentUserId == userId) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        out.print("{\"success\": false, \"error\": \"You cannot delete your own admin account\"}");
+                        out.print(
+                                "{\"success\": false, \"error\": \"You cannot delete your own admin account\"}");
                         out.flush();
                         return;
                     }
@@ -232,10 +255,12 @@ public class AdminUserManagementServlet extends HttpServlet {
                     boolean success = userDAO.deleteUser(userId);
 
                     if (success) {
-                        out.print("{\"success\": true, \"message\": \"User deleted successfully\"}");
+                        out.print(
+                                "{\"success\": true, \"message\": \"User deleted successfully\"}");
                     } else {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        out.print("{\"success\": false, \"error\": \"User not found or delete operation failed\"}");
+                        out.print(
+                                "{\"success\": false, \"error\": \"User not found or delete operation failed\"}");
                     }
                 } catch (NumberFormatException e) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -245,7 +270,7 @@ public class AdminUserManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"success\": false, \"error\": \"User ID is required for deletion\"}");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"success\": false, \"error\": \"Server error: " + e.getMessage() + "\"}");
         }

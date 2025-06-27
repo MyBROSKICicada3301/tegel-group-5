@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import com.google.gson.JsonSyntaxException;
 import jakarta.servlet.annotation.MultipartConfig;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,8 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/events/enroll")
 public class EventEnrollmentServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventEnrollmentServlet.class.getName());
-    private EventDAO eventDAO = new EventDAO();
-    private Gson gson = new Gson();
+    private final EventDAO eventDAO = new EventDAO();
+    private final Gson gson = new Gson();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -55,11 +56,13 @@ public class EventEnrollmentServlet extends HttpServlet {
                 wantsFoodOption = jsonObject.get("wantsFoodOption").getAsBoolean();
             }
 
-            if (jsonObject.has("dietaryRestrictions") && !jsonObject.get("dietaryRestrictions").isJsonNull()) {
+            if (jsonObject.has("dietaryRestrictions") &&
+                    !jsonObject.get("dietaryRestrictions").isJsonNull()) {
                 dietaryRestrictions = jsonObject.get("dietaryRestrictions").getAsString();
             }
 
-            if (jsonObject.has("specialRequests") && !jsonObject.get("specialRequests").isJsonNull()) {
+            if (jsonObject.has("specialRequests") &&
+                    !jsonObject.get("specialRequests").isJsonNull()) {
                 specialRequests = jsonObject.get("specialRequests").getAsString();
             }
 
@@ -72,33 +75,34 @@ public class EventEnrollmentServlet extends HttpServlet {
             }
 
             // Attempt to enroll user with all details
-            boolean success = eventDAO.enrollUserInEventWithDetails(
-                    userId,
-                    eventId,
-                    registrationData,
-                    "confirmed",
-                    specialRequests,
-                    wantsFoodOption
-            );
+            boolean success =
+                    eventDAO.enrollUserInEventWithDetails(userId, eventId, registrationData,
+                                                          "confirmed", specialRequests,
+                                                          wantsFoodOption);
 
             // Return appropriate response
             if (success) {
-                response.getWriter().write("{\"success\":true,\"message\":\"Enrollment successful\"}");
+                response.getWriter()
+                        .write("{\"success\":true,\"message\":\"Enrollment successful\"}");
                 logger.info("Enrollment successful for user " + userId + " in event " + eventId);
             } else {
-                response.getWriter().write("{\"success\":false,\"message\":\"Enrollment failed. You may already be enrolled or the event is full.\"}");
+                response.getWriter()
+                        .write("{\"success\":false,\"message\":\"Enrollment failed. You may already be enrolled or the event is full.\"}");
                 logger.warning("Enrollment failed for user " + userId + " in event " + eventId);
             }
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error processing enrollment request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\":false,\"message\":\"Server error occurred during enrollment\"}");
+            response.getWriter()
+                    .write("{\"success\":false,\"message\":\"Server error occurred during enrollment\"}");
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -119,23 +123,33 @@ public class EventEnrollmentServlet extends HttpServlet {
             int eventId = jsonObject.get("eventId").getAsInt();
             int userId = jsonObject.get("userId").getAsInt();
 
-            logger.info("De-enrollment request received for user " + userId + " in event " + eventId);
+            logger.info(
+                    "De-enrollment request received for user " + userId + " in event " + eventId);
 
             // Attempt to de-enroll user from event
             boolean success = eventDAO.deEnrollUserFromEvent(userId, eventId);
 
             // Return appropriate response
             if (success) {
-                response.getWriter().write("{\"success\":true,\"message\":\"De-enrollment successful\"}");
-                logger.info("De-enrollment successful for user " + userId + " from event " + eventId);
+                response.getWriter()
+                        .write("{\"success\":true,\"message\":\"De-enrollment successful\"}");
+                logger.info(
+                        "De-enrollment successful for user " + userId + " from event " + eventId);
             } else {
-                response.getWriter().write("{\"success\":false,\"message\":\"De-enrollment failed. You may not be enrolled in this event.\"}");
-                logger.warning("De-enrollment failed for user " + userId + " from event " + eventId);
+                response.getWriter()
+                        .write("{\"success\":false,\"message\":\"De-enrollment failed. You may not be enrolled in this event.\"}");
+                logger.warning(
+                        "De-enrollment failed for user " + userId + " from event " + eventId);
             }
+        } catch (JsonSyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error processing de-enrollment request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"success\":false,\"message\":\"Server error occurred during de-enrollment\"}");
+            response.getWriter()
+                    .write("{\"success\":false,\"message\":\"Server error occurred during de-enrollment\"}");
         }
     }
 }

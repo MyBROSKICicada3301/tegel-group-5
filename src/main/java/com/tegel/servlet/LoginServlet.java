@@ -15,12 +15,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Servlet to handle user login functionality.
+ * Validates user credentials and manages session.
+ */
 @MultipartConfig
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(LoginServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Handles POST requests for user login.
+     * Validates email and password, checks against the database,
+     * and manages user session.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -85,12 +94,18 @@ public class LoginServlet extends HttpServlet {
         } catch (SecurityException e) {
             logger.severe("Security violation during login: " + e.getMessage());
             response.sendRedirect("login.html?error=security");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.severe("Error during login: " + e.getMessage());
             response.sendRedirect("login.html?error=server");
         }
     }
 
+    /**
+     * Handles GET requests by redirecting to the login page.
+     * This is to ensure that GET requests do not perform any actions.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

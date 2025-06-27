@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import com.google.gson.JsonSyntaxException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,14 +21,18 @@ import com.tegel.model.User;
 import com.tegel.util.SecurityUtils;
 
 /**
- * Servlet to handle user profile updates
+ * Servlet to handle user profile updates.
  */
 @WebServlet("/update-profile")
 public class UpdateProfileServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(UpdateProfileServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
-    private Gson gson = new Gson();
+    private final UserDAO userDAO = new UserDAO();
+    private final Gson gson = new Gson();
 
+    /**
+     * Handles POST requests to update the user's profile.
+     * Expects user details in the request body as JSON.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,33 +71,41 @@ public class UpdateProfileServlet extends HttpServlet {
 
             // Update user object with new information
             if (jsonObject.has("fullName")) {
-                existingUser.setFullName(SecurityUtils.sanitizeInput(jsonObject.get("fullName").getAsString()));
+                existingUser.setFullName(
+                        SecurityUtils.sanitizeInput(jsonObject.get("fullName").getAsString()));
             }
 
             if (jsonObject.has("nickName")) {
-                existingUser.setNickName(SecurityUtils.sanitizeInput(jsonObject.get("nickName").getAsString()));
+                existingUser.setNickName(
+                        SecurityUtils.sanitizeInput(jsonObject.get("nickName").getAsString()));
             }
 
             if (jsonObject.has("phoneNumber")) {
-                existingUser.setPhoneNumber(SecurityUtils.sanitizeInput(jsonObject.get("phoneNumber").getAsString()));
+                existingUser.setPhoneNumber(
+                        SecurityUtils.sanitizeInput(jsonObject.get("phoneNumber").getAsString()));
             }
 
-            if (jsonObject.has("dateOfBirth") && !jsonObject.get("dateOfBirth").getAsString().isEmpty()) {
+            if (jsonObject.has("dateOfBirth") &&
+                    !jsonObject.get("dateOfBirth").getAsString().isEmpty()) {
                 try {
-                    existingUser.setDateOfBirth(LocalDate.parse(jsonObject.get("dateOfBirth").getAsString()));
-                } catch (Exception e) {
-                    logger.warning("Invalid date format received: " + jsonObject.get("dateOfBirth").getAsString());
+                    existingUser.setDateOfBirth(
+                            LocalDate.parse(jsonObject.get("dateOfBirth").getAsString()));
+                } catch (RuntimeException e) {
+                    logger.warning("Invalid date format received: " +
+                                           jsonObject.get("dateOfBirth").getAsString());
                 }
             }
 
             if (jsonObject.has("dietRes")) {
-                existingUser.setDietRes(SecurityUtils.sanitizeInput(jsonObject.get("dietRes").getAsString()));
+                existingUser.setDietRes(
+                        SecurityUtils.sanitizeInput(jsonObject.get("dietRes").getAsString()));
             }
 
             if (jsonObject.has("email")) {
-                String newEmail = SecurityUtils.sanitizeInput(jsonObject.get("email").getAsString());
+                String newEmail =
+                        SecurityUtils.sanitizeInput(jsonObject.get("email").getAsString());
                 // Only update if email is valid
-                if (newEmail != null && !newEmail.isEmpty() && newEmail.contains("@")) {
+                if (newEmail != null && newEmail.contains("@")) {
                     existingUser.setEmail(newEmail);
 
                     // Update email in session as well
@@ -115,6 +128,8 @@ public class UpdateProfileServlet extends HttpServlet {
                 logger.warning("Profile update failed for user ID: " + userId);
             }
 
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error updating profile", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -2,6 +2,7 @@ package com.tegel.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.tegel.dao.NewsletterDAO;
 import com.tegel.dao.UserDAO;
 import com.tegel.model.Newsletter;
@@ -15,29 +16,32 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Servlet for handling newsletter operations
+ * Servlet for handling newsletter operations.
  */
 @WebServlet("/api/newsletters/*")
 public class NewsletterServlet extends HttpServlet {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final NewsletterDAO newsletterDAO = new NewsletterDAO();
     private final UserDAO userDAO = new UserDAO();
-    private final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-            .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .create();
 
 
     /**
-     * Handle GET requests - retrieve newsletters
+     * Handle GET requests - retrieve newsletters.
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
 
@@ -94,39 +98,47 @@ public class NewsletterServlet extends HttpServlet {
 
                         if (!newsletter.isPublished() && !isAdmin) {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write(gson.toJson(Map.of("error", "Newsletter not available")));
+                            response.getWriter().write(gson.toJson(
+                                    Map.of("error", "Newsletter not available")));
                             return;
                         }
 
                         response.getWriter().write(gson.toJson(newsletter));
                     } else {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        response.getWriter().write(gson.toJson(Map.of("error", "Newsletter not found")));
+                        response.getWriter()
+                                .write(gson.toJson(Map.of("error", "Newsletter not found")));
                     }
                 } catch (NumberFormatException e) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write(gson.toJson(Map.of("error", "Invalid newsletter ID")));
+                    response.getWriter()
+                            .write(gson.toJson(Map.of("error", "Invalid newsletter ID")));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             Logger.error("NewsletterServlet", "Error processing GET request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write(gson.toJson(Map.of("error", "Server error processing newsletter request")));
+            response.getWriter().write(gson.toJson(
+                    Map.of("error", "Server error processing newsletter request")));
         }
     }
 
     /**
-     * Handle POST requests - create new newsletter
+     * Handle POST requests - create new newsletter.
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("application/json");
 
         // Check if user is admin
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || !"admin".equals(user.getRole())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write(gson.toJson(Map.of("error", "Only admins can create newsletters")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Only admins can create newsletters")));
             return;
         }
 
@@ -146,27 +158,33 @@ public class NewsletterServlet extends HttpServlet {
                 response.getWriter().write(gson.toJson(createdNewsletter));
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write(gson.toJson(Map.of("error", "Failed to create newsletter")));
+                response.getWriter()
+                        .write(gson.toJson(Map.of("error", "Failed to create newsletter")));
             }
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             Logger.error("NewsletterServlet", "Error creating newsletter", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write(gson.toJson(Map.of("error", "Server error creating newsletter")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Server error creating newsletter")));
         }
     }
 
     /**
-     * Handle PUT requests - update existing newsletter
+     * Handle PUT requests - update existing newsletter.
      */
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         response.setContentType("application/json");
 
         // Check if user is admin
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || !"admin".equals(user.getRole())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write(gson.toJson(Map.of("error", "Only admins can update newsletters")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Only admins can update newsletters")));
             return;
         }
 
@@ -204,30 +222,36 @@ public class NewsletterServlet extends HttpServlet {
                 response.getWriter().write(gson.toJson(newsletter));
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write(gson.toJson(Map.of("error", "Failed to update newsletter")));
+                response.getWriter()
+                        .write(gson.toJson(Map.of("error", "Failed to update newsletter")));
             }
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(gson.toJson(Map.of("error", "Invalid newsletter ID")));
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             Logger.error("NewsletterServlet", "Error updating newsletter", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write(gson.toJson(Map.of("error", "Server error updating newsletter")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Server error updating newsletter")));
         }
     }
 
     /**
-     * Handle DELETE requests - delete newsletter
+     * Handle DELETE requests - delete newsletter.
      */
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         response.setContentType("application/json");
 
         // Check if user is admin
         User user = (User) request.getSession().getAttribute("user");
         if (user == null || !"admin".equals(user.getRole())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write(gson.toJson(Map.of("error", "Only admins can delete newsletters")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Only admins can delete newsletters")));
             return;
         }
 
@@ -245,18 +269,24 @@ public class NewsletterServlet extends HttpServlet {
             boolean success = newsletterDAO.deleteNewsletter(id);
 
             if (success) {
-                response.getWriter().write(gson.toJson(Map.of("message", "Newsletter deleted successfully")));
+                response.getWriter()
+                        .write(gson.toJson(Map.of("message", "Newsletter deleted successfully")));
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write(gson.toJson(Map.of("error", "Newsletter not found or could not be deleted")));
+                response.getWriter().write(gson.toJson(
+                        Map.of("error", "Newsletter not found or could not be deleted")));
             }
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write(gson.toJson(Map.of("error", "Invalid newsletter ID")));
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             Logger.error("NewsletterServlet", "Error deleting newsletter", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write(gson.toJson(Map.of("error", "Server error deleting newsletter")));
+            response.getWriter()
+                    .write(gson.toJson(Map.of("error", "Server error deleting newsletter")));
         }
     }
+
 }

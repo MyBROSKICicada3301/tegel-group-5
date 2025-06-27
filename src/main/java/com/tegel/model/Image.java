@@ -2,12 +2,14 @@ package com.tegel.model;
 
 import java.sql.Timestamp;
 
+/**
+ * Model class representing an image in the system.
+ */
 public class Image {
     private int id;
     private String name;
     private String contentType;
     private byte[] data;
-    private Timestamp timestamp;
 
     // some setters and getters
     public int getId() {
@@ -42,11 +44,6 @@ public class Image {
         this.data = data;
     }
 
-    public Timestamp uploadDate() {
-        return timestamp;
-    }
-
     public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
     }
 }

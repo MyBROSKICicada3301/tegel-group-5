@@ -18,8 +18,8 @@ public class Announcement {
     }
 
     // Constructor with all fields
-    public Announcement(int announcementId, String title, String content,
-                      int postedBy, LocalDateTime postedAt, boolean isPublic) {
+    public Announcement(int announcementId, String title, String content, int postedBy,
+                        LocalDateTime postedAt, boolean isPublic) {
         this.announcementId = announcementId;
         this.title = title;
         this.content = content;
@@ -61,10 +61,6 @@ public class Announcement {
         this.postedBy = postedBy;
     }
 
-    public LocalDateTime getPostedAt() {
-        return postedAt;
-    }
-
     public void setPostedAt(LocalDateTime postedAt) {
         this.postedAt = postedAt;
     }
@@ -79,13 +75,8 @@ public class Announcement {
 
     @Override
     public String toString() {
-        return "Announcement{" +
-                "announcementId=" + announcementId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", postedBy=" + postedBy +
-                ", postedAt=" + postedAt +
-                ", isPublic=" + isPublic +
-                '}';
+        return "Announcement{" + "announcementId=" + announcementId + ", title='" + title + '\'' +
+                ", content='" + content + '\'' + ", postedBy=" + postedBy + ", postedAt=" +
+                postedAt + ", isPublic=" + isPublic + '}';
     }
 }

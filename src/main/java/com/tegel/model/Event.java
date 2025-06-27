@@ -3,6 +3,9 @@ package com.tegel.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Model class representing an event in the system.
+ */
 public class Event {
     private int eventId;
     private String title;
@@ -19,13 +22,14 @@ public class Event {
     private boolean hasFoodOption;
     private double price;
     private boolean isPublic;
-    
+
     // Constructors
-    public Event() {}
-    
-    public Event(String title, String description, LocalDate date, String location, 
-                 String image, int maxParticipants, int createdBy, boolean isActive,
-                 boolean hasFoodOption, double price, boolean isPublic) {
+    public Event() {
+    }
+
+    public Event(String title, String description, LocalDate date, String location, String image,
+                 int maxParticipants, int createdBy, boolean isActive, boolean hasFoodOption,
+                 double price, boolean isPublic) {
         this.title = title;
         this.description = description;
         this.date = date;
@@ -39,50 +43,125 @@ public class Event {
         this.price = price;
         this.isPublic = isPublic;
     }
-    
+
     // Getters and Setters
-    public int getEventId() { return eventId; }
-    public void setEventId(int eventId) { this.eventId = eventId; }
-    
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
-    
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
-    
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
-    
-    public Integer getImageId() { return imageId; } // Added getter for imageId
-    public void setImageId(int imageId) { this.imageId = imageId; } // Added setter for imageId
+    public int getEventId() {
+        return eventId;
+    }
 
-    public int getMaxParticipants() { return maxParticipants; }
-    public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
-    
-    public int getCurrentParticipants() { return currentParticipants; }
-    public void setCurrentParticipants(int currentParticipants) { this.currentParticipants = currentParticipants; }
-    
-    public int getCreatedBy() { return createdBy; }
-    public void setCreatedBy(int createdBy) { this.createdBy = createdBy; }
-    
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    
-    public boolean isActive() { return isActive; }
-    public void setActive(boolean active) { isActive = active; }
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
 
-    public boolean isHasFoodOption() { return hasFoodOption; }
-    public void setHasFoodOption(boolean hasFoodOption) { this.hasFoodOption = hasFoodOption; }
+    public String getTitle() {
+        return title;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price;}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public boolean isPublic() { return isPublic; }
-    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Integer getImageId() {
+        return imageId;
+    } // Added getter for imageId
+
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
+    } // Added setter for imageId
+
+    public int getMaxParticipants() {
+        return maxParticipants;
+    }
+
+    public void setMaxParticipants(int maxParticipants) {
+        this.maxParticipants = maxParticipants;
+    }
+
+    public int getCurrentParticipants() {
+        return currentParticipants;
+    }
+
+    public void setCurrentParticipants(int currentParticipants) {
+        this.currentParticipants = currentParticipants;
+    }
+
+    public int getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(int createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isHasFoodOption() {
+        return hasFoodOption;
+    }
+
+    public void setHasFoodOption(boolean hasFoodOption) {
+        this.hasFoodOption = hasFoodOption;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 }

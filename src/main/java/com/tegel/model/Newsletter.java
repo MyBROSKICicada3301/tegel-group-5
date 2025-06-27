@@ -3,7 +3,7 @@ package com.tegel.model;
 import java.time.LocalDateTime;
 
 /**
- * Model class representing a Newsletter
+ * Model class representing a Newsletter.
  */
 public class Newsletter {
     private int id;
@@ -19,8 +19,8 @@ public class Newsletter {
     }
 
     // Constructor with parameters
-    public Newsletter(int id, String title, String content, int createdBy,
-                     LocalDateTime createdAt, LocalDateTime publishedAt, boolean isPublished) {
+    public Newsletter(int id, String title, String content, int createdBy, LocalDateTime createdAt,
+                      LocalDateTime publishedAt, boolean isPublished) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -63,16 +63,8 @@ public class Newsletter {
         this.createdBy = createdBy;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getPublishedAt() {
-        return publishedAt;
     }
 
     public void setPublishedAt(LocalDateTime publishedAt) {
@@ -89,14 +81,9 @@ public class Newsletter {
 
     @Override
     public String toString() {
-        return "Newsletter{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", content='" + (content != null ? content.substring(0, Math.min(content.length(), 30)) + "..." : "null") + '\'' +
-                ", createdBy=" + createdBy +
-                ", createdAt=" + createdAt +
-                ", publishedAt=" + publishedAt +
-                ", isPublished=" + isPublished +
-                '}';
+        return "Newsletter{" + "id=" + id + ", title='" + title + '\'' + ", content='" +
+                (content != null ? content.substring(0, Math.min(content.length(), 30)) + "..." :
+                        "null") + '\'' + ", createdBy=" + createdBy + ", createdAt=" + createdAt +
+                ", publishedAt=" + publishedAt + ", isPublished=" + isPublished + '}';
     }
 }

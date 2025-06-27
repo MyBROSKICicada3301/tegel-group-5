@@ -101,7 +101,7 @@ public class AdminServlet extends HttpServlet {
             }
             
             event.setImage(image != null ? image.trim() : "");
-            event.setActive(isActiveStr != null && "on".equals(isActiveStr));
+            event.setActive("on".equals(isActiveStr));
 
             // set public visibility
             event.setPublic("on".equals(isPublicStr));

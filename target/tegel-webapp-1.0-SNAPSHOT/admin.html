@@ -70,11 +70,11 @@
             color: #fff;
         }
         .footer {
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 25px 0;
-            backdrop-filter: blur(10px);
+            background-color: #f8f9fa;
+            padding: 30px 0;
+            margin-top: auto;
         }
+
         .footer img {
             width: 28px;
             height: 28px;
@@ -264,8 +264,18 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="editEventImage" class="form-label">Image URL</label>
-                                <input type="url" class="form-control" id="editEventImage" name="image">
+                                <label for="editEventImage" class="form-label">Event Image</label>
+                                <input type="file" class="form-control" id="editEventImage" name="eventImage" accept="image/*">
+                                <small class="form-text text-muted">Upload a new image for this event</small>
+
+                                <!-- Hidden field to keep track of existing image ID if any -->
+                                <input type="hidden" id="currentImageId" name="currentImageId">
+
+                                <!-- Image preview section -->
+                                <div id="currentImagePreview" class="mt-2" style="display: none;">
+                                    <p>Current image:</p>
+                                    <img id="previewImg" src="" alt="Current event image" style="max-width: 100%; max-height: 150px;" class="img-thumbnail">
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -300,18 +310,28 @@
     </div>
 </div>
 
-<footer class="footer">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div class="social-links">
-            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
-            </a>
-            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
-            </a>
+<footer class="footer mt-2 py-3 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <div class="d-flex justify-content-center justify-content-md-start">
+                    <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                       target="_blank" rel="noopener" class="me-3">
+                        <i class="bi bi-instagram text-warning fs-4"></i>
+                    </a>
+                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                        <i class="bi bi-envelope text-warning fs-4"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
+                     style="width: 90px; height: auto;"/>
+            </div>
         </div>
-        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
-        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
     </div>
 </footer>
 
@@ -783,8 +803,34 @@
         document.getElementById('editMaxParticipants').value = event.maxParticipants || '';
         document.getElementById('editEventDescription').value = event.description || '';
 
-        // Handle image field as integer ID
-        document.getElementById('editEventImage').value = event.image || '';
+        // Reset file input (it can't be programmatically set for security reasons)
+        document.getElementById('editEventImage').value = '';
+
+        // Handle image preview and store current image ID if available
+        const previewContainer = document.getElementById('currentImagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const currentImageIdField = document.getElementById('currentImageId');
+
+        if (event.imageId) {
+            // Store the current image ID in the hidden field
+            currentImageIdField.value = event.imageId;
+
+            // Display image preview
+            previewImg.src = `${contextPath}/images/${event.imageId}`;
+            previewContainer.style.display = 'block';
+        } else if (event.image && !isNaN(parseInt(event.image))) {
+            // Handle legacy format where image is stored as a string but represents an ID
+            const imageId = parseInt(event.image);
+            currentImageIdField.value = imageId;
+
+            // Display image preview
+            previewImg.src = `${contextPath}/images/${imageId}`;
+            previewContainer.style.display = 'block';
+        } else {
+            // No image or invalid image reference
+            currentImageIdField.value = '';
+            previewContainer.style.display = 'none';
+        }
 
         document.getElementById('editIsActive').checked = event.isActive;
         document.getElementById('editIsPublic').checked = event.isPublic;
@@ -802,17 +848,17 @@
         const formData = new FormData(form);
         const eventId = formData.get('eventId');
 
-        // Make sure image is sent as an integer if it's numeric
-        const imageValue = formData.get('image');
-        if (imageValue !== null && imageValue !== '') {
-            formData.delete('image');
-            // Try to convert to int if possible
-            const imageId = parseInt(imageValue);
-            if (!isNaN(imageId)) {
-                formData.append('image', imageId);
-            } else {
-                formData.append('image', imageValue);
-            }
+        // Check if a new image was uploaded
+        const fileInput = document.getElementById('editEventImage');
+        const currentImageId = document.getElementById('currentImageId').value;
+
+        // If no new file is selected but we have a current image ID, use that
+        if (fileInput.files.length === 0 && currentImageId) {
+            // Remove the file input from formData since it's empty
+            formData.delete('eventImage');
+
+            // Add the existing image ID
+            formData.append('image', currentImageId);
         }
 
         fetch(`${contextPath}/admin/events/${eventId}`, {
@@ -820,7 +866,18 @@
             body: formData,
             credentials: 'include'
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            throw new Error(text || `Server error: ${response.status}`);
+                        }
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.eventId || data.success) {
                     notificationSystem.success('Event updated successfully!');
@@ -888,8 +945,10 @@
                 formData.append('description', event.description || '');
                 formData.append('maxParticipants', event.maxParticipants || '');
 
-                // Handle image field as integer
-                if (event.image) {
+                // Handle imageId correctly
+                if (event.imageId) {
+                    formData.append('image', event.imageId);
+                } else if (event.image) {
                     const imageId = parseInt(event.image);
                     formData.append('image', !isNaN(imageId) ? imageId : event.image);
                 }
@@ -971,101 +1030,6 @@
         });
     }
 
-    // Helper function to ensure admin navigation
-    function ensureAdminNavigation() {
-        // Update Home link for admins
-        const homeLinks = document.querySelectorAll('a.nav-link[href="index.html"]');
-        homeLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
-
-        // Update logo link for admins
-        const logoLinks = document.querySelectorAll('a.navbar-brand[href="index.html"]');
-        logoLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
-
-        // Also update any other index.html links
-        const otherIndexLinks = document.querySelectorAll('a[href="index.html"]:not(.nav-link):not(.navbar-brand)');
-        otherIndexLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
-    }
-
-    // Manual session check implementation for admin.html
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("Admin page loaded");
-        ensureAdminNavigation(); // Always update links on page load
-
-        // Force a check of the session status
-        fetch(`${contextPath}/check-session`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Session check failed: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Session check response:", data);
-            if (data.loggedIn) {
-                const authButtons = document.getElementById('authButtons');
-                if (authButtons) {
-                    authButtons.innerHTML = `
-                        <a href="#" class="btn btn-light me-2" id="accountBtn">Account</a>
-                        <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
-                    `;
-
-                    // Add click event listener to sign out button
-                    document.getElementById('signoutBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        signOut();
-                    });
-
-                    // Add click event for account button
-                    document.getElementById('accountBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Redirect to account page
-                        window.location.href = 'account.html';
-                    });
-                }
-
-                // Redirect if not admin
-                if (data.role !== 'admin') {
-                    alert('This page is restricted to administrators only.');
-                    window.location.href = 'index.html';
-                } else {
-                    // User is admin, load data
-                    loadUsers();
-                    loadEvents();
-                }
-            } else {
-                // Not logged in, redirect to login page
-                alert('Please log in as an administrator to access this page.');
-                window.location.href = 'login.html';
-            }
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-            alert('Failed to verify your login status. Please try logging in again.');
-            window.location.href = 'login.html';
-        });
-    });
-
-    function signOut() {
-        fetch(`${contextPath}/logout`, {
-            method: 'POST',
-            credentials: 'include'
-        })
-        .then(response => {
-            // Redirect to home page after successful logout
-            window.location.href = 'index.html';
-        })
-        .catch(error => {
-            console.error('Error signing out:', error);
-            alert('Error signing out. You will be redirected to the login page.');
-            window.location.href = 'login.html';
-        });
-    }
 
     // Notification system for admin interface
     const notificationSystem = {

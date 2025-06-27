@@ -793,8 +793,14 @@
         document.getElementById('editMaxParticipants').value = event.maxParticipants || '';
         document.getElementById('editEventDescription').value = event.description || '';
 
-        // Handle image field as integer ID
-        document.getElementById('editEventImage').value = event.image || '';
+        // Correctly handle image as imageId
+        if (event.imageId) {
+            document.getElementById('editEventImage').value = event.imageId;
+        } else if (event.image) {
+            document.getElementById('editEventImage').value = event.image;
+        } else {
+            document.getElementById('editEventImage').value = '';
+        }
 
         document.getElementById('editIsActive').checked = event.isActive;
         document.getElementById('editIsPublic').checked = event.isPublic;
@@ -898,8 +904,10 @@
                 formData.append('description', event.description || '');
                 formData.append('maxParticipants', event.maxParticipants || '');
 
-                // Handle image field as integer
-                if (event.image) {
+                // Handle imageId correctly
+                if (event.imageId) {
+                    formData.append('image', event.imageId);
+                } else if (event.image) {
                     const imageId = parseInt(event.image);
                     formData.append('image', !isNaN(imageId) ? imageId : event.image);
                 }

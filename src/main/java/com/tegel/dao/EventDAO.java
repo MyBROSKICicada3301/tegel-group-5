@@ -1,6 +1,12 @@
 package com.tegel.dao;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,40 +38,60 @@ public class EventDAO {
             return false;
         }
 
-        String sql = "CALL " + SCHEMA + ".create_event(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql =
+                "INSERT INTO " + SCHEMA + ".event (title, description, date, location, " +
+                        "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic, image) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Debug the hasFoodOption value before SQL execution
+        logger.info("Setting hasFoodOption to: " + event.isHasFoodOption());
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
 
-            try (CallableStatement stmt = conn.prepareCall(sql)) {
-                // Set input parameters
+            try (PreparedStatement stmt = conn.prepareStatement(sql,
+                                                                Statement.RETURN_GENERATED_KEYS)) {
+
+                // Sanitize and validate inputs before database call
                 stmt.setString(1, SecurityUtils.sanitizeInput(event.getTitle()));
                 stmt.setString(2, event.getDescription() != null ?
                         SecurityUtils.sanitizeTextArea(event.getDescription()) : null);
                 stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
                 stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setInt(5, event.getImageId());
-                stmt.setInt(6, event.getMaxParticipants());
-                stmt.setInt(7, event.getCreatedBy());
-                stmt.setBoolean(8, event.isActive());
-                stmt.setDouble(9, event.getPrice());
-                stmt.setBoolean(10, event.isHasFoodOption());
-                stmt.setBoolean(11, event.isPublic());
+                stmt.setInt(5, event.getMaxParticipants());
+                stmt.setInt(6, event.getCreatedBy());
+                stmt.setBoolean(7, event.isActive());
+                stmt.setDouble(8, event.getPrice());
+                stmt.setBoolean(9, event.isHasFoodOption());
+                stmt.setBoolean(10, event.isPublic());
 
-                // Register the OUT parameter for the generated ID
-                stmt.registerOutParameter(12, java.sql.Types.INTEGER);
+                // Set image ID as null or the provided integer value
+                if (event.getImageId() != null) {
+                    stmt.setInt(11, event.getImageId());
+                } else {
+                    stmt.setNull(11, java.sql.Types.INTEGER);
+                }
 
-                // Execute the stored procedure
-                stmt.execute();
+                int rowsAffected = stmt.executeUpdate();
 
-                // Get the generated event ID
-                int generatedId = stmt.getInt(12);
-                event.setEventId(generatedId);
+                if (rowsAffected > 0) {
+                    conn.commit();
 
-                conn.commit();
-                logger.info("Event created successfully with ID: " + generatedId);
-                return true;
+                    // Get generated event ID
+                    ResultSet generatedKeys = stmt.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        event.setEventId(generatedKeys.getInt(1));
+                    }
+
+                    logger.info("Event created successfully in database");
+                    return true;
+                } else {
+                    conn.rollback();
+                    logger.warning("No rows affected during event creation");
+                    return false;
+                }
+
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
@@ -195,37 +221,47 @@ public class EventDAO {
             return false;
         }
 
-        String sql = "CALL " + SCHEMA + ".update_event(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "UPDATE " + SCHEMA +
+                ".event SET title = ?, description = ?, date = ?, location = ?, " +
+                "maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
+                ", ispublic = ? WHERE event_id = ?";
+
+        if (event.getImageId() != null) {
+            sql = "UPDATE " + SCHEMA +
+                ".event SET title = ?, description = ?, date = ?, location = ?, " +
+                "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
+                ", ispublic = ? WHERE event_id = ?";
+        }
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
 
-            try (CallableStatement stmt = conn.prepareCall(sql)) {
-                // Set input parameters
-                stmt.setInt(1, event.getEventId());
-                stmt.setString(2, SecurityUtils.sanitizeInput(event.getTitle()));
-                stmt.setString(3, event.getDescription() != null ?
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                // Sanitize inputs
+                stmt.setString(1, SecurityUtils.sanitizeInput(event.getTitle()));
+                stmt.setString(2, event.getDescription() != null ?
                         SecurityUtils.sanitizeTextArea(event.getDescription()) : null);
-                stmt.setDate(4, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
-                stmt.setString(5, event.getLocation() != null ?
+                stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
+                stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setInt(6, event.getImageId());
-                stmt.setInt(7, event.getMaxParticipants());
-                stmt.setBoolean(8, event.isActive());
-                stmt.setDouble(9, event.getPrice());
-                stmt.setBoolean(10, event.isHasFoodOption());
-                stmt.setBoolean(11, event.isPublic());
 
-                // Register the OUT parameter for success
-                stmt.registerOutParameter(12, java.sql.Types.BOOLEAN);
+                int paramIndex = 5;
+                if (event.getImageId() != null) {
+                    // Set image ID as an integer
+                    stmt.setInt(paramIndex++, event.getImageId());
+                }
 
-                // Execute the stored procedure
-                stmt.execute();
+                stmt.setInt(paramIndex++, event.getMaxParticipants());
+                stmt.setBoolean(paramIndex++, event.isActive());
+                stmt.setDouble(paramIndex++, event.getPrice());
+                stmt.setBoolean(paramIndex++, event.isHasFoodOption());
+                stmt.setBoolean(paramIndex++, event.isPublic());
+                stmt.setInt(paramIndex, event.getEventId());
 
-                // Get the success value
-                boolean success = stmt.getBoolean(12);
+                int rowsAffected = stmt.executeUpdate();
 
-                if (success) {
+                if (rowsAffected > 0) {
                     conn.commit();
                     logger.info("Event updated successfully: " + event.getEventId());
                     return true;
@@ -234,10 +270,12 @@ public class EventDAO {
                     logger.warning("No event found with ID: " + event.getEventId());
                     return false;
                 }
+
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
             }
+
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database error updating event", e);
             return false;
@@ -562,7 +600,7 @@ public class EventDAO {
     }
 
     /**
-     * Get all events a user has enrolled in.
+     * Get all events a user has enrolled in
      *
      * @param userId The ID of the user
      * @return A list of events the user has enrolled in
@@ -600,7 +638,7 @@ public class EventDAO {
     }
 
     /**
-     * De-enroll a user from an event.
+     * De-enroll a user from an event
      *
      * @param userId  The ID of the user
      * @param eventId The ID of the event

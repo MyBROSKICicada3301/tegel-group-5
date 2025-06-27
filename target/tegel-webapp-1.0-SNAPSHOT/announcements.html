@@ -5,365 +5,691 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Announcements | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="styles.css" rel="stylesheet">
-    <script src="js/debug-utils.js"></script>
-    <script src="js/session-manager.js"></script>
-    <script src="js/auth-scripts.js"></script>
+    <style>
+        .announcement-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .announcement-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .announcement-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .announcement-date {
+            font-style: italic;
+        }
+
+        .announcement-author {
+            font-weight: 500;
+        }
+
+        .announcement-content {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-line;
+        }
+
+        .private-announcement {
+            background-color: #fff8e1;
+            border-color: #ffecb3;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            margin: 50px 0;
+        }
+
+        .no-announcements {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .admin-controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
-            </ul>
-            <div id="authButtons">
-                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
-                <a href="login.html" class="btn btn-light">Login</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(252,125,4,255);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html" style="padding:0;">
+                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
+                </ul>
+                <div id="authButtons">
+                    <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                    <a href="login.html" class="btn btn-light">Login</a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<main class="container my-4">
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-md-10">
-            <form id="searchForm" class="row g-2 mb-3" role="search" aria-label="Search announcements">
-                <div class="col-12 col-md-8">
-                    <input id="searchInput" class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
-                </div>
-                <div class="col-12 col-md-4">
-                    <input id="dateInput" class="form-control" type="date" aria-label="Search by date">
-                </div>
-                <div class="col-12 d-flex justify-content-end">
-                    <button class="btn btn-outline-warning mt-2" type="submit">Search</button>
-                    <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2" type="button">Reset</button>
-                </div>
-            </form>
-            <div class="announcements-section">
-                <h1>Announcements</h1>
-                <div id="announcements-container">
-                    <div class="loading-spinner">
-                        <div class="spinner-border text-warning" role="status">
-                            <span class="visually-hidden">Loading...</span>
+    <!-- Main Content -->
+    <main class="container my-4">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 col-md-10">
+                <!-- Search and Filter Form -->
+                <form id="searchForm" class="row g-2 mb-4" role="search" aria-label="Search announcements">
+                    <div class="col-12 col-md-8">
+                        <input id="searchInput" class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input id="dateInput" class="form-control" type="date" aria-label="Search by date">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button class="btn btn-outline-warning mt-2" type="submit">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                        <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2" type="button">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Announcements Section -->
+                <div class="announcements-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1>Announcements</h1>
+                        <button id="createAnnouncementBtn" class="btn btn-warning d-none">
+                            <i class="bi bi-plus-circle"></i> New Announcement
+                        </button>
+                    </div>
+
+                    <div id="announcements-container">
+                        <div class="loading-spinner">
+                            <div class="spinner-border text-warning" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Admin-only announcement creation form -->
-            <div class="admin-only container my-4" style="display:none">
-                <div class="card p-4">
-                    <h3>Create New Announcement</h3>
-                    <form id="adminAnnouncementCreateForm">
-                        <div class="mb-3">
-                            <label for="announcementTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="announcementTitle" name="title" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="announcementContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="announcementContent" name="content" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Announcement</button>
-                    </form>
-                    <div id="adminAnnouncementCreateMsg" class="mt-2"></div>
+        </div>
+
+        <!-- Create/Edit Announcement Modal -->
+        <div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="announcementModalLabel">Create Announcement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="announcementForm">
+                            <input type="hidden" id="announcementId">
+                            <div class="mb-3">
+                                <label for="announcementTitle" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="announcementTitle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="announcementContent" class="form-label">Content</label>
+                                <textarea class="form-control" id="announcementContent" rows="5" required></textarea>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="announcementIsPublic" checked>
+                                <label class="form-check-label" for="announcementIsPublic">
+                                    Public announcement (visible to everyone)
+                                </label>
+                            </div>
+                            <div id="modalErrorMsg" class="text-danger mb-3"></div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-warning" id="saveAnnouncementBtn">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
 
-<footer class="footer">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div class="social-links">
-            <a href="https://www.instagram.com/sgvtegel" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
-            </a>
-            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
-            </a>
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this announcement? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
-        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
-    </div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Debug code to check if script is loaded
-    console.log("Announcements page loaded");
+    </main>
 
-    // Track if admin navigation has been set up already
-    let adminNavInitialized = false;
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap">
+            <div class="social-links">
+                <a href="https://www.instagram.com/sgvtegel" target="_blank" rel="noopener">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
+                </a>
+                <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
+                </a>
+            </div>
+            <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
+            <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width:90px;height:auto;">
+        </div>
+    </footer>
 
-    // Function to update navigation for admin users
-    function updateNavForAdmin() {
-        if (adminNavInitialized) return; // Prevent duplicate initialization
-        adminNavInitialized = true;
+    <!-- Bootstrap JS and Custom JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentUserId = null;
+        let isAdmin = false;
+        let announcementToDelete = null;
+        const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
-        console.log("Updating navigation for admin user");
+        // Get the context path dynamically from the current URL
+        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
+        console.log("Using context path:", contextPath);
 
-        // Update the navbar brand link
-        document.querySelector('a.navbar-brand').setAttribute('href', 'adminindex.html');
+        // Event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Announcements page loaded");
 
-        // Update the navigation links
-        const navbarNav = document.querySelector('#navbarNav .navbar-nav');
-        if (navbarNav) {
-            navbarNav.innerHTML = `
-                <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
-                <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
-            `;
-        }
+            checkUserSession();
+            loadAnnouncements();
 
-        // Show admin creation form
-        const adminForm = document.querySelector('.admin-only');
-        if (adminForm) {
-            adminForm.style.display = 'block';
-        }
-    }
-
-    // Fetch announcements from the server
-    function fetchAnnouncements(searchTerm = "", dateFilter = "") {
-        let url = '/tegel_webapp/announcement';  // Updated to include context path
-
-        // Add query parameters if provided
-        if (searchTerm) {
-            url += `?search=${encodeURIComponent(searchTerm)}`;
-        } else if (dateFilter) {
-            url += `?date=${encodeURIComponent(dateFilter)}`;
-        }
-
-        console.log(`[DEBUG] Fetching announcements from URL: ${url}`);
-
-        fetch(url)
-            .then(response => {
-                console.log(`[DEBUG] Announcement response status: ${response.status}`);
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok (Status: ${response.status})`);
-                }
-                return response.json();
-            })
-            .then(announcements => {
-                console.log(`[DEBUG] Received ${announcements.length} announcements`);
-                displayAnnouncements(announcements);
-            })
-            .catch(error => {
-                console.error('Error fetching announcements:', error);
-                displayError('Failed to load announcements. Please try again later.');
-            });
-    }
-
-    // Display announcements in the container
-    function displayAnnouncements(announcements) {
-        const container = document.getElementById('announcements-container');
-        container.innerHTML = ''; // Clear loading spinner or previous results
-
-        if (!announcements || announcements.length === 0) {
-            container.innerHTML = '<div class="no-announcements">No announcements found. Stay tuned!</div>';
-            return;
-        }
-
-        // Loop through announcements and create HTML for each
-        announcements.forEach(announcement => {
-            const announcementElement = document.createElement('div');
-            announcementElement.className = 'announcement-card';
-
-            // Format date for display
-            const createdDate = new Date(announcement.createdAt);
-            const formattedDate = createdDate.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            // Create announcement HTML
-            announcementElement.innerHTML = `
-                <div class="announcement-title">${announcement.title}</div>
-                <div class="announcement-date">${formattedDate}</div>
-                <div class="announcement-content">${announcement.content}</div>
-            `;
-
-            container.appendChild(announcementElement);
+            document.getElementById('searchForm').addEventListener('submit', handleSearch);
+            document.getElementById('resetSearch').addEventListener('click', resetSearch);
+            document.getElementById('createAnnouncementBtn').addEventListener('click', showCreateAnnouncementModal);
+            document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteAnnouncement);
         });
-    }
 
-    // Display error message
-    function displayError(message) {
-        const container = document.getElementById('announcements-container');
-        container.innerHTML = `<div class="alert alert-danger" role="alert">${message}</div>`;
-    }
+        // Check if user is logged in
+        function checkUserSession() {
+            console.log("Checking user session...");
 
-    // Handle search form submission
-    document.getElementById('searchForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent normal form submission
-
-        const searchTerm = document.getElementById('searchInput').value.trim();
-        const dateFilter = document.getElementById('dateInput').value;
-
-        // Show loading spinner
-        document.getElementById('announcements-container').innerHTML = `
-            <div class="loading-spinner">
-                <div class="spinner-border text-warning" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        `;
-
-        // Fetch filtered announcements
-        if (searchTerm) {
-            fetchAnnouncements(searchTerm, "");
-        } else if (dateFilter) {
-            fetchAnnouncements("", dateFilter);
-        } else {
-            fetchAnnouncements();
-        }
-    });
-
-    // Reset search form
-    document.getElementById('resetSearch').addEventListener('click', function() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('dateInput').value = '';
-
-        // Show loading spinner
-        document.getElementById('announcements-container').innerHTML = `
-            <div class="loading-spinner">
-                <div class="spinner-border text-warning" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        `;
-
-        // Fetch all announcements
-        fetchAnnouncements();
-    });
-
-    // Ensure session is checked on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM fully loaded");
-
-        // Fetch announcements on page load
-        fetchAnnouncements();
-
-        // Force a check of the session status
-        fetch('/tegel_webapp/check-session', {
-            method: 'GET',
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Session check response:", data);
-            if(data.loggedIn) {
-                // Update auth buttons for logged-in users
-                const authButtons = document.getElementById('authButtons');
-                if (authButtons) {
-                    authButtons.innerHTML = `
-                        <a href="account.html" class="btn btn-light me-2">Account</a>
-                        <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
-                    `;
-
-                    // Add click event listener to sign out button
-                    document.getElementById('signoutBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        signOut();
-                    });
-                }
-
-                // Check if user is admin and update UI accordingly
-                if (data.role === 'admin') {
-                    console.log("User is admin, updating navigation");
-                    updateNavForAdmin();
-
-                    // Show admin form
-                    const adminForm = document.querySelector('.admin-only');
-                    if (adminForm) {
-                        adminForm.style.display = 'block';
+            fetch(contextPath + '/check-session', { credentials: 'include' })
+                .then(response => {
+                    console.log("Session check response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error(`Failed to check session: ${response.status}`);
                     }
-                }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Session data:", data);
+                    if (data.loggedIn) {
+                        currentUserId = data.userId;
+                        isAdmin = data.role === 'admin';
+                        console.log(`User is logged in, userId: ${currentUserId}, isAdmin: ${isAdmin}`);
+                        updateAuthUI(data);
+                    } else {
+                        console.log("User is not logged in");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session:', error);
+                });
+        }
+
+        // Update the UI based on authentication status
+        function updateAuthUI(userData) {
+            // Update auth buttons
+            const authButtons = document.getElementById('authButtons');
+            authButtons.innerHTML = `
+                <a href="account.html" class="btn btn-light me-2">My Account</a>
+                <button id="logoutBtn" class="btn btn-light">Logout</button>
+            `;
+
+            // Add logout event listener
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                logout();
+            });
+
+            // If admin, show additional controls and update navigation
+            if (isAdmin) {
+                document.getElementById('createAnnouncementBtn').classList.remove('d-none');
+
+                // Update navigation for admin users
+                const navbarNav = document.querySelector('#navbarNav .navbar-nav');
+                navbarNav.innerHTML = `
+                    <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
+                `;
             }
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-        });
+        }
 
-        // Handle admin announcement creation
-        document.getElementById('adminAnnouncementCreateForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Load all announcements
+        function loadAnnouncements() {
+            console.log("Loading announcements...");
 
-            const title = document.getElementById('announcementTitle').value.trim();
-            const content = document.getElementById('announcementContent').value.trim();
+            const container = document.getElementById('announcements-container');
+            container.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
 
-            // Basic client-side validation
-            if (!title || !content) {
-                displayAdminMessage('Title and content are required.', 'danger');
+            fetch(contextPath + '/announcement', { credentials: 'include' })
+                .then(response => {
+                    console.log("Announcements fetch response status:", response.status);
+
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+
+                    return response.text().then(text => {
+                        console.log("Raw response text:", text);
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error("Error parsing JSON:", e);
+                            throw new Error(`Invalid JSON response: ${text}`);
+                        }
+                    });
+                })
+                .then(announcements => {
+                    console.log(`Received ${announcements.length} announcements`);
+                    displayAnnouncements(announcements);
+                })
+                .catch(error => {
+                    console.error('Error loading announcements:', error);
+                    container.innerHTML = `
+                        <div class="alert alert-danger">
+                            Failed to load announcements. Please try again later.
+                            <br>Error details: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+
+        // Display announcements in the container
+        function displayAnnouncements(announcements) {
+            const container = document.getElementById('announcements-container');
+
+            if (!announcements || announcements.length === 0) {
+                container.innerHTML = `
+                    <div class="no-announcements">
+                        <p>No announcements found.</p>
+                    </div>
+                `;
                 return;
             }
 
-            // Send announcement data to server
-            fetch('/tegel_webapp/announcement', {
-                method: 'POST',
+            container.innerHTML = '';
+
+            announcements.forEach(announcement => {
+                const card = document.createElement('div');
+                card.className = 'announcement-card';
+                if (!announcement.public) {
+                    card.classList.add('private-announcement');
+                }
+
+                // Format the date
+                let formattedDate = 'Date unavailable';
+                if (announcement.postedAt) {
+                    const date = new Date(announcement.postedAt);
+                    formattedDate = date.toLocaleString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+
+                // Create the card content
+                card.innerHTML = `
+                    <div class="announcement-header">
+                        <div class="announcement-title">${announcement.title}</div>
+                        ${!announcement.public ? '<span class="badge bg-warning text-dark">Private</span>' : ''}
+                    </div>
+                    <div class="announcement-meta">
+                        <div class="announcement-date">${formattedDate}</div>
+                        <div class="announcement-author" data-user-id="${announcement.postedBy}">
+                            Posted by: User #${announcement.postedBy}
+                        </div>
+                    </div>
+                    <div class="announcement-content">${announcement.content}</div>
+                `;
+
+                // Add admin controls if user is admin
+                if (isAdmin) {
+                    const controls = document.createElement('div');
+                    controls.className = 'admin-controls';
+                    controls.innerHTML = `
+                        <button class="btn btn-sm btn-outline-primary me-2 edit-btn" data-id="${announcement.announcementId}">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${announcement.announcementId}">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    `;
+                    card.appendChild(controls);
+
+                    // Add event listeners for admin controls
+                    controls.querySelector('.edit-btn').addEventListener('click', () => {
+                        showEditAnnouncementModal(announcement);
+                    });
+
+                    controls.querySelector('.delete-btn').addEventListener('click', () => {
+                        announcementToDelete = announcement.announcementId;
+                        deleteModal.show();
+                    });
+                }
+
+                container.appendChild(card);
+
+                // Fetch user details for "Posted by"
+                fetchUserDetails(announcement.postedBy, card.querySelector('.announcement-author'));
+            });
+        }
+
+        // Fetch user details to show poster's name
+        function fetchUserDetails(userId, element) {
+            fetch(`/userdetails?id=${userId}`, { credentials: 'include' })
+                .then(response => {
+                    if (!response.ok) {
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(user => {
+                    if (user && user.firstName && user.lastName) {
+                        element.textContent = `Posted by: ${user.firstName} ${user.lastName}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user details:', error);
+                });
+        }
+
+        // Handle search form submission
+        function handleSearch(event) {
+            event.preventDefault();
+
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const dateFilter = document.getElementById('dateInput').value;
+
+            // Show loading spinner
+            const container = document.getElementById('announcements-container');
+            container.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+
+            let url = `/announcement`;
+
+            if (searchTerm) {
+                url += `?search=${encodeURIComponent(searchTerm)}`;
+            } else if (dateFilter) {
+                url += `?date=${encodeURIComponent(dateFilter)}`;
+            } else {
+                loadAnnouncements();
+                return;
+            }
+
+            fetch(url, { credentials: 'include' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(announcements => {
+                    displayAnnouncements(announcements);
+                })
+                .catch(error => {
+                    console.error('Error searching announcements:', error);
+                    container.innerHTML = `
+                        <div class="alert alert-danger">
+                            Failed to search announcements. Please try again later.
+                        </div>
+                    `;
+                });
+        }
+
+        // Reset search form and reload all announcements
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateInput').value = '';
+            loadAnnouncements();
+        }
+
+        // Show the modal for creating a new announcement
+        function showCreateAnnouncementModal() {
+            // Clear form fields
+            document.getElementById('announcementId').value = '';
+            document.getElementById('announcementTitle').value = '';
+            document.getElementById('announcementContent').value = '';
+            document.getElementById('announcementIsPublic').checked = true;
+            document.getElementById('modalErrorMsg').textContent = '';
+
+            // Update modal title
+            document.getElementById('announcementModalLabel').textContent = 'Create Announcement';
+
+            announcementModal.show();
+        }
+
+        // Show the modal for editing an existing announcement
+        function showEditAnnouncementModal(announcement) {
+            // Set form fields
+            document.getElementById('announcementId').value = announcement.announcementId;
+            document.getElementById('announcementTitle').value = announcement.title;
+            document.getElementById('announcementContent').value = announcement.content;
+            document.getElementById('announcementIsPublic').checked = announcement.public;
+            document.getElementById('modalErrorMsg').textContent = '';
+
+            // Update modal title
+            document.getElementById('announcementModalLabel').textContent = 'Edit Announcement';
+
+            announcementModal.show();
+        }
+
+        // Save announcement (create new or update existing)
+        function saveAnnouncement() {
+            const id = document.getElementById('announcementId').value.trim();
+            const title = document.getElementById('announcementTitle').value.trim();
+            const content = document.getElementById('announcementContent').value.trim();
+            const isPublic = document.getElementById('announcementIsPublic').checked;
+            const errorMsg = document.getElementById('modalErrorMsg');
+
+            // Validate inputs
+            if (!title) {
+                errorMsg.textContent = 'Title is required';
+                return;
+            }
+
+            if (!content) {
+                errorMsg.textContent = 'Content is required';
+                return;
+            }
+
+            const announcement = {
+                title: title,
+                content: content,
+                public: isPublic
+            };
+
+            let url = `/announcement`;
+            let method = 'POST';
+
+            // If ID exists, we're updating an existing announcement
+            if (id) {
+                announcement.announcementId = parseInt(id);
+                method = 'PUT';
+            }
+
+            fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, content }),
+                body: JSON.stringify(announcement),
                 credentials: 'include'
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Operation failed');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log("Announcement creation response:", data);
-                if(data.success) {
-                    displayAdminMessage('Announcement created successfully!', 'success');
-                    // Clear form fields
-                    document.getElementById('announcementTitle').value = '';
-                    document.getElementById('announcementContent').value = '';
-                    // Optionally, refresh announcements list
-                    fetchAnnouncements();
+                if (data.success) {
+                    announcementModal.hide();
+                    loadAnnouncements();
+
+                    // Show success message
+                    const container = document.getElementById('announcements-container');
+                    const message = document.createElement('div');
+                    message.className = 'alert alert-success alert-dismissible fade show mb-4';
+                    message.role = 'alert';
+                    message.innerHTML = `
+                        ${id ? 'Announcement updated successfully!' : 'Announcement created successfully!'}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    container.parentNode.insertBefore(message, container);
+
+                    // Auto-dismiss the success message after 3 seconds
+                    setTimeout(() => {
+                        message.remove();
+                    }, 3000);
                 } else {
-                    displayAdminMessage('Failed to create announcement. Please try again.', 'danger');
+                    errorMsg.textContent = data.message || 'Operation failed';
                 }
             })
             .catch(error => {
-                console.error('Error creating announcement:', error);
-                displayAdminMessage('Error creating announcement. Please try again later.', 'danger');
+                console.error('Error saving announcement:', error);
+                errorMsg.textContent = error.message || 'An error occurred. Please try again.';
             });
-        });
-    });
+        }
 
-    // Display message in admin announcement creation form
-    function displayAdminMessage(message, type) {
-        const msgDiv = document.getElementById('adminAnnouncementCreateMsg');
-        msgDiv.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
-        // Auto-dismiss message after 3 seconds
-        setTimeout(() => {
-            msgDiv.innerHTML = '';
-        }, 3000);
-    }
+        // Delete an announcement
+        function deleteAnnouncement() {
+            if (!announcementToDelete) return;
 
-    function signOut() {
-        fetch('/tegel_webapp/logout', {
-            method: 'POST',
-            credentials: 'include'
-        })
-        .then(() => {
-            // Redirect to home page after successful logout
-            window.location.href = 'index.html';
-        })
-        .catch(error => {
-            console.error('Error signing out:', error);
-        });
-    }
-</script>
+            fetch(`/announcement?id=${announcementToDelete}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to delete announcement');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                deleteModal.hide();
+                loadAnnouncements();
+
+                // Show success message
+                const container = document.getElementById('announcements-container');
+                const message = document.createElement('div');
+                message.className = 'alert alert-success alert-dismissible fade show mb-4';
+                message.role = 'alert';
+                message.innerHTML = `
+                    Announcement deleted successfully!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                container.parentNode.insertBefore(message, container);
+
+                // Auto-dismiss the success message after 3 seconds
+                setTimeout(() => {
+                    message.remove();
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error deleting announcement:', error);
+                deleteModal.hide();
+
+                // Show error message
+                const container = document.getElementById('announcements-container');
+                const message = document.createElement('div');
+                message.className = 'alert alert-danger alert-dismissible fade show mb-4';
+                message.role = 'alert';
+                message.innerHTML = `
+                    Failed to delete announcement: ${error.message || 'Unknown error'}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                container.parentNode.insertBefore(message, container);
+            })
+            .finally(() => {
+                announcementToDelete = null;
+            });
+        }
+
+        // Logout function
+        function logout() {
+            fetch(`${contextPath}/logout`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(() => {
+                window.location.href = 'index.html';
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+            });
+        }
+    </script>
 </body>
 </html>

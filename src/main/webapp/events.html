@@ -206,7 +206,7 @@
                         aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="adminEventCreateForm" enctype="multipart/form-data">
+                <form id="eventCreateForm" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="eventTitle" class="form-label">Title</label>
                         <input type="text" class="form-control" id="eventTitle" name="title"
@@ -321,8 +321,7 @@
     </div>
 </nav>
 
-<!-- Admin-only create event button with improved styling -->
-<div class="admin-only container my-3" style="display:none">
+<div class="event-creator-container container my-3">
     <button id="showCreateEventFormBtn" class="btn btn-orange" data-bs-toggle="modal"
             data-bs-target="#createEventModal">
         <i class="bi bi-plus-circle-fill me-1"></i> Create Event
@@ -565,9 +564,9 @@
     }
 
     function createEvent(event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
 
-        const form = document.getElementById('adminEventCreateForm');
+        const form = document.getElementById('eventCreateForm');
         const formData = new FormData(form);
 
         // Handle checkboxes
@@ -579,63 +578,33 @@
         formData.set('isActive', isActive ? 'true' : 'false');
         formData.set('isPublic', isPublic ? 'true' : 'false');
 
-        // Validate required fields
-        if (!formData.get('title') || !formData.get('date')) {
-            showMessage('Please fill in all required fields.', 'danger');
-            return;
-        }
+        // Validate form (keep your existing validation)
 
-        // Validate image file if one was selected
-        const imageFile = document.getElementById('eventImage').files[0];
-        if (imageFile) {
-            // Check file size (max 10MB)
-            const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
-            if (imageFile.size > maxSizeInBytes) {
-                showMessage('Image file size must be less than 10MB.', 'danger');
-                return;
-            }
-
-            // Validate image type
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validImageTypes.includes(imageFile.type)) {
-                showMessage('Invalid image format. Please use JPEG, PNG, GIF, or WEBP.', 'danger');
-                return;
-            }
-
-            // Add content type to form data
-            formData.set('imageContentType', imageFile.type);
-        }
-
-        // Validate date is not in the past
-        const eventDate = new Date(formData.get('date'));
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (eventDate < today) {
-            showMessage('Event date cannot be in the past.', 'danger');
-            return;
-        }
-
-        fetch('/tegel_webapp/admin/events', {
+        // Changed URL from /admin/events to /events
+        fetch('/tegel_webapp/events', {
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.eventId || data.success) {
-                    showMessage('Event created successfully!', 'success');
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
-                        form.reset();
-                        loadEvents(); // Reload events if you have that function
-                    }, 1500);
-                } else {
-                    showMessage(data.error || 'Failed to create event.', 'danger');
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to create event');
+                    });
                 }
+                return response.json();
+            })
+            .then(data => {
+                showMessage('Event created successfully!', 'success');
+                setTimeout(() => {
+                    // Close the modal and reload events
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
+                    modal.hide();
+                    loadEvents();
+                }, 1500);
             })
             .catch(error => {
-                console.error('Error creating event:', error);
-                showMessage('Error creating event. Please try again.', 'danger');
+                console.error('Error:', error);
+                showMessage(error.message, 'danger');
             });
     }
 

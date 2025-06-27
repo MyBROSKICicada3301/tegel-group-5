@@ -1,6 +1,7 @@
 package com.tegel.servlet;
 
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -142,6 +143,111 @@ public class EventServlet extends HttpServlet {
             logger.log(Level.SEVERE, "EventServlet: Error processing request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Check if user is logged in
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"Please login to create events\"}");
+            return;
+        }
+
+        // Get user role - support different possible session attribute names
+        String userRole = (String) session.getAttribute("userRole");
+        String role = (String) session.getAttribute("role");
+
+        // Allow both admin and member roles
+        boolean isAuthorized = ("admin".equalsIgnoreCase(userRole) || "member".equalsIgnoreCase(userRole) ||
+                "admin".equalsIgnoreCase(role) || "member".equalsIgnoreCase(role) ||
+                "ADMIN".equals(userRole) || "MEMBER".equals(userRole) ||
+                "ADMIN".equals(role) || "MEMBER".equals(role));
+
+        if (!isAuthorized) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("{\"error\":\"Admin or member access required\"}");
+            return;
+        }
+
+        // Event creation logic copied from AdminServlet.handleEventCreation
+        try {
+            String title = request.getParameter("title");
+            String description = request.getParameter("description");
+            String dateStr = request.getParameter("date");
+            String location = request.getParameter("location");
+            String maxParticipantsStr = request.getParameter("maxParticipants");
+            String image = request.getParameter("image");
+            String isActiveStr = request.getParameter("isActive");
+            String priceStr = request.getParameter("price");
+            String hasFoodOptionStr = request.getParameter("hasFoodOption");
+            String isPublicStr = request.getParameter("isPublic");
+
+            logger.info("Received parameters: isActive=" + isActiveStr + ", price=" + priceStr +
+                                ", hasFoodOption=" + hasFoodOptionStr + ", isPublic=" + isPublicStr);
+
+            // Validate required fields
+            if (title == null || title.trim().isEmpty() || dateStr == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Missing required fields\"}");
+                return;
+            }
+
+            Event event = new Event();
+            event.setTitle(title.trim());
+            event.setDescription(description != null ? description.trim() : "");
+            event.setDate(java.time.LocalDate.parse(dateStr));
+            event.setLocation(location != null ? location.trim() : "");
+
+            if (maxParticipantsStr != null && !maxParticipantsStr.trim().isEmpty()) {
+                event.setMaxParticipants(Integer.parseInt(maxParticipantsStr));
+            } else {
+                event.setMaxParticipants(0); // 0 = unlimited
+            }
+
+            if (image != null && !image.trim().isEmpty()) {
+                event.setImage(String.valueOf(Integer.parseInt(image)));
+            } else {
+                // Set a default value or null
+                event.setImage("0"); // Default image ID
+            }
+            event.setActive("true".equalsIgnoreCase(isActiveStr) || "on".equals(isActiveStr));
+            event.setPublic("true".equalsIgnoreCase(isPublicStr) || "on".equals(isPublicStr));
+
+            // Set price, default to 0
+            if (priceStr != null && !priceStr.trim().isEmpty()) {
+                try {
+                    double price = Double.parseDouble(priceStr);
+                    event.setPrice(price);
+                } catch (NumberFormatException e) {
+                    event.setPrice(0.0);
+                }
+            } else {
+                event.setPrice(0.0);
+            }
+
+            event.setHasFoodOption("true".equalsIgnoreCase(hasFoodOptionStr) || "on".equals(hasFoodOptionStr));
+            event.setCreatedBy((Integer) session.getAttribute("userId"));
+
+            boolean success = eventDAO.createEvent(event);
+
+            if (success) {
+                response.getWriter()
+                        .write("{\"eventId\":" + event.getEventId() + ",\"success\":true}");
+            } else {
+                response.getWriter().write("{\"error\":\"Failed to create event\"}");
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error creating event", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"Server error: " + e.getMessage() + "\"}");
         }
     }
 }

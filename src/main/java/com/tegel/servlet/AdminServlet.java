@@ -78,11 +78,27 @@ public class AdminServlet extends HttpServlet {
     private void handleEventCreation(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
-            // Check if user is admin
+            // Check if user is logged in
             HttpSession session = request.getSession(false);
-            if (session == null || !"admin".equals(session.getAttribute("userRole"))) {
+            if (session == null || session.getAttribute("userId") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Please login to create events\"}");
+                return;
+            }
+
+            // Get user role - check for both possible attribute names and formats
+            String userRole = (String) session.getAttribute("userRole");
+            String role = (String) session.getAttribute("role");
+
+            // Support multiple formats of role names (case-insensitive)
+            boolean isAuthorized = ("admin".equalsIgnoreCase(userRole) || "member".equalsIgnoreCase(userRole) ||
+                    "admin".equalsIgnoreCase(role) || "member".equalsIgnoreCase(role) ||
+                    "ADMIN".equals(userRole) || "MEMBER".equals(userRole) ||
+                    "ADMIN".equals(role) || "MEMBER".equals(role));
+
+            if (!isAuthorized) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write("{\"error\":\"Admin access required\"}");
+                response.getWriter().write("{\"error\":\"Admin or member access required\"}");
                 return;
             }
 

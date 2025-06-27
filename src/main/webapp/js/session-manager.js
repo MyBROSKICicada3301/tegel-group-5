@@ -16,6 +16,7 @@ if (typeof debug === 'undefined') {
     };
 }
 
+
 // Check if user is logged in when the page loads
 document.addEventListener('DOMContentLoaded', function () {
     debug.log('SessionManager', 'DOM loaded, checking login status');
@@ -164,6 +165,39 @@ function signOut() {
             debug.error('SessionManager', 'Error signing out:', error);
         });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in and has proper role
+    fetch('/tegel_webapp/auth/check-session')
+        .then(response => response.json())
+        .then(data => {
+            if (data.isLoggedIn) {
+                // Show appropriate auth buttons
+                document.getElementById('authButtons').innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            ${data.username}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
+                    </div>
+                `;
+
+                // Show create event button for both admin and member roles
+                if (data.roles && (data.roles.includes('ADMIN') || data.roles.includes('MEMBER'))) {
+                    const creatorContainer = document.querySelector('.event-creator-container');
+                    if (creatorContainer) {
+                        creatorContainer.style.display = 'block';
+                    }
+                }
+
+                // Add logout event listener
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+            }
+        })
+        .catch(error => console.error('Error checking session:', error));
+});
 
 // Keep session alive by making periodic requests to the server
 function keepSessionAlive() {

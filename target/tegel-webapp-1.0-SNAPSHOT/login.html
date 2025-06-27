@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Main body styling */
@@ -22,25 +23,64 @@
             flex: 1;
             display: flex;
             align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        /* Login Form Styling */
-        .login-card {
-            max-width: 500px;
-            margin: 100px auto;
-            padding: 40px;
+        /* Login Container Layout */
+        .login-container {
+            display: flex;
+            max-width: 900px;
+            width: 100%;
             background: white;
             border-radius: 15px;
+            overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .login-card h3 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-            font-size: 28px;
+        /* Login image styling */
+        .login-image {
+            flex: 1;
+            background: #ff8c1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
+        .login-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Login form section */
+        .login-form-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        /* Form styling */
         .btn-login {
             background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
             color: white;
@@ -51,11 +91,54 @@
             font-weight: 500;
             margin-top: 20px;
             transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 15px rgba(255, 140, 26, 0.3);
+        }
+
+        /* Remember me and forgot password */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .form-check-input {
+            margin-right: 8px;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: center;
+            color: #ff8c1a;
+            margin-top: 15px;
+            text-decoration: none;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #ff8c1a;
+        }
+
+        /* Auth option styling */
+        .auth-option {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .orange-link {
+            color: #ff8c1a;
+            text-decoration: none;
+        }
+
+        .orange-link:hover {
+            text-decoration: underline;
         }
 
         /* Navbar Styles */
@@ -152,9 +235,16 @@
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
-            .login-card {
-                margin: 40px auto;
-                padding: 25px;
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-image {
+                display: none;
+            }
+
+            .login-form-section {
+                padding: 20px;
             }
         }
     </style>
@@ -207,7 +297,7 @@
 
                     <div class="input-group mb-3">
                         <input id="password" name="password" class="form-control" type="password" placeholder="Password" required>
-                        <span class="input-group-text" id="togglePassword">
+                        <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
                             <i class="fas fa-eye-slash"></i>
                         </span>
                     </div>
@@ -221,7 +311,7 @@
 
                     <button type="submit" class="btn-login">Log In</button>
 
-                    <a href="forgot-password.html" class="forgot-password">Forgot password?</a>
+                    <a href="forgot-password-alt.html" class="forgot-password">Forgot password?</a>
                 </form>
             </div>
 
@@ -247,7 +337,7 @@
                 </div>
             </div>
             <div class="col-md-4 text-center mb-3 mb-md-0">
-                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                <div class="address-text text-white"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
             </div>
             <div class="col-md-4 text-center text-md-end">
                 <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"

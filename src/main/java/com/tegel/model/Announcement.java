@@ -3,38 +3,38 @@ package com.tegel.model;
 import java.time.LocalDateTime;
 
 /**
- * Model class for announcement entities
+ * Model class representing an announcement in the system.
  */
 public class Announcement {
-    private int id; // maps to announcement_id in database
+    private int announcementId;
     private String title;
     private String content;
-    private LocalDateTime createdAt; // maps to postedat in database
-    private int postedBy; // maps to postedby in database
-    private boolean isPublic; // maps to ispublic in database
+    private int postedBy;
+    private LocalDateTime postedAt;
+    private boolean isPublic;
 
     // Default constructor
     public Announcement() {
     }
 
     // Constructor with all fields
-    public Announcement(int id, String title, String content, LocalDateTime createdAt,
-                       int postedBy, boolean isPublic) {
-        this.id = id;
+    public Announcement(int announcementId, String title, String content,
+                      int postedBy, LocalDateTime postedAt, boolean isPublic) {
+        this.announcementId = announcementId;
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
         this.postedBy = postedBy;
+        this.postedAt = postedAt;
         this.isPublic = isPublic;
     }
 
     // Getters and setters
-    public int getId() {
-        return id;
+    public int getAnnouncementId() {
+        return announcementId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAnnouncementId(int announcementId) {
+        this.announcementId = announcementId;
     }
 
     public String getTitle() {
@@ -53,20 +53,20 @@ public class Announcement {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public int getPostedBy() {
         return postedBy;
     }
 
     public void setPostedBy(int postedBy) {
         this.postedBy = postedBy;
+    }
+
+    public LocalDateTime getPostedAt() {
+        return postedAt;
+    }
+
+    public void setPostedAt(LocalDateTime postedAt) {
+        this.postedAt = postedAt;
     }
 
     public boolean isPublic() {
@@ -80,11 +80,11 @@ public class Announcement {
     @Override
     public String toString() {
         return "Announcement{" +
-                "id=" + id +
+                "announcementId=" + announcementId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", createdAt=" + createdAt +
                 ", postedBy=" + postedBy +
+                ", postedAt=" + postedAt +
                 ", isPublic=" + isPublic +
                 '}';
     }

@@ -38,6 +38,16 @@ CREATE TABLE Event (
     FOREIGN KEY (CreatedBy) REFERENCES Users(user_ID)
 );
 
+CREATE TABLE Images (
+    image_id serial PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    content_type VARCHAR(100) NOT NULL,
+    data BYTEA NOT NULL,
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    event_id INT,
+    FOREIGN KEY (event_id) REFERENCES Event(event_id)
+);
+
 -- EVENT REGISTRATIONS
 CREATE TABLE EventRegistration (
     registration_ID SERIAL PRIMARY KEY,

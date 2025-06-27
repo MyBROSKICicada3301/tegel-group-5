@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Announcements | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         /* Main body styling */
         body {
@@ -20,19 +22,6 @@
         }
 
         /* Announcement specific styles */
-        .announcement-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .announcement-card:hover {
-            transform: translateY(-5px);
-        }
 
         .announcement-header {
             display: flex;
@@ -55,15 +44,6 @@
 
         .announcement-content {
             color: #444;
-        }
-
-        .announcement-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
         }
 
         .announcement-author {
@@ -141,286 +121,279 @@
             margin-bottom: 8px;
         }
 
-        .form-text {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
         /* Error and success messages */
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
-            .page-title {
-                font-size: 36px;
-            }
 
-            .content-section {
-                padding: 25px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
-        <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link text-white active" href="announcements.html" aria-current="page">Announcements</a></li>
-                </ul>
-                <div id="authButtons">
-                    <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
-                    <a href="login.html" class="btn btn-light">Login</a>
-                </div>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40"
+                 class="d-inline-block align-middle">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
+                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white active" href="announcements.html"
+                                        aria-current="page">Announcements</a></li>
+            </ul>
+            <div id="authButtons">
+                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                <a href="login.html" class="btn btn-light">Login</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Main Content -->
-    <main class="container my-4">
-        <div class="row justify-content-center mb-4">
-            <div class="col-lg-8 col-md-10">
-                <!-- Search and Filter Form -->
-                <form id="searchForm" class="row g-2 mb-4" role="search" aria-label="Search announcements">
-                    <div class="col-12 col-md-8">
-                        <input id="searchInput" class="form-control" type="search" placeholder="Search announcements..." aria-label="Search announcements">
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <input id="dateInput" class="form-control" type="date" aria-label="Search by date">
-                    </div>
-                    <div class="col-12 d-flex justify-content-end">
-                        <button class="btn btn-outline-warning mt-2" type="submit">
-                            <i class="bi bi-search"></i> Search
-                        </button>
-                        <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2" type="button">
-                            <i class="bi bi-arrow-counterclockwise"></i> Reset
-                        </button>
-                    </div>
-                </form>
+<!-- Main Content -->
+<main class="container my-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 col-md-10">
+            <!-- Search and Filter Form -->
+            <form id="searchForm" class="row g-2 mb-4" role="search"
+                  aria-label="Search announcements">
+                <div class="col-12 col-md-8">
+                    <input id="searchInput" class="form-control" type="search"
+                           placeholder="Search announcements..." aria-label="Search announcements">
+                </div>
+                <div class="col-12 col-md-4">
+                    <input id="dateInput" class="form-control" type="date"
+                           aria-label="Search by date">
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button class="btn btn-outline-warning mt-2" type="submit">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <button id="resetSearch" class="btn btn-outline-secondary mt-2 ms-2"
+                            type="button">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </button>
+                </div>
+            </form>
 
-                <!-- Announcements Section -->
-                <div class="announcements-section">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1>Announcements</h1>
-                        <button id="createAnnouncementBtn" class="btn btn-warning d-none">
-                            <i class="bi bi-plus-circle"></i> New Announcement
-                        </button>
-                    </div>
+            <!-- Announcements Section -->
+            <div class="announcements-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>Announcements</h1>
+                    <button id="createAnnouncementBtn" class="btn btn-warning d-none">
+                        <i class="bi bi-plus-circle"></i> New Announcement
+                    </button>
+                </div>
 
-                    <div id="announcements-container">
-                        <div class="loading-spinner">
-                            <div class="spinner-border text-warning" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
+                <div id="announcements-container">
+                    <div class="loading-spinner">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Create/Edit Announcement Modal -->
-        <div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="announcementModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="announcementModalLabel">Create Announcement</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="announcementForm">
-                            <input type="hidden" id="announcementId">
-                            <div class="mb-3">
-                                <label for="announcementTitle" class="form-label">Title</label>
-                                <input type="text" class="form-control" id="announcementTitle" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="announcementContent" class="form-label">Content</label>
-                                <textarea class="form-control" id="announcementContent" rows="5" required></textarea>
-                            </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="announcementIsPublic" checked>
-                                <label class="form-check-label" for="announcementIsPublic">
-                                    Public announcement (visible to everyone)
-                                </label>
-                            </div>
-                            <div id="modalErrorMsg" class="text-danger mb-3"></div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-warning" id="saveAnnouncementBtn">Save</button>
-                    </div>
+    <!-- Create/Edit Announcement Modal -->
+    <div class="modal fade" id="announcementModal" tabindex="-1"
+         aria-labelledby="announcementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="announcementModalLabel">Create Announcement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="announcementForm">
+                        <input type="hidden" id="announcementId">
+                        <div class="mb-3">
+                            <label for="announcementTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="announcementTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="announcementContent" class="form-label">Content</label>
+                            <textarea class="form-control" id="announcementContent" rows="5"
+                                      required></textarea>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox"
+                                   id="announcementIsPublic" checked>
+                            <label class="form-check-label" for="announcementIsPublic">
+                                Public announcement (visible to everyone)
+                            </label>
+                        </div>
+                        <div id="modalErrorMsg" class="text-danger mb-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-warning" id="saveAnnouncementBtn">Save
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Delete Confirmation Modal -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete this announcement? This action cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this announcement? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <footer class="footer mt-2 py-3 bg-dark text-white">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                    <div class="d-flex justify-content-center justify-content-md-start">
-                        <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                           target="_blank" rel="noopener" class="me-3">
-                            <i class="bi bi-instagram text-warning fs-4"></i>
-                        </a>
-                        <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                            <i class="bi bi-envelope text-warning fs-4"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center mb-3 mb-md-0">
-                    <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
-                         style="width: 90px; height: auto;"/>
+<footer class="footer mt-2 py-3 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <div class="d-flex justify-content-center justify-content-md-start">
+                    <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                       target="_blank" rel="noopener" class="me-3">
+                        <i class="bi bi-instagram text-warning fs-4"></i>
+                    </a>
+                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                        <i class="bi bi-envelope text-warning fs-4"></i>
+                    </a>
                 </div>
             </div>
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB
+                    Enschede
+                </div>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
+                     style="width: 90px; height: auto;"/>
+            </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- Bootstrap JS and Custom JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Global variables
-        let currentUserId = null;
-        let isAdmin = false;
-        let announcementToDelete = null;
-        const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+<!-- Bootstrap JS and Custom JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Global variables
+    let currentUserId = null;
+    let isAdmin = false;
+    let announcementToDelete = null;
+    const announcementModal = new bootstrap.Modal(document.getElementById('announcementModal'));
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
-        // Get the context path dynamically from the current URL
-        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
-        console.log("Using context path:", contextPath);
+    // Get the context path dynamically from the current URL
+    const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
+    console.log("Using context path:", contextPath);
 
-        // Event listeners when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Announcements page loaded");
+    // Event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Announcements page loaded");
 
-            checkUserSession();
-            loadAnnouncements();
+        checkUserSession();
+        loadAnnouncements();
 
-            document.getElementById('searchForm').addEventListener('submit', handleSearch);
-            document.getElementById('resetSearch').addEventListener('click', resetSearch);
-            document.getElementById('createAnnouncementBtn').addEventListener('click', showCreateAnnouncementModal);
-            document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
-            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteAnnouncement);
-        });
+        document.getElementById('searchForm').addEventListener('submit', handleSearch);
+        document.getElementById('resetSearch').addEventListener('click', resetSearch);
+        document.getElementById('createAnnouncementBtn').addEventListener('click', showCreateAnnouncementModal);
+        document.getElementById('saveAnnouncementBtn').addEventListener('click', saveAnnouncement);
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteAnnouncement);
+    });
 
-        // Check if user is logged in
-        function checkUserSession() {
-            console.log("Checking user session...");
+    // Check if user is logged in
+    function checkUserSession() {
+        console.log("Checking user session...");
 
-            fetch(contextPath + '/check-session', { credentials: 'include' })
-                .then(response => {
-                    console.log("Session check response status:", response.status);
-                    if (!response.ok) {
-                        throw new Error(`Failed to check session: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Session data:", data);
-                    if (data.loggedIn) {
-                        // Make sure currentUserId is set correctly
-                        currentUserId = parseInt(data.userId);
-                        isAdmin = data.role === 'admin';
-                        console.log(`User is logged in, userId: ${currentUserId}, isAdmin: ${isAdmin}`);
-                        updateAuthUI(data);
-                    } else {
-                        console.log("User is not logged in");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking session:', error);
-                });
-        }
+        fetch(contextPath + '/check-session', {credentials: 'include'})
+            .then(response => {
+                console.log("Session check response status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`Failed to check session: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Session data:", data);
+                if (data.loggedIn) {
+                    // Make sure currentUserId is set correctly
+                    currentUserId = parseInt(data.userId);
+                    isAdmin = data.role === 'admin';
+                    console.log(`User is logged in, userId: ${currentUserId}, isAdmin: ${isAdmin}`);
+                    updateAuthUI(data);
+                } else {
+                    console.log("User is not logged in");
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+            });
+    }
 
-        // Update the UI based on authentication status
-        function updateAuthUI(userData) {
-            // Update auth buttons
-            const authButtons = document.getElementById('authButtons');
-            authButtons.innerHTML = `
+    // Update the UI based on authentication status
+    function updateAuthUI(userData) {
+        // Update auth buttons
+        const authButtons = document.getElementById('authButtons');
+        authButtons.innerHTML = `
                 <a href="account.html" class="btn btn-light me-2">My Account</a>
                 <button id="logoutBtn" class="btn btn-light">Logout</button>
             `;
 
-            // Add logout event listener
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                logout();
-            });
+        // Add logout event listener
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            logout();
+        });
 
-            // If admin, update navigation for admin users
-            if (isAdmin) {
-                document.getElementById('createAnnouncementBtn').classList.remove('d-none');
+        // If admin, update navigation for admin users
+        if (isAdmin) {
+            document.getElementById('createAnnouncementBtn').classList.remove('d-none');
 
-                // Update navigation for admin users
-                const navbarNav = document.querySelector('#navbarNav .navbar-nav');
-                navbarNav.innerHTML = `
+            // Update navigation for admin users
+            const navbarNav = document.querySelector('#navbarNav .navbar-nav');
+            navbarNav.innerHTML = `
                     <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
                     <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
                 `;
-            }
-            // For members, show the create announcement button but keep regular navigation
-            else if (userData.role === 'member') {
-                document.getElementById('createAnnouncementBtn').classList.remove('d-none');
-            }
         }
+        // For members, show the create announcement button but keep regular navigation
+        else if (userData.role === 'member') {
+            document.getElementById('createAnnouncementBtn').classList.remove('d-none');
+        }
+    }
 
-        // Load all announcements
-        function loadAnnouncements() {
-            console.log("Loading announcements...");
+    // Load all announcements
+    function loadAnnouncements() {
+        console.log("Loading announcements...");
 
-            const container = document.getElementById('announcements-container');
-            container.innerHTML = `
+        const container = document.getElementById('announcements-container');
+        container.innerHTML = `
                 <div class="loading-spinner">
                     <div class="spinner-border text-warning" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -428,77 +401,77 @@
                 </div>
             `;
 
-            fetch(contextPath + '/announcement', { credentials: 'include' })
-                .then(response => {
-                    console.log("Announcements fetch response status:", response.status);
+        fetch(contextPath + '/announcement', {credentials: 'include'})
+            .then(response => {
+                console.log("Announcements fetch response status:", response.status);
 
-                    if (!response.ok) {
-                        throw new Error(`Server error: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                return response.text().then(text => {
+                    console.log("Raw response text:", text);
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error("Error parsing JSON:", e);
+                        throw new Error(`Invalid JSON response: ${text}`);
                     }
-
-                    return response.text().then(text => {
-                        console.log("Raw response text:", text);
-                        try {
-                            return JSON.parse(text);
-                        } catch (e) {
-                            console.error("Error parsing JSON:", e);
-                            throw new Error(`Invalid JSON response: ${text}`);
-                        }
-                    });
-                })
-                .then(announcements => {
-                    console.log(`Received ${announcements.length} announcements`);
-                    displayAnnouncements(announcements);
-                })
-                .catch(error => {
-                    console.error('Error loading announcements:', error);
-                    container.innerHTML = `
+                });
+            })
+            .then(announcements => {
+                console.log(`Received ${announcements.length} announcements`);
+                displayAnnouncements(announcements);
+            })
+            .catch(error => {
+                console.error('Error loading announcements:', error);
+                container.innerHTML = `
                         <div class="alert alert-danger">
                             Failed to load announcements. Please try again later.
                             <br>Error details: ${error.message}
                         </div>
                     `;
-                });
-        }
+            });
+    }
 
-        // Display announcements in the container
-        function displayAnnouncements(announcements) {
-            const container = document.getElementById('announcements-container');
+    // Display announcements in the container
+    function displayAnnouncements(announcements) {
+        const container = document.getElementById('announcements-container');
 
-            if (!announcements || announcements.length === 0) {
-                container.innerHTML = `
+        if (!announcements || announcements.length === 0) {
+            container.innerHTML = `
                     <div class="no-announcements">
                         <p>No announcements found.</p>
                     </div>
                 `;
-                return;
+            return;
+        }
+
+        container.innerHTML = '';
+
+        announcements.forEach(announcement => {
+            const card = document.createElement('div');
+            card.className = 'announcement-card';
+            if (!announcement.public) {
+                card.classList.add('private-announcement');
             }
 
-            container.innerHTML = '';
+            // Format the date
+            let formattedDate = 'Date unavailable';
+            if (announcement.postedAt) {
+                const date = new Date(announcement.postedAt);
+                formattedDate = date.toLocaleString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
 
-            announcements.forEach(announcement => {
-                const card = document.createElement('div');
-                card.className = 'announcement-card';
-                if (!announcement.public) {
-                    card.classList.add('private-announcement');
-                }
-
-                // Format the date
-                let formattedDate = 'Date unavailable';
-                if (announcement.postedAt) {
-                    const date = new Date(announcement.postedAt);
-                    formattedDate = date.toLocaleString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
-
-                // Create the card content with author placeholder
-                card.innerHTML = `
+            // Create the card content with author placeholder
+            card.innerHTML = `
                     <div class="announcement-header">
                         <div class="announcement-title">${announcement.title}</div>
                     </div>
@@ -509,11 +482,11 @@
                     <div class="announcement-content">${announcement.content}</div>
                 `;
 
-                // Add controls for admins or for members who own the announcement
-                if (isAdmin || (currentUserId && announcement.postedBy === currentUserId)) {
-                    const controls = document.createElement('div');
-                    controls.className = 'admin-controls';
-                    controls.innerHTML = `
+            // Add controls for admins or for members who own the announcement
+            if (isAdmin || (currentUserId && announcement.postedBy === currentUserId)) {
+                const controls = document.createElement('div');
+                controls.className = 'admin-controls';
+                controls.innerHTML = `
                         <button class="btn btn-sm btn-outline-primary me-2 edit-btn" data-id="${announcement.announcementId}">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
@@ -521,66 +494,66 @@
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     `;
-                    card.appendChild(controls);
+                card.appendChild(controls);
 
-                    // Add event listeners for controls
-                    controls.querySelector('.edit-btn').addEventListener('click', () => {
-                        showEditAnnouncementModal(announcement);
-                    });
-
-                    controls.querySelector('.delete-btn').addEventListener('click', () => {
-                        announcementToDelete = announcement.announcementId;
-                        deleteModal.show();
-                    });
-                }
-
-                container.appendChild(card);
-
-                // Only fetch user details if the user is logged in
-                if (currentUserId) {
-                    fetchUserDetails(announcement.postedBy, card.querySelector('.announcement-author'));
-                }
-            });
-        }
-
-        // Fetch user details to show poster's name
-        function fetchUserDetails(userId, element) {
-            // Use the correct endpoint path for the UserInfoServlet
-            fetch(contextPath + `/userdetails?id=${userId}`, { credentials: 'include' })
-                .then(response => {
-                    console.log(`User details response for ID ${userId}:`, response.status);
-                    if (!response.ok) {
-                        throw new Error(`Error fetching user details: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(user => {
-                    console.log(`User details received for ID ${userId}:`, user);
-                    if (user && user.fullName) {
-                        // Display the user's full name from the database
-                        element.textContent = `Posted by: ${user.fullName}`;
-                    } else {
-                        // Fallback only if user data cannot be retrieved
-                        element.textContent = `Posted by: Unknown User`;
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error fetching user details for ID ${userId}:`, error);
-                    // Fallback in case of error
-                    element.textContent = `Posted by: Unknown User`;
+                // Add event listeners for controls
+                controls.querySelector('.edit-btn').addEventListener('click', () => {
+                    showEditAnnouncementModal(announcement);
                 });
-        }
 
-        // Handle search form submission
-        function handleSearch(event) {
-            event.preventDefault();
+                controls.querySelector('.delete-btn').addEventListener('click', () => {
+                    announcementToDelete = announcement.announcementId;
+                    deleteModal.show();
+                });
+            }
 
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            const dateFilter = document.getElementById('dateInput').value;
+            container.appendChild(card);
 
-            // Show loading spinner
-            const container = document.getElementById('announcements-container');
-            container.innerHTML = `
+            // Only fetch user details if the user is logged in
+            if (currentUserId) {
+                fetchUserDetails(announcement.postedBy, card.querySelector('.announcement-author'));
+            }
+        });
+    }
+
+    // Fetch user details to show poster's name
+    function fetchUserDetails(userId, element) {
+        // Use the correct endpoint path for the UserInfoServlet
+        fetch(contextPath + `/userdetails?id=${userId}`, {credentials: 'include'})
+            .then(response => {
+                console.log(`User details response for ID ${userId}:`, response.status);
+                if (!response.ok) {
+                    throw new Error(`Error fetching user details: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(user => {
+                console.log(`User details received for ID ${userId}:`, user);
+                if (user && user.fullName) {
+                    // Display the user's full name from the database
+                    element.textContent = `Posted by: ${user.fullName}`;
+                } else {
+                    // Fallback only if user data cannot be retrieved
+                    element.textContent = `Posted by: Unknown User`;
+                }
+            })
+            .catch(error => {
+                console.error(`Error fetching user details for ID ${userId}:`, error);
+                // Fallback in case of error
+                element.textContent = `Posted by: Unknown User`;
+            });
+    }
+
+    // Handle search form submission
+    function handleSearch(event) {
+        event.preventDefault();
+
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const dateFilter = document.getElementById('dateInput').value;
+
+        // Show loading spinner
+        const container = document.getElementById('announcements-container');
+        container.innerHTML = `
                 <div class="loading-spinner">
                     <div class="spinner-border text-warning" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -588,131 +561,131 @@
                 </div>
             `;
 
-            // Build the URL with the correct context path
-            let url = contextPath + '/announcement';
+        // Build the URL with the correct context path
+        let url = contextPath + '/announcement';
 
-            if (searchTerm) {
-                url += `?search=${encodeURIComponent(searchTerm)}`;
-            } else if (dateFilter) {
-                url += `?date=${encodeURIComponent(dateFilter)}`;
-            } else {
-                loadAnnouncements();
-                return;
-            }
+        if (searchTerm) {
+            url += `?search=${encodeURIComponent(searchTerm)}`;
+        } else if (dateFilter) {
+            url += `?date=${encodeURIComponent(dateFilter)}`;
+        } else {
+            loadAnnouncements();
+            return;
+        }
 
-            console.log("Searching announcements with URL:", url);
+        console.log("Searching announcements with URL:", url);
 
-            fetch(url, { credentials: 'include' })
-                .then(response => {
-                    console.log("Search response status:", response.status);
-                    if (!response.ok) {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(announcements => {
-                    console.log(`Found ${announcements.length} matching announcements`);
-                    displayAnnouncements(announcements);
-                })
-                .catch(error => {
-                    console.error('Error searching announcements:', error);
-                    container.innerHTML = `
+        fetch(url, {credentials: 'include'})
+            .then(response => {
+                console.log("Search response status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(announcements => {
+                console.log(`Found ${announcements.length} matching announcements`);
+                displayAnnouncements(announcements);
+            })
+            .catch(error => {
+                console.error('Error searching announcements:', error);
+                container.innerHTML = `
                         <div class="alert alert-danger">
                             Failed to search announcements. Please try again later.
                             <br>Error details: ${error.message}
                         </div>
                     `;
-                });
+            });
+    }
+
+    // Reset search form and reload all announcements
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateInput').value = '';
+        loadAnnouncements();
+    }
+
+    // Show the modal for creating a new announcement
+    function showCreateAnnouncementModal() {
+        // Clear form fields
+        document.getElementById('announcementId').value = '';
+        document.getElementById('announcementTitle').value = '';
+        document.getElementById('announcementContent').value = '';
+        document.getElementById('announcementIsPublic').checked = true;
+        document.getElementById('modalErrorMsg').textContent = '';
+
+        // Update modal title
+        document.getElementById('announcementModalLabel').textContent = 'Create Announcement';
+
+        announcementModal.show();
+    }
+
+    // Show the modal for editing an existing announcement
+    function showEditAnnouncementModal(announcement) {
+        console.log("Editing announcement:", announcement); // Add debug info
+
+        // Set form fields
+        document.getElementById('announcementId').value = announcement.announcementId;
+        document.getElementById('announcementTitle').value = announcement.title;
+        document.getElementById('announcementContent').value = announcement.content;
+
+        // Use the correct property - could be public or isPublic depending on how backend serializes it
+        document.getElementById('announcementIsPublic').checked = announcement.isPublic !== undefined ?
+            announcement.isPublic : announcement.public;
+
+        document.getElementById('modalErrorMsg').textContent = '';
+
+        // Update modal title
+        document.getElementById('announcementModalLabel').textContent = 'Edit Announcement';
+
+        announcementModal.show();
+    }
+
+    // Save announcement (create new or update existing)
+    function saveAnnouncement() {
+        const id = document.getElementById('announcementId').value.trim();
+        const title = document.getElementById('announcementTitle').value.trim();
+        const content = document.getElementById('announcementContent').value.trim();
+        const isPublic = document.getElementById('announcementIsPublic').checked;
+        const errorMsg = document.getElementById('modalErrorMsg');
+
+        // Validate inputs
+        if (!title) {
+            errorMsg.textContent = 'Title is required';
+            return;
         }
 
-        // Reset search form and reload all announcements
-        function resetSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('dateInput').value = '';
-            loadAnnouncements();
+        if (!content) {
+            errorMsg.textContent = 'Content is required';
+            return;
         }
 
-        // Show the modal for creating a new announcement
-        function showCreateAnnouncementModal() {
-            // Clear form fields
-            document.getElementById('announcementId').value = '';
-            document.getElementById('announcementTitle').value = '';
-            document.getElementById('announcementContent').value = '';
-            document.getElementById('announcementIsPublic').checked = true;
-            document.getElementById('modalErrorMsg').textContent = '';
+        // Make sure we send isPublic as a property (backend expects this)
+        const announcement = {
+            title: title,
+            content: content,
+            isPublic: isPublic // Changed from 'public' to 'isPublic' to match the Java model
+        };
 
-            // Update modal title
-            document.getElementById('announcementModalLabel').textContent = 'Create Announcement';
+        let url = `${contextPath}/announcement`;
+        let method = 'POST';
 
-            announcementModal.show();
+        // If ID exists, we're updating an existing announcement
+        if (id) {
+            announcement.announcementId = parseInt(id);
+            method = 'PUT';
         }
 
-        // Show the modal for editing an existing announcement
-        function showEditAnnouncementModal(announcement) {
-            console.log("Editing announcement:", announcement); // Add debug info
+        console.log("Saving announcement with data:", announcement); // Debug info
 
-            // Set form fields
-            document.getElementById('announcementId').value = announcement.announcementId;
-            document.getElementById('announcementTitle').value = announcement.title;
-            document.getElementById('announcementContent').value = announcement.content;
-
-            // Use the correct property - could be public or isPublic depending on how backend serializes it
-            document.getElementById('announcementIsPublic').checked = announcement.isPublic !== undefined ?
-                announcement.isPublic : announcement.public;
-
-            document.getElementById('modalErrorMsg').textContent = '';
-
-            // Update modal title
-            document.getElementById('announcementModalLabel').textContent = 'Edit Announcement';
-
-            announcementModal.show();
-        }
-
-        // Save announcement (create new or update existing)
-        function saveAnnouncement() {
-            const id = document.getElementById('announcementId').value.trim();
-            const title = document.getElementById('announcementTitle').value.trim();
-            const content = document.getElementById('announcementContent').value.trim();
-            const isPublic = document.getElementById('announcementIsPublic').checked;
-            const errorMsg = document.getElementById('modalErrorMsg');
-
-            // Validate inputs
-            if (!title) {
-                errorMsg.textContent = 'Title is required';
-                return;
-            }
-
-            if (!content) {
-                errorMsg.textContent = 'Content is required';
-                return;
-            }
-
-            // Make sure we send isPublic as a property (backend expects this)
-            const announcement = {
-                title: title,
-                content: content,
-                isPublic: isPublic // Changed from 'public' to 'isPublic' to match the Java model
-            };
-
-            let url = `${contextPath}/announcement`;
-            let method = 'POST';
-
-            // If ID exists, we're updating an existing announcement
-            if (id) {
-                announcement.announcementId = parseInt(id);
-                method = 'PUT';
-            }
-
-            console.log("Saving announcement with data:", announcement); // Debug info
-
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(announcement),
-                credentials: 'include'
-            })
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(announcement),
+            credentials: 'include'
+        })
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(data => {
@@ -749,16 +722,16 @@
                 console.error('Error saving announcement:', error);
                 errorMsg.textContent = error.message || 'An error occurred. Please try again.';
             });
-        }
+    }
 
-        // Delete an announcement
-        function deleteAnnouncement() {
-            if (!announcementToDelete) return;
+    // Delete an announcement
+    function deleteAnnouncement() {
+        if (!announcementToDelete) return;
 
-            fetch(`${contextPath}/announcement?id=${announcementToDelete}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            })
+        fetch(`${contextPath}/announcement?id=${announcementToDelete}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(data => {
@@ -805,21 +778,21 @@
             .finally(() => {
                 announcementToDelete = null;
             });
-        }
+    }
 
-        // Logout function
-        function logout() {
-            fetch(`${contextPath}/logout`, {
-                method: 'POST',
-                credentials: 'include'
-            })
+    // Logout function
+    function logout() {
+        fetch(`${contextPath}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        })
             .then(() => {
                 window.location.href = 'index.html';
             })
             .catch(error => {
                 console.error('Error during logout:', error);
             });
-        }
-    </script>
+    }
+</script>
 </body>
 </html>

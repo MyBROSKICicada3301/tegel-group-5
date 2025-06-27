@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TEGEL - Newsletter Management</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
     <script src="js/session-manager.js"></script>
@@ -17,11 +17,13 @@
         .action-buttons .btn {
             margin-right: 0.5rem;
         }
+
         .footer {
             background-color: #000000;
             padding: 30px 0;
             margin-top: auto;
         }
+
         .newsletter-status {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -30,169 +32,175 @@
             margin-left: 0.5rem;
         }
 
-        .status-draft {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-        }
-
-        .status-published {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border: 1px solid #badbcc;
-        }
-
         .newsletter-card {
             margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="adminindex.html" style="padding:0;">
-                    <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin Home</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
-                        <li class="nav-item"><a class="nav-link text-white active" href="admin-newsletters.html">Newsletters</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
-                    </ul>
-                    <div id="authButtons">
-                        <a href="account.html" class="btn btn-light me-2">Account</a>
-                        <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
-                    </div>
+<header>
+    <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="adminindex.html" style="padding:0;">
+                <img src="images/TEGEL LOGO.png" alt="Tegel Logo"
+                     style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin
+                        Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="admin.html">User
+                        Management</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active"
+                                            href="admin-newsletters.html">Newsletters</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
+                    </li>
+                </ul>
+                <div id="authButtons">
+                    <a href="account.html" class="btn btn-light me-2">Account</a>
+                    <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
                 </div>
             </div>
-        </nav>
-    </header>
-
-    <main class="container py-5">
-        <div class="admin-title d-flex justify-content-between align-items-center">
-            <h1>Newsletter Management</h1>
-            <button class="btn btn-primary" onclick="showNewNewsletterForm()">Create New Newsletter</button>
         </div>
+    </nav>
+</header>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div id="newslettersContainer">
-                    <!-- Newsletters will be loaded here -->
-                    <div class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
+<main class="container py-5">
+    <div class="admin-title d-flex justify-content-between align-items-center">
+        <h1>Newsletter Management</h1>
+        <button class="btn btn-primary" onclick="showNewNewsletterForm()">Create New Newsletter
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="newslettersContainer">
+                <!-- Newsletters will be loaded here -->
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading newsletters...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter Form Modal -->
+    <div class="modal fade" id="newsletterFormModal" tabindex="-1"
+         aria-labelledby="newsletterFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newsletterFormModalLabel">Create Newsletter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newsletterForm">
+                        <input type="hidden" id="newsletterId">
+
+                        <div class="mb-3">
+                            <label for="newsletterTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="newsletterTitle" required>
                         </div>
-                        <p>Loading newsletters...</p>
-                    </div>
+
+                        <div class="mb-3">
+                            <label for="newsletterContent" class="form-label">Content</label>
+                            <textarea id="newsletterContent" class="form-control"></textarea>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox"
+                                   id="newsletterPublished">
+                            <label class="form-check-label" for="newsletterPublished">
+                                Publish Immediately
+                            </label>
+                            <small class="form-text text-muted d-block">
+                                If unchecked, the newsletter will be saved as a draft.
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveNewsletterBtn">Save
+                        Newsletter
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Newsletter Form Modal -->
-        <div class="modal fade" id="newsletterFormModal" tabindex="-1" aria-labelledby="newsletterFormModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="newsletterFormModalLabel">Create Newsletter</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="newsletterForm">
-                            <input type="hidden" id="newsletterId">
-
-                            <div class="mb-3">
-                                <label for="newsletterTitle" class="form-label">Title</label>
-                                <input type="text" class="form-control" id="newsletterTitle" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="newsletterContent" class="form-label">Content</label>
-                                <textarea id="newsletterContent" class="form-control"></textarea>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="newsletterPublished">
-                                <label class="form-check-label" for="newsletterPublished">
-                                    Publish Immediately
-                                </label>
-                                <small class="form-text text-muted d-block">
-                                    If unchecked, the newsletter will be saved as a draft.
-                                </small>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="saveNewsletterBtn">Save Newsletter</button>
-                    </div>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1"
+         aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this newsletter? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
+</main>
 
-        <!-- Delete Confirmation Modal -->
-        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete this newsletter? This action cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                    </div>
+<footer class="footer mt-2 py-3 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <div class="d-flex justify-content-center justify-content-md-start">
+                    <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                       target="_blank" rel="noopener" class="me-3">
+                        <i class="bi bi-instagram text-warning fs-4"></i>
+                    </a>
+                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                        <i class="bi bi-envelope text-warning fs-4"></i>
+                    </a>
                 </div>
             </div>
-        </div>
-    </main>
-
-    <footer class="footer mt-2 py-3 bg-dark text-white">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                    <div class="d-flex justify-content-center justify-content-md-start">
-                        <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                           target="_blank" rel="noopener" class="me-3">
-                            <i class="bi bi-instagram text-warning fs-4"></i>
-                        </a>
-                        <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                            <i class="bi bi-envelope text-warning fs-4"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-md-4 text-center mb-3 mb-md-0">
-                    <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
-                         style="width: 90px; height: auto;"/>
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB
+                    Enschede
                 </div>
             </div>
+            <div class="col-md-4 text-center text-md-end">
+                <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
+                     style="width: 90px; height: auto;"/>
+            </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <script>
-        // Variables to store state
-        let currentNewsletters = [];
-        let newsletterFormMode = 'create';
-        let newsletterToDelete = null;
+<script>
+    // Variables to store state
+    let currentNewsletters = [];
+    let newsletterFormMode = 'create';
+    let newsletterToDelete = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Instead of using checkSession which doesn't exist, we'll check the session directly
-            fetch('/tegel_webapp/check-session', {
-                method: 'GET',
-                credentials: 'include'
-            })
+    document.addEventListener('DOMContentLoaded', function () {
+        // Instead of using checkSession which doesn't exist, we'll check the session directly
+        fetch('/tegel_webapp/check-session', {
+            method: 'GET',
+            credentials: 'include'
+        })
             .then(response => response.json())
             .then(data => {
                 if (!data.loggedIn || data.role !== 'admin') {
@@ -213,9 +221,9 @@
                             'insertdatetime', 'media', 'table', 'help', 'wordcount'
                         ],
                         toolbar: 'undo redo | formatselect | ' +
-                                'bold italic backcolor | alignleft aligncenter ' +
-                                'alignright alignjustify | bullist numlist outdent indent | ' +
-                                'removeformat | help',
+                            'bold italic backcolor | alignleft aligncenter ' +
+                            'alignright alignjustify | bullist numlist outdent indent | ' +
+                            'removeformat | help',
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; }'
                     });
 
@@ -226,67 +234,67 @@
                     document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteNewsletter);
                 }
             });
-        });
+    });
 
-        // Function to load all newsletters
-        function loadNewsletters() {
-            fetch('/tegel_webapp/api/newsletters')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(newsletters => {
-                    currentNewsletters = newsletters;
-                    displayNewsletters(newsletters);
-                })
-                .catch(error => {
-                    console.error('Error loading newsletters:', error);
-                    document.getElementById('newslettersContainer').innerHTML = `
+    // Function to load all newsletters
+    function loadNewsletters() {
+        fetch('/tegel_webapp/api/newsletters')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(newsletters => {
+                currentNewsletters = newsletters;
+                displayNewsletters(newsletters);
+            })
+            .catch(error => {
+                console.error('Error loading newsletters:', error);
+                document.getElementById('newslettersContainer').innerHTML = `
                         <div class="alert alert-danger">
                             Error loading newsletters. Please try again later.
                         </div>
                     `;
-                });
-        }
+            });
+    }
 
-        // Function to display newsletters
-        function displayNewsletters(newsletters) {
-            const container = document.getElementById('newslettersContainer');
+    // Function to display newsletters
+    function displayNewsletters(newsletters) {
+        const container = document.getElementById('newslettersContainer');
 
-            if (newsletters.length === 0) {
-                container.innerHTML = `
+        if (newsletters.length === 0) {
+            container.innerHTML = `
                     <div class="alert alert-info">
                         No newsletters found. Create your first newsletter by clicking the button above.
                     </div>
                 `;
-                return;
-            }
+            return;
+        }
 
-            let html = '<div class="row">';
+        let html = '<div class="row">';
 
-            newsletters.forEach(newsletter => {
-                // Format dates
-                const createdDate = new Date(newsletter.createdAt);
-                const formattedCreatedDate = createdDate.toLocaleDateString('en-US', {
+        newsletters.forEach(newsletter => {
+            // Format dates
+            const createdDate = new Date(newsletter.createdAt);
+            const formattedCreatedDate = createdDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            let publishedInfo = "";
+            if (newsletter.isPublished) {
+                const publishedDate = new Date(newsletter.publishedAt);
+                const formattedPublishedDate = publishedDate.toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
                 });
+                publishedInfo = `<br>Published: ${formattedPublishedDate}`;
+            }
 
-                let publishedInfo = "";
-                if (newsletter.isPublished) {
-                    const publishedDate = new Date(newsletter.publishedAt);
-                    const formattedPublishedDate = publishedDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                    publishedInfo = `<br>Published: ${formattedPublishedDate}`;
-                }
-
-                html += `
+            html += `
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card newsletter-card h-100">
                             <div class="card-body">
@@ -320,91 +328,91 @@
                         </div>
                     </div>
                 `;
-            });
+        });
 
-            html += '</div>';
-            container.innerHTML = html;
-        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
 
-        // Function to show form for new newsletter
-        function showNewNewsletterForm() {
-            newsletterFormMode = 'create';
-            document.getElementById('newsletterFormModalLabel').textContent = 'Create Newsletter';
-            document.getElementById('newsletterForm').reset();
-            document.getElementById('newsletterId').value = '';
+    // Function to show form for new newsletter
+    function showNewNewsletterForm() {
+        newsletterFormMode = 'create';
+        document.getElementById('newsletterFormModalLabel').textContent = 'Create Newsletter';
+        document.getElementById('newsletterForm').reset();
+        document.getElementById('newsletterId').value = '';
 
-            // Clear TinyMCE editor
-            tinymce.get('newsletterContent').setContent('');
+        // Clear TinyMCE editor
+        tinymce.get('newsletterContent').setContent('');
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('newsletterFormModal'));
+        modal.show();
+    }
+
+    // Function to edit newsletter
+    function editNewsletter(id) {
+        newsletterFormMode = 'edit';
+        document.getElementById('newsletterFormModalLabel').textContent = 'Edit Newsletter';
+
+        // Find newsletter in current list
+        const newsletter = currentNewsletters.find(n => n.id === id);
+        if (newsletter) {
+            document.getElementById('newsletterId').value = newsletter.id;
+            document.getElementById('newsletterTitle').value = newsletter.title;
+            document.getElementById('newsletterPublished').checked = newsletter.isPublished;
+
+            // Set content in TinyMCE
+            tinymce.get('newsletterContent').setContent(newsletter.content);
 
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('newsletterFormModal'));
             modal.show();
         }
+    }
 
-        // Function to edit newsletter
-        function editNewsletter(id) {
-            newsletterFormMode = 'edit';
-            document.getElementById('newsletterFormModalLabel').textContent = 'Edit Newsletter';
+    // Function to save newsletter (create or update)
+    function saveNewsletter() {
+        // Get form values
+        const id = document.getElementById('newsletterId').value;
+        const title = document.getElementById('newsletterTitle').value;
+        const content = tinymce.get('newsletterContent').getContent();
+        const isPublished = document.getElementById('newsletterPublished').checked;
 
-            // Find newsletter in current list
-            const newsletter = currentNewsletters.find(n => n.id === id);
-            if (newsletter) {
-                document.getElementById('newsletterId').value = newsletter.id;
-                document.getElementById('newsletterTitle').value = newsletter.title;
-                document.getElementById('newsletterPublished').checked = newsletter.isPublished;
-
-                // Set content in TinyMCE
-                tinymce.get('newsletterContent').setContent(newsletter.content);
-
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById('newsletterFormModal'));
-                modal.show();
-            }
+        // Validate form
+        if (!title.trim()) {
+            alert('Please enter a newsletter title.');
+            return;
         }
 
-        // Function to save newsletter (create or update)
-        function saveNewsletter() {
-            // Get form values
-            const id = document.getElementById('newsletterId').value;
-            const title = document.getElementById('newsletterTitle').value;
-            const content = tinymce.get('newsletterContent').getContent();
-            const isPublished = document.getElementById('newsletterPublished').checked;
+        if (!content.trim()) {
+            alert('Please enter newsletter content.');
+            return;
+        }
 
-            // Validate form
-            if (!title.trim()) {
-                alert('Please enter a newsletter title.');
-                return;
-            }
+        const newsletter = {
+            title: title,
+            content: content,
+            isPublished: isPublished
+        };
 
-            if (!content.trim()) {
-                alert('Please enter newsletter content.');
-                return;
-            }
+        let url = '/tegel_webapp/api/newsletters';
+        let method = 'POST';
 
-            const newsletter = {
-                title: title,
-                content: content,
-                isPublished: isPublished
-            };
+        // If editing, add ID to URL and use PUT method
+        if (newsletterFormMode === 'edit' && id) {
+            url = `/tegel_webapp/api/newsletters/${id}`;
+            method = 'PUT';
+            newsletter.id = parseInt(id);
+        }
 
-            let url = '/tegel_webapp/api/newsletters';
-            let method = 'POST';
-
-            // If editing, add ID to URL and use PUT method
-            if (newsletterFormMode === 'edit' && id) {
-                url = `/tegel_webapp/api/newsletters/${id}`;
-                method = 'PUT';
-                newsletter.id = parseInt(id);
-            }
-
-            // Save newsletter
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newsletter)
-            })
+        // Save newsletter
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newsletter)
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -420,30 +428,30 @@
 
                 // Show success message
                 alert(newsletterFormMode === 'create' ?
-                      'Newsletter created successfully!' :
-                      'Newsletter updated successfully!');
+                    'Newsletter created successfully!' :
+                    'Newsletter updated successfully!');
             })
             .catch(error => {
                 console.error('Error saving newsletter:', error);
                 alert('Error saving newsletter. Please try again.');
             });
-        }
+    }
 
-        // Function to publish a draft newsletter
-        function publishNewsletter(id) {
-            // Find newsletter in current list
-            const newsletter = currentNewsletters.find(n => n.id === id);
-            if (newsletter) {
-                newsletter.isPublished = true;
+    // Function to publish a draft newsletter
+    function publishNewsletter(id) {
+        // Find newsletter in current list
+        const newsletter = currentNewsletters.find(n => n.id === id);
+        if (newsletter) {
+            newsletter.isPublished = true;
 
-                // Update newsletter
-                fetch(`/tegel_webapp/api/newsletters/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newsletter)
-                })
+            // Update newsletter
+            fetch(`/tegel_webapp/api/newsletters/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newsletter)
+            })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -461,22 +469,22 @@
                     console.error('Error publishing newsletter:', error);
                     alert('Error publishing newsletter. Please try again.');
                 });
-            }
         }
+    }
 
-        // Function to show delete confirmation
-        function deleteNewsletter(id) {
-            newsletterToDelete = id;
-            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            modal.show();
-        }
+    // Function to show delete confirmation
+    function deleteNewsletter(id) {
+        newsletterToDelete = id;
+        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        modal.show();
+    }
 
-        // Function to confirm and process delete
-        function confirmDeleteNewsletter() {
-            if (newsletterToDelete) {
-                fetch(`/tegel_webapp/api/newsletters/${newsletterToDelete}`, {
-                    method: 'DELETE'
-                })
+    // Function to confirm and process delete
+    function confirmDeleteNewsletter() {
+        if (newsletterToDelete) {
+            fetch(`/tegel_webapp/api/newsletters/${newsletterToDelete}`, {
+                method: 'DELETE'
+            })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -500,21 +508,8 @@
                     console.error('Error deleting newsletter:', error);
                     alert('Error deleting newsletter. Please try again.');
                 });
-            }
         }
-
-        // Logout function
-        function logout() {
-            fetch('/api/logout', {
-                method: 'POST',
-                credentials: 'include'
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = 'index.html';
-                }
-            });
-        }
-    </script>
+    }
+</script>
 </body>
 </html>

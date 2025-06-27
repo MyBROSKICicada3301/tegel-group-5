@@ -11,6 +11,7 @@
         html, body {
             height: 100%;
         }
+
         body {
             display: flex;
             flex-direction: column;
@@ -19,6 +20,7 @@
             margin: 0;
             padding: 0;
         }
+
         main {
             flex: 1;
             display: flex;
@@ -27,11 +29,13 @@
             justify-content: flex-start;
             padding: 40px 20px;
         }
+
         .navbar-brand {
             font-family: 'Courier New', cursive;
             font-size: 28px;
             font-weight: bold;
         }
+
         .admin-card {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -43,6 +47,7 @@
             width: 100%;
             margin-bottom: 40px;
         }
+
         .admin-card h2 {
             color: #333;
             font-size: 28px;
@@ -50,25 +55,31 @@
             text-align: center;
             margin-bottom: 30px;
         }
+
         .table thead th {
             background: #ff8c1a;
             color: #fff;
             border: none;
         }
+
         .table tbody tr {
-            background: rgba(255,255,255,0.85);
+            background: rgba(255, 255, 255, 0.85);
         }
+
         .btn-role {
             min-width: 100px;
         }
+
         .btn-delete {
             background: #e74c3c;
             color: #fff;
         }
+
         .btn-delete:hover {
             background: #c0392b;
             color: #fff;
         }
+
         .footer {
             background-color: #f8f9fa;
             padding: 30px 0;
@@ -81,27 +92,28 @@
             margin-right: 15px;
             filter: brightness(0) invert(1);
         }
+
         .footer a {
             text-decoration: none;
         }
-        .social-links {
-            display: flex;
-            align-items: center;
-        }
+
         .address-text {
             color: #ccc;
             font-size: 14px;
         }
+
         .footer-brand {
             font-family: 'Courier New', cursive;
             font-size: 24px;
             color: #ff8c1a;
             font-weight: bold;
         }
+
         @media (max-width: 900px) {
             .admin-card {
                 padding: 20px 5px;
             }
+
             .table-responsive {
                 font-size: 14px;
             }
@@ -113,7 +125,8 @@
 <nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
     <div class="container-fluid">
         <a class="navbar-brand" href="adminindex.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo"
+                 style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
@@ -121,10 +134,14 @@
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white active" href="admin.html">User Management</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Admin
+                    Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white active" href="admin.html">User
+                    Management</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a>
+                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
+                </li>
             </ul>
             <div id="authButtons">
                 <a href="account.html" class="btn btn-light me-2">Account</a>
@@ -138,22 +155,24 @@
     <div class="admin-card mb-4">
         <h2>User Management</h2>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" id="userSearchInput" placeholder="Search users by name or email...">
+            <input type="text" class="form-control" id="userSearchInput"
+                   placeholder="Search users by name or email...">
             <button class="btn btn-primary" type="button" onclick="searchUsers()">Search</button>
-            <button class="btn btn-secondary" type="button" onclick="resetUserSearch()">Reset</button>
+            <button class="btn btn-secondary" type="button" onclick="resetUserSearch()">Reset
+            </button>
         </div>
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Actions</th>
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
                 </thead>
                 <tbody id="userTableBody">
-                    <!-- Users will be loaded here by JS -->
+                <!-- Users will be loaded here by JS -->
                 </tbody>
             </table>
         </div>
@@ -163,9 +182,12 @@
         <h2>Event Management</h2>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="input-group" style="max-width: 600px;">
-                <input type="text" class="form-control" id="eventSearchInput" placeholder="Search events by name, location...">
-                <button class="btn btn-primary" type="button" onclick="searchEvents()">Search</button>
-                <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset</button>
+                <input type="text" class="form-control" id="eventSearchInput"
+                       placeholder="Search events by name, location...">
+                <button class="btn btn-primary" type="button" onclick="searchEvents()">Search
+                </button>
+                <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset
+                </button>
             </div>
             <button class="btn btn-success" onclick="window.location.href='admin-create.html'">
                 <i class="bi bi-plus-circle"></i> Create New Event
@@ -174,17 +196,17 @@
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
-                    <tr>
-                        <th>Event Name</th>
-                        <th>Date</th>
-                        <th>Location</th>
-                        <th>Participants</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Participants</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
                 </thead>
                 <tbody id="eventTableBody">
-                    <!-- Events will be loaded here by JS -->
+                <!-- Events will be loaded here by JS -->
                 </tbody>
             </table>
         </div>
@@ -192,16 +214,19 @@
 </main>
 
 <!-- Password Reset Modal -->
-<div class="modal fade" id="passwordResetModal" tabindex="-1" aria-labelledby="passwordResetModalLabel" aria-hidden="true">
+<div class="modal fade" id="passwordResetModal" tabindex="-1"
+     aria-labelledby="passwordResetModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="passwordResetModalLabel">Reset User Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="resetPasswordUserId">
-                <p>You are about to reset the password for <strong id="resetPasswordUserEmail"></strong></p>
+                <p>You are about to reset the password for <strong
+                        id="resetPasswordUserEmail"></strong></p>
                 <div class="mb-3">
                     <label for="newPassword" class="form-label">New Password</label>
                     <input type="password" class="form-control" id="newPassword" required>
@@ -215,20 +240,24 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmResetBtn">Reset Password</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmResetBtn">Reset Password
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Edit Event Modal -->
-<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editEventForm">
@@ -238,28 +267,33 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="editEventTitle" class="form-label">Event Title *</label>
-                                <input type="text" class="form-control" id="editEventTitle" name="title" required maxlength="100">
+                                <input type="text" class="form-control" id="editEventTitle"
+                                       name="title" required maxlength="100">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="editEventDate" class="form-label">Event Date *</label>
-                                <input type="date" class="form-control" id="editEventDate" name="date" required>
+                                <input type="date" class="form-control" id="editEventDate"
+                                       name="date" required>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="editEventLocation" class="form-label">Location</label>
-                                <input type="text" class="form-control" id="editEventLocation" name="location" maxlength="100">
+                                <input type="text" class="form-control" id="editEventLocation"
+                                       name="location" maxlength="100">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="editMaxParticipants" class="form-label">Max Participants</label>
-                                <input type="number" class="form-control" id="editMaxParticipants" name="maxParticipants" min="0" max="10000">
+                                <label for="editMaxParticipants" class="form-label">Max
+                                    Participants</label>
+                                <input type="number" class="form-control" id="editMaxParticipants"
+                                       name="maxParticipants" min="0" max="10000">
                             </div>
                         </div>
                     </div>
@@ -268,7 +302,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="eventPrice" class="form-label">Event Price (€)</label>
-                                <input type="number" class="form-control" id="eventPrice" name="price"
+                                <input type="number" class="form-control" id="eventPrice"
+                                       name="price"
                                        min="0" step="0.01" value="0.00">
                                 <small class="form-text text-muted">Set to 0 for free events</small>
                             </div>
@@ -277,27 +312,33 @@
                             <div class="mb-3">
                                 <label class="form-label">Food Options</label>
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="hasFoodOption" name="hasFoodOption">
                                     <label class="form-check-label" for="hasFoodOption">
                                         <strong>This event includes food options</strong>
                                     </label>
-                                    <div class="form-text">Enables participants to select food options during enrollment</div>
+                                    <div class="form-text">Enables participants to select food
+                                        options during enrollment
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="editEventDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="editEventDescription" name="description" rows="4" maxlength="2000"></textarea>
+                        <textarea class="form-control" id="editEventDescription" name="description"
+                                  rows="4" maxlength="2000"></textarea>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="editEventImage" class="form-label">Event Image</label>
-                                <input type="file" class="form-control" id="editEventImage" name="eventImage" accept="image/*">
-                                <small class="form-text text-muted">Upload a new image for this event</small>
+                                <input type="file" class="form-control" id="editEventImage"
+                                       name="eventImage" accept="image/*">
+                                <small class="form-text text-muted">Upload a new image for this
+                                    event</small>
 
                                 <!-- Hidden field to keep track of existing image ID if any -->
                                 <input type="hidden" id="currentImageId" name="currentImageId">
@@ -305,25 +346,31 @@
                                 <!-- Image preview section -->
                                 <div id="currentImagePreview" class="mt-2" style="display: none;">
                                     <p>Current image:</p>
-                                    <img id="previewImg" src="" alt="Current event image" style="max-width: 100%; max-height: 150px;" class="img-thumbnail">
+                                    <img id="previewImg" src="" alt="Current event image"
+                                         style="max-width: 100%; max-height: 150px;"
+                                         class="img-thumbnail">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <div class="form-check mt-4">
-                                    <input class="form-check-input" type="checkbox" id="editIsPublic" name="isPublic">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="editIsPublic" name="isPublic">
                                     <label class="form-check-label" for="editIsPublic">
                                         Public Event
                                     </label>
-                                    <div class="form-text">If checked, event will be visible to non-members</div>
+                                    <div class="form-text">If checked, event will be visible to
+                                        non-members
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <div class="form-check mt-4">
-                                    <input class="form-check-input" type="checkbox" id="editIsActive" name="isActive">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="editIsActive" name="isActive">
                                     <label class="form-check-label" for="editIsActive">
                                         Active Event
                                     </label>
@@ -334,8 +381,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="updateEvent()">Update Event</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="updateEvent()">Update Event
+                </button>
             </div>
         </div>
     </div>
@@ -356,7 +405,9 @@
                 </div>
             </div>
             <div class="col-md-4 text-center mb-3 mb-md-0">
-                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB
+                    Enschede
+                </div>
             </div>
             <div class="col-md-4 text-center text-md-end">
                 <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
@@ -372,7 +423,7 @@
     const contextPath = '/tegel_webapp'; // Define the application context path
 
     // Initialize notification system on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         notificationSystem.init();
     });
 
@@ -388,51 +439,51 @@
             },
             credentials: 'include' // Include credentials for session cookies
         })
-        .then(response => {
-            console.log("User data response status:", response.status);
-            if (!response.ok) {
-                if (response.status === 403) {
-                    throw new Error('Admin privileges required to access user data');
-                } else if (response.status === 401) {
-                    throw new Error('You must be logged in to access this resource');
-                } else {
-                    throw new Error(`Server error: ${response.status}`);
+            .then(response => {
+                console.log("User data response status:", response.status);
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Admin privileges required to access user data');
+                    } else if (response.status === 401) {
+                        throw new Error('You must be logged in to access this resource');
+                    } else {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
                 }
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("User data received:", data);
-            // Process the response data
-            if (!Array.isArray(data)) {
-                console.warn('Server did not return an array of users:', data);
-                throw new Error('Invalid user data format');
-            }
-            users = data;
-            renderUsers();
-        })
-        .catch(error => {
-            console.error('Error loading users:', error);
-            // Show error message to user
-            const userTable = document.getElementById('userTableBody').closest('.table-responsive');
-            if (userTable) {
-                const notification = document.createElement('div');
-                notification.className = 'alert alert-danger mt-3';
-                notification.innerHTML = `<strong>Error:</strong> Failed to load user data. ${error.message}`;
-                userTable.parentNode.insertBefore(notification, userTable);
+                return response.json();
+            })
+            .then(data => {
+                console.log("User data received:", data);
+                // Process the response data
+                if (!Array.isArray(data)) {
+                    console.warn('Server did not return an array of users:', data);
+                    throw new Error('Invalid user data format');
+                }
+                users = data;
+                renderUsers();
+            })
+            .catch(error => {
+                console.error('Error loading users:', error);
+                // Show error message to user
+                const userTable = document.getElementById('userTableBody').closest('.table-responsive');
+                if (userTable) {
+                    const notification = document.createElement('div');
+                    notification.className = 'alert alert-danger mt-3';
+                    notification.innerHTML = `<strong>Error:</strong> Failed to load user data. ${error.message}`;
+                    userTable.parentNode.insertBefore(notification, userTable);
 
-                // Also add retry button
-                const retryBtn = document.createElement('button');
-                retryBtn.className = 'btn btn-primary mt-2';
-                retryBtn.textContent = 'Retry';
-                retryBtn.onclick = function() {
-                    notification.remove();
-                    retryBtn.remove();
-                    loadUsers();
-                };
-                userTable.parentNode.insertBefore(retryBtn, userTable);
-            }
-        });
+                    // Also add retry button
+                    const retryBtn = document.createElement('button');
+                    retryBtn.className = 'btn btn-primary mt-2';
+                    retryBtn.textContent = 'Retry';
+                    retryBtn.onclick = function () {
+                        notification.remove();
+                        retryBtn.remove();
+                        loadUsers();
+                    };
+                    userTable.parentNode.insertBefore(retryBtn, userTable);
+                }
+            });
     }
 
     // Load events from database (admin view - all events)
@@ -441,30 +492,30 @@
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            events = data;
-            renderEvents();
-        })
-        .catch(error => {
-            console.error('Error loading events:', error);
-            // Fallback to public events endpoint
-            fetch(`${contextPath}/events`, {
-                method: 'GET',
-                credentials: 'include'
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 events = data;
                 renderEvents();
             })
-            .catch(err => console.error('Error loading fallback events:', err));
-        });
+            .catch(error => {
+                console.error('Error loading events:', error);
+                // Fallback to public events endpoint
+                fetch(`${contextPath}/events`, {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        events = data;
+                        renderEvents();
+                    })
+                    .catch(err => console.error('Error loading fallback events:', err));
+            });
     }
 
     function renderUsers() {
@@ -506,7 +557,7 @@
 
         // Add event listeners for role change
         document.querySelectorAll('.btn-role').forEach(select => {
-            select.addEventListener('change', function() {
+            select.addEventListener('change', function () {
                 const userId = parseInt(this.getAttribute('data-id'));
                 const newRole = this.value;
                 updateUserRole(userId, newRole);
@@ -521,7 +572,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ role: newRole }),
+            body: JSON.stringify({role: newRole}),
             credentials: 'include'
         })
             .then(response => response.json())
@@ -549,7 +600,7 @@
         notificationSystem.confirm(
             "Delete User",
             "Are you sure you want to delete this user? This action cannot be undone.",
-            function() {
+            function () {
                 fetch(`${contextPath}/admin/users/${userId}`, {
                     method: 'DELETE',
                     credentials: 'include'
@@ -633,7 +684,7 @@
         const query = document.getElementById('userSearchInput').value.toLowerCase();
         const filteredUsers = users.filter(user => {
             return (user.fullName && user.fullName.toLowerCase().includes(query)) ||
-                   user.email.toLowerCase().includes(query);
+                user.email.toLowerCase().includes(query);
         });
         renderUserTable(filteredUsers);
     }
@@ -676,7 +727,7 @@
 
         // Add event listeners for role change
         document.querySelectorAll('.btn-role').forEach(select => {
-            select.addEventListener('change', function() {
+            select.addEventListener('change', function () {
                 const userId = parseInt(this.getAttribute('data-id'));
                 const newRole = this.value;
                 updateUserRole(userId, newRole);
@@ -685,7 +736,7 @@
     }
 
     // Manual session check implementation for admin.html
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         console.log("Admin page loaded");
         ensureAdminNavigation(); // Always update links on page load
 
@@ -697,56 +748,56 @@
                 'Cache-Control': 'no-cache'
             }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Session check failed: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Session check response:", data);
-            if (data.loggedIn) {
-                const authButtons = document.getElementById('authButtons');
-                if (authButtons) {
-                    authButtons.innerHTML = `
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Session check failed: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Session check response:", data);
+                if (data.loggedIn) {
+                    const authButtons = document.getElementById('authButtons');
+                    if (authButtons) {
+                        authButtons.innerHTML = `
                         <a href="#" class="btn btn-light me-2" id="accountBtn">Account</a>
                         <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
                     `;
 
-                    // Add click event listener to sign out button
-                    document.getElementById('signoutBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        signOut();
-                    });
+                        // Add click event listener to sign out button
+                        document.getElementById('signoutBtn').addEventListener('click', function (e) {
+                            e.preventDefault();
+                            signOut();
+                        });
 
-                    // Add click event for account button
-                    document.getElementById('accountBtn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Redirect to account page
-                        window.location.href = 'account.html';
-                    });
-                }
+                        // Add click event for account button
+                        document.getElementById('accountBtn').addEventListener('click', function (e) {
+                            e.preventDefault();
+                            // Redirect to account page
+                            window.location.href = 'account.html';
+                        });
+                    }
 
-                // Redirect if not admin
-                if (data.role !== 'admin') {
-                    alert('This page is restricted to administrators only.');
-                    window.location.href = 'index.html';
+                    // Redirect if not admin
+                    if (data.role !== 'admin') {
+                        alert('This page is restricted to administrators only.');
+                        window.location.href = 'index.html';
+                    } else {
+                        // User is admin, load data
+                        loadUsers();
+                        loadEvents();
+                    }
                 } else {
-                    // User is admin, load data
-                    loadUsers();
-                    loadEvents();
+                    // Not logged in, redirect to login page
+                    alert('Please log in as an administrator to access this page.');
+                    window.location.href = 'login.html';
                 }
-            } else {
-                // Not logged in, redirect to login page
-                alert('Please log in as an administrator to access this page.');
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+                alert('Failed to verify your login status. Please try logging in again.');
                 window.location.href = 'login.html';
-            }
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-            alert('Failed to verify your login status. Please try logging in again.');
-            window.location.href = 'login.html';
-        });
+            });
     });
 
     function signOut() {
@@ -754,15 +805,15 @@
             method: 'POST',
             credentials: 'include'
         })
-        .then(response => {
-            // Redirect to home page after successful logout
-            window.location.href = 'index.html';
-        })
-        .catch(error => {
-            console.error('Error signing out:', error);
-            alert('Error signing out. You will be redirected to the login page.');
-            window.location.href = 'login.html';
-        });
+            .then(response => {
+                // Redirect to home page after successful logout
+                window.location.href = 'index.html';
+            })
+            .catch(error => {
+                console.error('Error signing out:', error);
+                alert('Error signing out. You will be redirected to the login page.');
+                window.location.href = 'login.html';
+            });
     }
 
     // Helper function to ensure admin navigation
@@ -798,10 +849,10 @@
         sortedEvents.forEach(event => {
             const tr = document.createElement('tr');
             const eventDate = event.date ? new Date(event.date).toLocaleDateString() : 'TBA';
-            const statusBadge = event.isActive ? 
-                '<span class="badge bg-success">Active</span>' : 
+            const statusBadge = event.isActive ?
+                '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
-                
+
             tr.innerHTML = `
                 <td>${event.title}</td>
                 <td>${eventDate}</td>
@@ -929,7 +980,7 @@
         notificationSystem.confirm(
             "Delete Event",
             "Are you sure you want to delete this event? This action cannot be undone.",
-            function() {
+            function () {
                 fetch(`${contextPath}/admin/events/${eventId}`, {
                     method: 'DELETE',
                     credentials: 'include'
@@ -963,7 +1014,7 @@
         notificationSystem.confirm(
             `${action.charAt(0).toUpperCase() + action.slice(1)} Event`,
             `Are you sure you want to ${action} this event?`,
-            function() {
+            function () {
                 const event = events.find(e => e.eventId === eventId);
                 if (!event) {
                     notificationSystem.error("Event not found");
@@ -1021,7 +1072,7 @@
         const query = document.getElementById('eventSearchInput').value.toLowerCase();
         const filteredEvents = events.filter(event => {
             return event.title.toLowerCase().includes(query) ||
-                   (event.location && event.location.toLowerCase().includes(query));
+                (event.location && event.location.toLowerCase().includes(query));
         });
         renderEventTable(filteredEvents);
     }
@@ -1069,7 +1120,7 @@
         toastContainer: null,
 
         // Initialize the notification system
-        init: function() {
+        init: function () {
             // Create toast container if it doesn't exist
             if (!this.toastContainer) {
                 this.toastContainer = document.createElement('div');
@@ -1080,7 +1131,7 @@
         },
 
         // Show a toast notification
-        toast: function(message, type = 'info', autoDismiss = true) {
+        toast: function (message, type = 'info', autoDismiss = true) {
             this.init();
 
             const toastId = 'toast-' + Date.now();
@@ -1109,7 +1160,7 @@
             toast.show();
 
             // Remove from DOM after hiding
-            toastElement.addEventListener('hidden.bs.toast', function() {
+            toastElement.addEventListener('hidden.bs.toast', function () {
                 toastElement.remove();
             });
 
@@ -1117,22 +1168,22 @@
         },
 
         // Show success notification
-        success: function(message) {
+        success: function (message) {
             return this.toast(message, 'success');
         },
 
         // Show error notification
-        error: function(message) {
+        error: function (message) {
             return this.toast(message, 'error');
         },
 
         // Show warning notification
-        warning: function(message) {
+        warning: function (message) {
             return this.toast(message, 'warning');
         },
 
         // Show confirmation dialog
-        confirm: function(title, message, confirmCallback, cancelCallback = null) {
+        confirm: function (title, message, confirmCallback, cancelCallback = null) {
             // Create modal if it doesn't exist
             let confirmModal = document.getElementById('confirmActionModal');
 
@@ -1171,7 +1222,7 @@
             const modal = new bootstrap.Modal(confirmModal);
 
             // Set up confirm action
-            const handleConfirm = function() {
+            const handleConfirm = function () {
                 confirmCallback();
                 modal.hide();
                 confirmButton.removeEventListener('click', handleConfirm);
@@ -1192,6 +1243,7 @@
             modal.show();
         }
     };
+
     // Password reset functionality
     function resetPassword(userId) {
         const user = users.find(u => u.userId === userId);
@@ -1209,7 +1261,7 @@
         passwordResetModal.show();
 
         // Add event listener to the confirm button
-        document.getElementById('confirmResetBtn').onclick = function() {
+        document.getElementById('confirmResetBtn').onclick = function () {
             submitPasswordReset();
         };
     }
@@ -1237,7 +1289,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ password: newPassword }),
+            body: JSON.stringify({password: newPassword}),
             credentials: 'include'
         })
             .then(response => {

@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Custom color variables */
         :root {
-            --tegel-orange: rgba(252,125,4,255);
-            --tegel-orange-light: rgba(252,165,44,255);
-            --tegel-orange-dark: rgba(222,95,0,255);
+            --tegel-orange: rgba(252, 125, 4, 255);
+            --tegel-orange-light: rgba(252, 165, 44, 255);
+            --tegel-orange-dark: rgba(222, 95, 0, 255);
         }
 
         /* Main body styling */
@@ -186,34 +188,7 @@
             box-shadow: 0 0 0 0.2rem rgba(252, 125, 4, 0.25);
         }
 
-        .form-label {
-            font-weight: 500;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .form-text {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
         /* Error and success messages */
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
 
         /* Media queries for responsiveness */
         @media (min-width: 992px) {
@@ -250,18 +225,22 @@
 <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
     <div class="container">
         <a class="navbar-brand" href="index.html">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40"
+                 class="d-inline-block align-middle">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
+                </li>
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
+                </li>
             </ul>
             <div id="authButtons">
                 <a href="signup.html" class="btn btn-light me-2 active">Sign Up</a>
@@ -291,20 +270,29 @@
 
                 <form id="signupForm">
                     <div class="form-group">
-                        <input id="fullName" class="form-control" type="text" placeholder="Full Name" required>
+                        <label for="fullName"></label><input id="fullName" class="form-control"
+                                                             type="text"
+                                                             placeholder="Full Name" required>
                     </div>
 
                     <div class="form-group">
-                        <input id="nickname" class="form-control" type="text" placeholder="Nickname (optional)">
+                        <label for="nickname"></label><input id="nickname" class="form-control"
+                                                             type="text"
+                                                             placeholder="Nickname (optional)">
                     </div>
 
                     <div class="form-group">
-                        <input id="emailAddress" class="form-control" type="email" placeholder="Email address" required>
+                        <label for="emailAddress"></label><input id="emailAddress"
+                                                                 class="form-control" type="email"
+                                                                 placeholder="Email address"
+                                                                 required>
                     </div>
 
                     <div class="form-group">
                         <div class="input-group">
-                            <input id="password" class="form-control" type="password" placeholder="Password" required>
+                            <label for="password"></label><input id="password" class="form-control"
+                                                                 type="password"
+                                                                 placeholder="Password" required>
                             <span class="input-group-text" id="togglePassword">
                                 <i class="fas fa-eye-slash"></i>
                             </span>
@@ -312,19 +300,26 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="date" id="dob" class="form-control" required>
+                        <label for="dob"></label><input type="date" id="dob" class="form-control"
+                                                        required>
                     </div>
 
                     <div class="form-group">
-                        <input type="tel" id="phone" class="form-control" placeholder="Phone number" required>
+                        <label for="phone"></label><input type="tel" id="phone" class="form-control"
+                                                          placeholder="Phone number"
+                                                          required>
                     </div>
 
                     <div class="form-group">
-                        <textarea id="dietary" class="form-control" placeholder="Dietary restrictions (if any)" rows="2"></textarea>
+                        <label for="dietary"></label><textarea id="dietary" class="form-control"
+                                                               placeholder="Dietary restrictions (if any)"
+                                                               rows="2"></textarea>
                     </div>
 
                     <p class="tos-text">
-                        By signing up, you agree to our <a href="terms-of-service.html" class="orange-link">Terms of Service</a> and <a href="privacy-policy.html" class="orange-link">Privacy Policy</a>.
+                        By signing up, you agree to our <a href="terms-of-service.html"
+                                                           class="orange-link">Terms of Service</a>
+                        and <a href="privacy-policy.html" class="orange-link">Privacy Policy</a>.
                     </p>
 
                     <button type="submit" class="btn-register">Create Account</button>
@@ -383,7 +378,7 @@
         }
 
         // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
+        document.getElementById('togglePassword').addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
             const icon = this.querySelector('i');
 
@@ -420,27 +415,27 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    return response.json().then(data => {
-                        if (data.success) {
-                            window.location.href = 'login.html?registered=true';
-                        } else {
-                            showAlert(data.message || 'Registration failed. Please try again.', 'danger');
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalText;
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('Registration failed. Please check your connection and try again.', 'danger');
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            });
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.json().then(data => {
+                            if (data.success) {
+                                window.location.href = 'login.html?registered=true';
+                            } else {
+                                showAlert(data.message || 'Registration failed. Please try again.', 'danger');
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalText;
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Registration failed. Please check your connection and try again.', 'danger');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
         });
     });
 </script>

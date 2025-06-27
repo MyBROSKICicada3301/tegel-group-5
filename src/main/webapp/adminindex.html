@@ -121,24 +121,54 @@
 
         /* Footer styles */
         .footer {
-            background-color: #f8f9fa;
+            background-color: #343a40;
+            color: #ffffff;
             padding: 30px 0;
             margin-top: auto;
         }
 
-
-        .social-links a {
-            display: inline-block;
-            margin-right: 10px;
+        .footer .social-links a {
+            color: #ffc107;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .address-text {
-            color: #666;
+        .footer .social-links a:hover {
+            color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        .footer .address-text {
+            color: #adb5bd;
             font-size: 14px;
+            margin: 0;
         }
 
-        .footer-brand {
-            height: 40px;
+        .footer .footer-brand {
+            max-width: 90px;
+            height: auto;
+        }
+
+        /* Footer responsive adjustments */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .footer .social-links {
+                margin-bottom: 15px;
+            }
+
+            .footer .social-links a {
+                margin: 0 10px;
+            }
+
+            .footer .address-text {
+                margin-bottom: 15px;
+            }
         }
 
         /* Media queries for responsiveness */
@@ -164,18 +194,19 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="adminindex.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+    <div class="container">
+        <a class="navbar-brand" href="adminindex.html">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-white active" href="adminindex.html">Admin Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white active" href="adminindex.html" aria-current="page">Home</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
@@ -255,7 +286,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
-                <div class="d-flex justify-content-center justify-content-md-start">
+                <div class="d-flex justify-content-center justify-content-md-start social-links">
                     <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                        target="_blank" rel="noopener" class="me-3">
                         <i class="bi bi-instagram text-warning fs-4"></i>

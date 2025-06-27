@@ -13,9 +13,13 @@
             color: #333;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
             line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         main {
+            flex: 1;
             min-height: 70vh;
         }
 
@@ -102,24 +106,54 @@
 
         /* Footer styles */
         .footer {
-            background-color: #f8f9fa;
+            background-color: #343a40;
+            color: #ffffff;
             padding: 30px 0;
             margin-top: auto;
         }
 
-
-        .social-links a {
-            display: inline-block;
-            margin-right: 10px;
+        .footer .social-links a {
+            color: #ffc107;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .address-text {
-            color: #666;
+        .footer .social-links a:hover {
+            color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        .footer .address-text {
+            color: #adb5bd;
             font-size: 14px;
+            margin: 0;
         }
 
-        .footer-brand {
-            height: 40px;
+        .footer .footer-brand {
+            max-width: 90px;
+            height: auto;
+        }
+
+        /* Footer responsive adjustments */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .footer .social-links {
+                margin-bottom: 15px;
+            }
+
+            .footer .social-links a {
+                margin: 0 10px;
+            }
+
+            .footer .address-text {
+                margin-bottom: 15px;
+            }
         }
 
         /* Form styles */
@@ -403,7 +437,7 @@
                 // Update navigation for admin users
                 const navbarNav = document.querySelector('#navbarNav .navbar-nav');
                 navbarNav.innerHTML = `
-                    <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="adminindex.html">Home</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
                     <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>

@@ -17,7 +17,7 @@
         }
 
         main {
-            min-height: 70vh;
+            flex: 1;
         }
 
         /* Hero Carousel Styles */
@@ -115,24 +115,54 @@
 
         /* Footer styles */
         .footer {
-            background-color: #f8f9fa;
+            background-color: #343a40;
+            color: #ffffff;
             padding: 30px 0;
-            margin-top: auto;
+            margin-top: 0 !important;
         }
 
-
-        .social-links a {
-            display: inline-block;
-            margin-right: 10px;
+        .footer .social-links a {
+            color: #ffc107;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .address-text {
-            color: #ccc;
+        .footer .social-links a:hover {
+            color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        .footer .address-text {
+            color: #adb5bd;
             font-size: 14px;
+            margin: 0;
         }
 
-        .footer-brand {
-            height: 40px;
+        .footer .footer-brand {
+            max-width: 90px;
+            height: auto;
+        }
+
+        /* Footer responsive adjustments */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .footer .social-links {
+                margin-bottom: 15px;
+            }
+
+            .footer .social-links a {
+                margin: 0 10px;
+            }
+
+            .footer .address-text {
+                margin-bottom: 15px;
+            }
         }
 
         /* Media queries for responsiveness */
@@ -167,10 +197,6 @@
         .py-3 {
             padding-top: 0.5rem !important;
             padding-bottom: 0.5rem !important;
-        }
-
-        .footer.mt-2 {
-            margin-top: 0.5rem !important;
         }
     </style>
 </head>

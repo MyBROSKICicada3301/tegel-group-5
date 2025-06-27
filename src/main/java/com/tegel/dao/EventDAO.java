@@ -39,8 +39,8 @@ public class EventDAO {
         }
 
         String sql =
-                "INSERT INTO " + SCHEMA + ".event (title, description, date, location, image, " +
-                        "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic) " +
+                "INSERT INTO " + SCHEMA + ".event (title, description, date, location, " +
+                        "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic, image) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Debug the hasFoodOption value before SQL execution
@@ -59,14 +59,19 @@ public class EventDAO {
                 stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
                 stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setString(5, event.getImage() != null ?
-                        SecurityUtils.sanitizeInput(event.getImage()) : null);
-                stmt.setInt(6, event.getMaxParticipants());
-                stmt.setInt(7, event.getCreatedBy());
-                stmt.setBoolean(8, event.isActive());
-                stmt.setDouble(9, event.getPrice());
-                stmt.setBoolean(10, event.isHasFoodOption());
-                stmt.setBoolean(11, event.isPublic());
+                stmt.setInt(5, event.getMaxParticipants());
+                stmt.setInt(6, event.getCreatedBy());
+                stmt.setBoolean(7, event.isActive());
+                stmt.setDouble(8, event.getPrice());
+                stmt.setBoolean(9, event.isHasFoodOption());
+                stmt.setBoolean(10, event.isPublic());
+
+                // Set image ID as null or the provided integer value
+                if (event.getImageId() != null) {
+                    stmt.setInt(11, event.getImageId());
+                } else {
+                    stmt.setNull(11, java.sql.Types.INTEGER);
+                }
 
                 int rowsAffected = stmt.executeUpdate();
 
@@ -447,7 +452,34 @@ public class EventDAO {
             }
 
             event.setLocation(rs.getString("location"));
-            event.setImage(rs.getString("image"));
+
+            // Get the image ID directly from the 'image' column in event table
+            try {
+                int imageId = rs.getInt("image");
+                if (!rs.wasNull()) {
+                    event.setImageId(imageId);
+                    // The legacy image field should be set to null since we're now using imageId
+                    event.setImage(null);
+                    logger.info("Found image ID " + imageId + " for event " + event.getEventId());
+                } else {
+                    // For backward compatibility, check if there's a string value in the image column
+                    String imageStr = rs.getString("image");
+                    if (imageStr != null && !imageStr.isEmpty()) {
+                        event.setImage(imageStr);
+                        // Try to parse it as an integer for compatibility
+                        try {
+                            int parsedImageId = Integer.parseInt(imageStr);
+                            event.setImageId(parsedImageId);
+                        } catch (NumberFormatException e) {
+                            // Not a number, it's probably a legacy URL or path
+                            logger.fine("Image column contains a non-numeric value: " + imageStr);
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                logger.fine("Error accessing image column in result set: " + e.getMessage());
+            }
+
             event.setMaxParticipants(rs.getInt("maxparticipants"));
             event.setCreatedBy(rs.getInt("createdby"));
 
@@ -459,6 +491,15 @@ public class EventDAO {
             event.setActive(rs.getBoolean("isactive"));
             event.setPrice(rs.getDouble("price"));
             event.setHasFoodOption(rs.getBoolean("hasfoodoption"));
+
+            // Set ispublic if it exists in the result set
+            try {
+                event.setPublic(rs.getBoolean("ispublic"));
+            } catch (SQLException e) {
+                // Column might not exist in some queries, set default value
+                event.setPublic(true);
+                logger.fine("ispublic column not found in result set");
+            }
 
             return event;
         } catch (Exception e) {
@@ -707,6 +748,37 @@ public class EventDAO {
             }
         } catch (SQLException e) {
             logger.severe("Error enrolling user with details: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Updates an event with the associated image ID
+     * @param eventId The ID of the event to update
+     * @param imageId The ID of the image to associate with the event
+     * @return true if update was successful, false otherwise
+     */
+    public boolean updateEventImageId(int eventId, int imageId) {
+        String sql = "UPDATE " + SCHEMA + ".event SET image = ? WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, imageId);
+            stmt.setInt(2, eventId);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                logger.info("Successfully updated event " + eventId + " with image ID " + imageId);
+                return true;
+            } else {
+                logger.warning("No event found with ID " + eventId + " to update image");
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error updating event with image ID", e);
             return false;
         }
     }

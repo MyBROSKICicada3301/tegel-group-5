@@ -4,23 +4,278 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Custom color variables */
+        :root {
+            --tegel-orange: rgba(252,125,4,255);
+            --tegel-orange-light: rgba(252,165,44,255);
+            --tegel-orange-dark: rgba(222,95,0,255);
+        }
+
+        /* Main body styling */
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            line-height: 1.6;
+        }
+
+        main {
+            min-height: 70vh;
+        }
+
+        /* Button styles */
+        .btn-orange {
+            background-color: var(--tegel-orange);
+            border-color: var(--tegel-orange);
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background-color: var(--tegel-orange-dark);
+            border-color: var(--tegel-orange-dark);
+            color: white;
+        }
+
+        .btn-outline-orange {
+            border-color: var(--tegel-orange);
+            color: var(--tegel-orange);
+        }
+
+        .btn-outline-orange:hover {
+            background-color: var(--tegel-orange);
+            color: white;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(252, 125, 4, 1);
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+
+        .navbar .nav-link {
+            font-size: 18px;
+            padding: 12px 20px !important;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Page Header Styles */
+        .page-header {
+            background: white;
+            padding: 40px;
+            margin-bottom: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* Event Card Styles */
+        .event-tile {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .event-tile:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .event-description {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .event-date, .event-duration {
+            color: #ff8c1a;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .event-location, .event-participants {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .btn-select {
+            background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 140, 26, 0.3);
+            color: white;
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px 0;
+            margin-top: 80px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .address-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            height: 40px;
+        }
+
+        /* Form styles */
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #ff8c1a;
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-text {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Error and success messages */
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+
+            .event-title {
+                font-size: 20px;
+            }
+
+            .event-filter {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Filter section */
+        .filter-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <!-- Admin-only event creation form -->
-    <!-- Modal for creating events -->
+    <!-- Admin-only event creation modal -->
     <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-orange text-white">
                     <h5 class="modal-title" id="createEventModalLabel">Create New Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="adminEventCreateForm">
+                    <form id="adminEventCreateForm" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="eventTitle" class="form-label">Title</label>
                             <input type="text" class="form-control" id="eventTitle" name="title" required>
@@ -29,48 +284,59 @@
                             <label for="eventDescription" class="form-label">Description</label>
                             <textarea class="form-control" id="eventDescription" name="description" rows="3" required></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="eventDate" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="eventDate" name="date" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="eventDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="eventDate" name="date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="maxParticipants" class="form-label">Maximum Participants</label>
+                                <input type="number" class="form-control" id="maxParticipants" name="maxParticipants"
+                                       value="50" required>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="eventLocation" class="form-label">Location</label>
-                            <input type="text" class="form-control" id="eventLocation" name="location" value="Tegel Community Center" required>
+                            <input type="text" class="form-control" id="eventLocation" name="location"
+                                   value="Tegel Community Center" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="maxParticipants" class="form-label">Maximum Participants</label>
-                            <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" value="50" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="eventPrice" class="form-label">Event Price (€)</label>
-                            <input type="number" class="form-control" id="eventPrice" name="price"
-                                   min="0" step="0.01" value="0.00">
-                            <small class="form-text text-muted">Set to 0 for free events</small>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
-                                <label class="form-check-label" for="hasFoodOption">
-                                    This event includes food options
-                                </label>
-                                <div class="form-text">Enables participants to select food options during enrollment</div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="eventPrice" class="form-label">Event Price (€)</label>
+                                <input type="number" class="form-control" id="eventPrice" name="price"
+                                       min="0" step="0.01" value="0.00">
+                                <small class="form-text text-muted">Set to 0 for free events</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="eventImage" class="form-label">Event Image</label>
+                                <input type="file" class="form-control" id="eventImage" name="eventImage" accept="image/*">
+                                <small class="form-text text-muted">Upload an image (max 10MB)</small>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
-                                <label class="form-check-label" for="isPublic">
-                                    Make this event public
-                                </label>
-                                <div class="form-text">Public events are visible to all users</div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
+                                    <label class="form-check-label" for="hasFoodOption">
+                                        Food options available
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
-                                <label class="form-check-label" for="isActive">
-                                    Active Event
-                                </label>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
+                                    <label class="form-check-label" for="isPublic">
+                                        Public event
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                                    <label class="form-check-label" for="isActive">
+                                        Active event
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div id="adminEventCreateMsg" class="mt-2"></div>
@@ -78,315 +344,405 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="submitEventBtn">Create Event</button>
+                    <button type="button" class="btn btn-orange" id="submitEventBtn">Create Event</button>
                 </div>
             </div>
         </div>
     </div>
 
-<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+    <!-- Navigation Bar with improved Bootstrap styling -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="events.html"
+                        aria-current="page">Events</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                </ul>
+                <div id="authButtons">
+                    <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                    <a href="login.html" class="btn btn-light">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin-only create event button with improved styling -->
+    <div class="admin-only container my-3" style="display:none">
+        <button id="showCreateEventFormBtn" class="btn btn-orange" data-bs-toggle="modal"
+                data-bs-target="#createEventModal">
+            <i class="bi bi-plus-circle-fill me-1"></i> Create Event
         </button>
-        <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
-            </ul>
-            <div id="authButtons">
-                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
-                <a href="login.html" class="btn btn-light">Login</a>
-            </div>
-        </div>
     </div>
-</nav>
 
-<!-- Admin-only create event button -->
-<div class="admin-only container my-3" style="display:none">
-    <button id="showCreateEventFormBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">Create Event</button>
-</div>
-
-<main class="container my-4">
-    <div class="mb-4">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="eventSearchInput" placeholder="Search events by name, location...">
-                    <button class="btn btn-primary" type="button" onclick="searchEvents()">Search</button>
-                    <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-4" id="eventsContainer">
-        <!-- Events will be loaded here -->
-    </div>
-</main>
-
-<script>
-    function loadEvents() {
-        console.log('Loading events from server...');
-        fetch('/tegel_webapp/events')
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                return response.text(); // Get response as text first for debugging
-            })
-            .then(text => {
-                console.log('Raw response:', text);
-                try {
-                    const events = JSON.parse(text);
-                    console.log('Parsed events:', events);
-                    if (!Array.isArray(events)) {
-                        console.error('Events is not an array:', events);
-                        throw new Error('Expected array of events');
-                    }
-                    displayEvents(events);
-                } catch (e) {
-                    console.error('JSON parse error:', e);
-                    console.log('Showing empty events list due to error');
-                    displayEvents([]);  // Display empty array instead of dummy events
-                }
-            })
-            .catch(error => {
-                console.error('Error loading events from server:', error);
-                // Show empty state instead of dummy data
-                console.log('Showing empty events list due to server error');
-                displayEvents([]);
-            });
-    }
-
-    // Store the current events that are displayed
-    let currentEvents = [];
-
-    // Update displayEvents to store the events in currentEvents
-    function displayEvents(events) {
-        currentEvents = events; // Store the events for search functionality
-        const container = document.getElementById('eventsContainer');
-        container.innerHTML = '';
-
-        if (events.length === 0) {
-            container.innerHTML = '<div class="col-12"><p class="text-center">No events available.</p></div>';
-            return;
-        }
-
-        events.forEach(event => {
-            const eventCard = document.createElement('div');
-            eventCard.className = 'col-lg-4 col-md-6';
-
-            // Calculate duration or use provided duration
-            let duration = 'Duration not specified';
-            if (event.startTime && event.endTime) {
-                duration = `${event.startTime} - ${event.endTime}`;
-            } else if (event.duration) {
-                duration = event.duration;
-            }
-
-            // Format date for display
-            let displayDate = event.date;
-            if (event.date) {
-                const eventDate = new Date(event.date);
-                displayDate = eventDate.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-
-            eventCard.innerHTML = `
-                <div class="card event-tile h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="event-title">${event.title}</h5>
-                        <p class="event-description">${event.description || 'No description available.'}</p>
-                        <div class="event-duration mb-3">
-                            <i class="bi bi-clock"></i> ${duration}
-                        </div>
-                        <div class="event-date mb-3" style="color: #ff8c1a; font-weight: bold;">
-                            📅 ${displayDate}
-                        </div>
-                        <div class="event-location mb-3" style="color: #666; font-size: 14px;">
-                            📍 ${event.location || 'Location TBA'}
-                        </div>
-                        <div class="event-participants mb-3" style="color: #333; font-size: 14px;">
-                            👥 ${event.currentParticipants || 0}/${event.maxParticipants || '∞'} enrolled
-                        </div>
-                        <div class="mt-auto">
-                            <button class="btn btn-select" onclick="selectEvent(${event.id || event.eventId})">
-                                Select
-                            </button>
+    <!-- Main content with improved Bootstrap grid and components -->
+    <main class="container my-4">
+        <!-- Search and filter section -->
+        <div class="mb-4">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="bi bi-search me-2"></i>Find Events</h5>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="eventSearchInput"
+                                       placeholder="Search events by name, location..."
+                                       aria-label="Search events">
+                                <button class="btn btn-orange" type="button" onclick="searchEvents()">
+                                    Search
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="resetEventSearch()">
+                                    Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            `;
-            container.appendChild(eventCard);
-        });
-    }
-
-    function selectEvent(eventId) {
-        // Redirect to event details page with event ID as parameter
-        window.location.href = `event-details.html?eventId=${eventId}`;
-    }
-
-    function searchEvents() {
-        const query = document.getElementById('eventSearchInput').value.toLowerCase();
-        if (!query) {
-            // If search is empty, reload all events
-            loadEvents();
-            return;
-        }
-
-        const filteredEvents = currentEvents.filter(event => {
-            return event.title.toLowerCase().includes(query) ||
-                   (event.location && event.location.toLowerCase().includes(query)) ||
-                   (event.description && event.description.toLowerCase().includes(query));
-        });
-
-        if (filteredEvents.length === 0) {
-            // No matching events found
-            const container = document.getElementById('eventsContainer');
-            container.innerHTML = '<div class="col-12"><p class="text-center">Event not found⚠️!</p></div>';
-        } else {
-            displayEvents(filteredEvents);
-        }
-    }
-
-    function resetEventSearch() {
-        document.getElementById('eventSearchInput').value = '';
-        // Reload all events from server
-        loadEvents();
-    }
-
-    function createEvent(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        const form = document.getElementById('adminEventCreateForm');
-        const formData = new FormData(form);
-
-        // Handle checkboxes
-        const hasFoodOption = document.getElementById('hasFoodOption').checked;
-        const isActive = document.getElementById('isActive').checked;
-        const isPublic = document.getElementById('isPublic').checked;
-
-        formData.set('hasFoodOption', hasFoodOption ? 'true' : 'false');
-        formData.set('isActive', isActive ? 'true' : 'false');
-        formData.set('isPublic', isPublic ? 'true' : 'false');
-
-        // Validate required fields
-        if (!formData.get('title') || !formData.get('date')) {
-            showMessage('Please fill in all required fields.', 'danger');
-            return;
-        }
-
-        // Validate date is not in the past
-        const eventDate = new Date(formData.get('date'));
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (eventDate < today) {
-            showMessage('Event date cannot be in the past.', 'danger');
-            return;
-        }
-
-        fetch('/tegel_webapp/admin/events', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.eventId || data.success) {
-                    showMessage('Event created successfully!', 'success');
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
-                        form.reset();
-                        loadEvents(); // Reload events if you have that function
-                    }, 1500);
-                } else {
-                    showMessage(data.error || 'Failed to create event.', 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating event:', error);
-                showMessage('Error creating event. Please try again.', 'danger');
-            });
-    }
-
-    // Helper function to show messages
-    function showMessage(message, type) {
-        const msgContainer = document.getElementById('adminEventCreateMsg');
-        msgContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-
-        // Auto-dismiss success messages
-        if (type === 'success') {
-            setTimeout(() => {
-                msgContainer.innerHTML = '';
-            }, 3000);
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', loadEvents);
-
-    // Admin event creation functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle event creation form submission via the submit button in modal
-        document.getElementById('submitEventBtn').addEventListener('click', function(e) {
-           e.preventDefault()
-            createEvent(e);
-        });
-
-            // Insert at the top of the main content
-            const mainContent = document.querySelector('main');
-            mainContent.insertBefore(notification, mainContent.firstChild);
-
-            // Auto-dismiss after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 500);
-            }, 5000);
-
-
-        // Reset the form and error messages when the modal is closed
-        const createEventModal = document.getElementById('createEventModal');
-        if (createEventModal) {
-            createEventModal.addEventListener('hidden.bs.modal', function() {
-                const form = document.getElementById('adminEventCreateForm');
-                if (form) form.reset();
-
-                const msgElement = document.getElementById('adminEventCreateMsg');
-                if (msgElement) {
-                    msgElement.textContent = '';
-                    msgElement.className = '';
-                }
-            });
-        }
-    });
-</script>
-
-<footer class="footer">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div class="social-links">
-            <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);margin-right:15px;">
-            </a>
-            <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Gmail" style="width:28px;height:28px;filter:invert(41%) sepia(77%) saturate(7492%) hue-rotate(326deg) brightness(99%) contrast(101%);">
-            </a>
+            </div>
         </div>
-        <div class="address-text">Drienerlolaan 5, 7522 NB Enschede</div>
-        <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo" style="width: 90px; height: auto; filter: none; margin-right: 0;" />
-    </div>
-</footer>
 
-<!-- Load scripts in the correct order -->
-<script src="js/debug-utils.js"></script>
-<script src="js/session-manager.js"></script>
+        <!-- Event list container -->
+        <div class="row g-4" id="eventsContainer">
+            <!-- Events will be loaded here -->
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border spinner-orange" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Loading events...</p>
+            </div>
+        </div>
+    </main>
 
+    <!-- Footer with improved layout -->
+    <footer class="footer mt-2 py-3 bg-dark text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                    <div class="d-flex justify-content-center justify-content-md-start">
+                        <a href="https://www.instagram.com/sgvtegel?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                           target="_blank" rel="noopener" class="me-3">
+                            <i class="bi bi-instagram text-warning fs-4"></i>
+                        </a>
+                        <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                            <i class="bi bi-envelope text-warning fs-4"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
+                         style="width: 90px; height: auto;"/>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script section -->
+    <script>
+        function loadEvents() {
+            console.log('Loading events from server...');
+            fetch('/tegel_webapp/events')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    return response.text(); // Get response as text first for debugging
+                })
+                .then(text => {
+                    console.log('Raw response:', text);
+                    try {
+                        const events = JSON.parse(text);
+                        console.log('Parsed events:', events);
+                        if (!Array.isArray(events)) {
+                            console.error('Events is not an array:', events);
+                            throw new Error('Expected array of events');
+                        }
+                        displayEvents(events);
+                    } catch (e) {
+                        console.error('JSON parse error:', e);
+                        console.log('Showing empty events list due to error');
+                        displayEvents([]);  // Display empty array instead of dummy events
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading events from server:', error);
+                    // Show empty state instead of dummy data
+                    console.log('Showing empty events list due to server error');
+                    displayEvents([]);
+                });
+        }
+
+        // Store the current events that are displayed
+        let currentEvents = [];
+
+        // Update displayEvents to store the events in currentEvents
+        function displayEvents(events) {
+            currentEvents = events; // Store the events for search functionality
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '';
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-orange" style="background-color: #fff3e6; color: #de5f00; border-color: #ffccaa;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            No events available at this time.
+                        </div>
+                        <p>Check back later or try a different search.</p>
+                    </div>`;
+                return;
+            }
+
+            events.forEach(event => {
+                // Format date for display
+                let displayDate = event.date;
+                if (event.date) {
+                    const eventDate = new Date(event.date);
+                    displayDate = eventDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                }
+
+                // Determine the image source
+                let imageHtml = '';
+                if (event.imageId) {
+                    imageHtml = `
+                        <div class="card-img-top-container">
+                            <img src="/tegel_webapp/get-image?id=${event.imageId}"
+                                 class="card-img-top event-image" alt="${event.title}">
+                        </div>`;
+                } else if (event.image) {
+                    const imageId = parseInt(event.image);
+                    if (!isNaN(imageId)) {
+                        imageHtml = `
+                            <div class="card-img-top-container">
+                                <img src="/tegel_webapp/get-image?id=${imageId}"
+                                     class="card-img-top event-image" alt="${event.title}">
+                            </div>`;
+                    } else {
+                        imageHtml = `
+                            <div class="card-img-top-container">
+                                <img src="${event.image}" class="card-img-top event-image" alt="${event.title}">
+                            </div>`;
+                    }
+                } else {
+                    imageHtml = `
+                        <div class="card-img-top-container">
+                            <div class="card-img-top event-image-placeholder d-flex align-items-center justify-content-center bg-light">
+                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        </div>`;
+                }
+
+                const eventCard = document.createElement('div');
+                eventCard.className = 'col-lg-4 col-md-6';
+                eventCard.innerHTML = `
+                    <div class="card event-tile h-100 shadow-sm">
+                        ${imageHtml}
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title event-title">${event.title}</h5>
+                            <p class="card-text event-description">${event.description || 'No description available.'}</p>
+
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-calendar-event text-orange me-2"></i>
+                                    <span>${displayDate}</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-geo-alt text-orange me-2"></i>
+                                    <span>${event.location || 'Location TBA'}</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-people text-orange me-2"></i>
+                                    <span>${event.currentParticipants || 0}/${event.maxParticipants || '∞'} enrolled</span>
+                                </div>
+
+                                <button class="btn btn-orange w-100" onclick="selectEvent(${event.id || event.eventId})">
+                                    <i class="bi bi-arrow-right-circle me-1"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(eventCard);
+            });
+        }
+
+        function selectEvent(eventId) {
+            // Redirect to event details page with event ID as parameter
+            window.location.href = `event-details.html?eventId=${eventId}`;
+        }
+
+        function searchEvents() {
+            const query = document.getElementById('eventSearchInput').value.toLowerCase();
+            if (!query) {
+                // If search is empty, reload all events
+                loadEvents();
+                return;
+            }
+
+            const filteredEvents = currentEvents.filter(event => {
+                return event.title.toLowerCase().includes(query) ||
+                       (event.location && event.location.toLowerCase().includes(query)) ||
+                       (event.description && event.description.toLowerCase().includes(query));
+            });
+
+            if (filteredEvents.length === 0) {
+                // No matching events found
+                const container = document.getElementById('eventsContainer');
+                container.innerHTML = '<div class="col-12"><p class="text-center">Event not found⚠️!</p></div>';
+            } else {
+                displayEvents(filteredEvents);
+            }
+        }
+
+        function resetEventSearch() {
+            document.getElementById('eventSearchInput').value = '';
+            // Reload all events from server
+            loadEvents();
+        }
+
+        function createEvent(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = document.getElementById('adminEventCreateForm');
+            const formData = new FormData(form);
+
+            // Handle checkboxes
+            const hasFoodOption = document.getElementById('hasFoodOption').checked;
+            const isActive = document.getElementById('isActive').checked;
+            const isPublic = document.getElementById('isPublic').checked;
+
+            formData.set('hasFoodOption', hasFoodOption ? 'true' : 'false');
+            formData.set('isActive', isActive ? 'true' : 'false');
+            formData.set('isPublic', isPublic ? 'true' : 'false');
+
+            // Validate required fields
+            if (!formData.get('title') || !formData.get('date')) {
+                showMessage('Please fill in all required fields.', 'danger');
+                return;
+            }
+
+            // Validate image file if one was selected
+            const imageFile = document.getElementById('eventImage').files[0];
+            if (imageFile) {
+                // Check file size (max 10MB)
+                const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+                if (imageFile.size > maxSizeInBytes) {
+                    showMessage('Image file size must be less than 10MB.', 'danger');
+                    return;
+                }
+
+                // Validate image type
+                const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validImageTypes.includes(imageFile.type)) {
+                    showMessage('Invalid image format. Please use JPEG, PNG, GIF, or WEBP.', 'danger');
+                    return;
+                }
+
+                // Add content type to form data
+                formData.set('imageContentType', imageFile.type);
+            }
+
+            // Validate date is not in the past
+            const eventDate = new Date(formData.get('date'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (eventDate < today) {
+                showMessage('Event date cannot be in the past.', 'danger');
+                return;
+            }
+
+            fetch('/tegel_webapp/admin/events', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.eventId || data.success) {
+                        showMessage('Event created successfully!', 'success');
+                        setTimeout(() => {
+                            bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
+                            form.reset();
+                            loadEvents(); // Reload events if you have that function
+                        }, 1500);
+                    } else {
+                        showMessage(data.error || 'Failed to create event.', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating event:', error);
+                    showMessage('Error creating event. Please try again.', 'danger');
+                });
+        }
+
+        // Helper function to show messages
+        function showMessage(message, type) {
+            const msgContainer = document.getElementById('adminEventCreateMsg');
+            msgContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+
+            // Auto-dismiss success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    msgContainer.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadEvents);
+
+        // Admin event creation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle event creation form submission via the submit button in modal
+            document.getElementById('submitEventBtn').addEventListener('click', function(e) {
+               e.preventDefault()
+                createEvent(e);
+            });
+
+                // Insert at the top of the main content
+                const mainContent = document.querySelector('main');
+                mainContent.insertBefore(notification, mainContent.firstChild);
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 500);
+                }, 5000);
+
+
+            // Reset the form and error messages when the modal is closed
+            const createEventModal = document.getElementById('createEventModal');
+            if (createEventModal) {
+                createEventModal.addEventListener('hidden.bs.modal', function() {
+                    const form = document.getElementById('adminEventCreateForm');
+                    if (form) form.reset();
+
+                    const msgElement = document.getElementById('adminEventCreateMsg');
+                    if (msgElement) {
+                        msgElement.textContent = '';
+                        msgElement.className = '';
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Load scripts in the correct order -->
+    <script src="js/debug-utils.js"></script>
+    <script src="js/session-manager.js"></script>
 </body>
 </html>

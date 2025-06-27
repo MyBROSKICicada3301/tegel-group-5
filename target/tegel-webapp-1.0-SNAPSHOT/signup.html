@@ -6,187 +6,179 @@
     <title>Sign Up | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="styles.css" rel="stylesheet">
     <style>
+        /* Main body styling */
         body {
             background-color: #f8f9fa;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            color: #333;
+            line-height: 1.6;
         }
+
         main {
             flex: 1;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 2rem 0;
         }
-        .signup-container {
-            max-width: 900px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-        }
-        .signup-image {
-            display: none;
-            flex: 1;
-            margin-right: 3rem;
-            border-radius: 16px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        }
-        .signup-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .signup-image::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(252, 125, 4, 0.3), transparent);
-        }
-        .signup-form-section {
-            flex: 1;
-            max-width: 430px;
-            width: 100%;
-            margin: 0 auto;
-        }
+
+        /* Signup Form Styling */
         .signup-card {
-            background-color: white;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-        .brand-logo {
-            margin-bottom: 1.25rem;
-        }
-        .brand-logo img {
-            height: 60px;
-        }
+
         .signup-card h3 {
+            text-align: center;
+            margin-bottom: 30px;
             color: #333;
-            font-size: 1.1rem;
-            font-weight: 600;
-            line-height: 1.4;
-            margin-bottom: 1.5rem;
+            font-size: 28px;
         }
-        .form-group {
-            margin-bottom: 1rem;
-            text-align: left;
-        }
-        .form-control {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            background-color: #f8f9fa;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus {
-            border-color: rgba(252, 125, 4, 0.5);
-            box-shadow: 0 0 0 4px rgba(252, 125, 4, 0.15);
-        }
-        .input-group .input-group-text {
-            background-color: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-left: none;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .input-group .form-control {
-            border-right: none;
-            border-radius: 8px 0 0 8px;
-        }
-        .btn-register {
-            background: rgba(252, 125, 4, 1);
+
+        .btn-signup {
+            background: linear-gradient(135deg, #ff8c1a 0%, #ffb56b 100%);
             color: white;
+            padding: 12px;
             border: none;
             border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 1rem;
-            font-size: 1rem;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(252, 125, 4, 0.3);
+            width: 100%;
         }
-        .btn-register:hover {
-            background: rgba(230, 115, 0, 1);
+
+        .btn-signup:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(252, 125, 4, 0.4);
+            box-shadow: 0 8px 15px rgba(255, 140, 26, 0.3);
         }
-        .btn-register:active {
-            transform: translateY(0);
+
+        /* Navbar Styles */
+        .navbar {
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(252, 125, 4, 1);
         }
-        .auth-option {
-            background-color: white;
-            border-radius: 16px;
-            padding: 1.25rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
         }
-        .auth-option p {
-            margin: 0;
-            font-size: 0.95rem;
+
+        .navbar-brand:hover img {
+            transform: scale(1.05);
         }
-        .orange-link {
-            color: rgba(252, 125, 4, 1);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
+
+        .navbar .nav-link {
+            font-size: 18px;
+            padding: 12px 20px !important;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
         }
-        .orange-link:hover {
-            color: rgba(230, 115, 0, 1);
+
+        .navbar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
-        .form-label {
-            display: none;
+
+        /* Footer styles */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px 0;
+            margin-top: 80px;
         }
-        .tos-text {
+
+        .social-links a {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .address-text {
             color: #666;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin: 1.25rem 0;
-            text-align: center;
+            font-size: 14px;
         }
-        @media (min-width: 768px) {
-            .signup-image {
-                display: block;
+
+        .footer-brand {
+            height: 40px;
+        }
+
+        /* Form styles */
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #ff8c1a;
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-text {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Error and success messages */
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .signup-card {
+                margin: 20px auto;
+                padding: 25px;
             }
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg" style="background: rgba(252,125,4,255);">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.html" style="padding:0;">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo"
-                 style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+<nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
-                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
-                </li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
             </ul>
             <div id="authButtons">
-                <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                <a href="signup.html" class="btn btn-light me-2 active">Sign Up</a>
                 <a href="login.html" class="btn btn-light">Login</a>
             </div>
         </div>

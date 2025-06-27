@@ -10,6 +10,7 @@ public class Event {
     private LocalDate date;
     private String location;
     private String image;
+    private Integer imageId; // Added imageId field
     private int maxParticipants;
     private int currentParticipants;
     private int createdBy;
@@ -58,6 +59,9 @@ public class Event {
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
     
+    public Integer getImageId() { return imageId; } // Added getter for imageId
+    public void setImageId(int imageId) { this.imageId = imageId; } // Added setter for imageId
+
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
     

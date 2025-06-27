@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tegel.dao.EventDAO;
+import com.tegel.dao.ImageDAO;
 import com.tegel.model.Event;
+import com.tegel.model.Image;
 import com.tegel.util.LocalDateAdapter;
 import com.tegel.util.LocalDateTimeAdapter;
 
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 public class EventServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventServlet.class.getName());
     private EventDAO eventDAO = new EventDAO();
+    private ImageDAO imageDAO = new ImageDAO();  // Added ImageDAO
 
     // Configure Gson with adapters for proper date/time serialization
     private Gson gson = new GsonBuilder()
@@ -61,8 +64,21 @@ public class EventServlet extends HttpServlet {
                         if (count >= 0) {
                             event.setCurrentParticipants(count);
                         }
+
+                        // If imageId is null but the image column contains an integer value,
+                        // try to convert it and set as imageId
+                        if (event.getImageId() == null && event.getImage() != null) {
+                            try {
+                                int imageId = Integer.parseInt(event.getImage());
+                                event.setImageId(imageId);
+                                logger.info("Converted image string to ID: " + imageId + " for event " + event.getEventId());
+                            } catch (NumberFormatException e) {
+                                // Not a number, leave as is (probably a legacy URL)
+                                logger.fine("Unable to parse image as ID for event " + event.getEventId() + ": " + event.getImage());
+                            }
+                        }
                     } catch (Exception e) {
-                        logger.warning("EventServlet: Error getting participant count for event " + event.getEventId() + ": " + e.getMessage());
+                        logger.warning("EventServlet: Error processing event " + event.getEventId() + ": " + e.getMessage());
                     }
                 }
 
@@ -85,6 +101,19 @@ public class EventServlet extends HttpServlet {
                             event.setCurrentParticipants(count);
                         }
 
+                        // If imageId is null but the image column contains an integer value,
+                        // try to convert it and set as imageId
+                        if (event.getImageId() == null && event.getImage() != null) {
+                            try {
+                                int imageId = Integer.parseInt(event.getImage());
+                                event.setImageId(imageId);
+                                logger.info("Converted image string to ID: " + imageId + " for event " + event.getEventId());
+                            } catch (NumberFormatException e) {
+                                // Not a number, leave as is (probably a legacy URL)
+                                logger.fine("Unable to parse image as ID for event " + event.getEventId() + ": " + event.getImage());
+                            }
+                        }
+
                         String jsonEvent = gson.toJson(event);
                         logger.info("EventServlet: JSON response for single event: " + jsonEvent);
                         response.getWriter().write(jsonEvent);
@@ -101,10 +130,9 @@ public class EventServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "EventServlet: Error retrieving events: " + e.getMessage(), e);
-            e.printStackTrace(); // Print stack trace for detailed error information
+            logger.log(Level.SEVERE, "EventServlet: Error processing request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\":\"Server error occurred: " + e.getMessage() + "\"}");
+            response.getWriter().write("{\"error\":\"Internal server error\"}");
         }
     }
 }

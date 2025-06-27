@@ -14,16 +14,16 @@
     <session-config>
         <session-timeout>2</session-timeout>
     </session-config>
-    
+
     <!-- Newsletter servlet mapping -->
-    <servlet>
+ <!--   <servlet>
         <servlet-name>NewsletterServlet</servlet-name>
         <servlet-class>com.tegel.servlet.NewsletterServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>NewsletterServlet</servlet-name>
-        <url-pattern>/newsletter</url-pattern>
-    </servlet-mapping>
+        <url-pattern>/api/newsletters/*</url-pattern>
+    </servlet-mapping> -->
 
     <!-- Admin User Management servlet mapping -->
     <servlet>

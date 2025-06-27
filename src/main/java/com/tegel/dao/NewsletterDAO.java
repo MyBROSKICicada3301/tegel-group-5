@@ -20,8 +20,8 @@ public class NewsletterDAO {
      * @return The created newsletter with ID, or null if creation failed
      */
     public Newsletter createNewsletter(Newsletter newsletter) {
-        String sql = "INSERT INTO mod4db.newsletter (title, content, created_by, is_published) " +
-                     "VALUES (?, ?, ?, ?) RETURNING newsletter_id";
+        String sql = "INSERT INTO mod4db.newsletter (title, content, postedby) " +
+                "VALUES (?, ?, ?) RETURNING letter_id";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -29,15 +29,11 @@ public class NewsletterDAO {
             stmt.setString(1, newsletter.getTitle());
             stmt.setString(2, newsletter.getContent());
             stmt.setInt(3, newsletter.getCreatedBy());
-            stmt.setBoolean(4, newsletter.isPublished());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     newsletter.setId(rs.getInt(1));
-                    // If published, set the published_at timestamp
-                    if (newsletter.isPublished()) {
-                        updatePublishedAt(newsletter.getId());
-                    }
+                    newsletter.setPublished(true); // Always published in this schema
                     logger.info("Created newsletter with ID: " + newsletter.getId());
                     return newsletter;
                 }
@@ -54,24 +50,17 @@ public class NewsletterDAO {
      * @return true if successful, false otherwise
      */
     public boolean updateNewsletter(Newsletter newsletter) {
-        String sql = "UPDATE mod4db.newsletter SET title = ?, content = ?, is_published = ? " +
-                     "WHERE newsletter_id = ?";
+        String sql = "UPDATE mod4db.newsletter SET title = ?, content = ? " +
+                "WHERE letter_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newsletter.getTitle());
             stmt.setString(2, newsletter.getContent());
-            stmt.setBoolean(3, newsletter.isPublished());
-            stmt.setInt(4, newsletter.getId());
+            stmt.setInt(3, newsletter.getId());
 
             int rowsAffected = stmt.executeUpdate();
-
-            // If newsletter is being published for the first time, set published_at
-            if (newsletter.isPublished()) {
-                boolean updated = updatePublishedAtIfNeeded(newsletter.getId());
-                logger.info("Newsletter published status updated: " + updated);
-            }
 
             logger.info("Updated newsletter ID " + newsletter.getId() + ", rows affected: " + rowsAffected);
             return rowsAffected > 0;
@@ -88,7 +77,7 @@ public class NewsletterDAO {
      * @return true if successful, false otherwise
      */
     public boolean deleteNewsletter(int newsletterId) {
-        String sql = "DELETE FROM mod4db.newsletter WHERE newsletter_id = ?";
+        String sql = "DELETE FROM mod4db.newsletter WHERE letter_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -111,7 +100,7 @@ public class NewsletterDAO {
      * @return The newsletter object or null if not found
      */
     public Newsletter getNewsletterById(int id) {
-        String sql = "SELECT * FROM mod4db.newsletter WHERE newsletter_id = ?";
+        String sql = "SELECT * FROM mod4db.newsletter WHERE letter_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -135,12 +124,12 @@ public class NewsletterDAO {
     }
 
     /**
-     * Get all published newsletters
+     * Get all published newsletters (all newsletters are considered published in this schema)
      * @return List of published newsletters
      */
     public List<Newsletter> getAllPublishedNewsletters() {
         return getNewslettersByQuery(
-            "SELECT * FROM mod4db.newsletter WHERE is_published = TRUE ORDER BY published_at DESC"
+                "SELECT * FROM mod4db.newsletter ORDER BY postedat DESC"
         );
     }
 
@@ -151,8 +140,8 @@ public class NewsletterDAO {
      */
     public List<Newsletter> getLatestNewsletters(int limit) {
         return getNewslettersByQuery(
-            "SELECT * FROM mod4db.newsletter WHERE is_published = TRUE ORDER BY published_at DESC LIMIT ?",
-            limit
+                "SELECT * FROM mod4db.newsletter ORDER BY postedat DESC LIMIT ?",
+                limit
         );
     }
 
@@ -162,7 +151,7 @@ public class NewsletterDAO {
      */
     public List<Newsletter> getAllNewsletters() {
         return getNewslettersByQuery(
-            "SELECT * FROM mod4db.newsletter ORDER BY created_at DESC"
+                "SELECT * FROM mod4db.newsletter ORDER BY postedat DESC"
         );
     }
 
@@ -173,26 +162,20 @@ public class NewsletterDAO {
      */
     public List<Newsletter> getNewslettersByUser(int userId) {
         return getNewslettersByQuery(
-            "SELECT * FROM mod4db.newsletter WHERE created_by = ? ORDER BY created_at DESC",
-            userId
+                "SELECT * FROM mod4db.newsletter WHERE postedby = ? ORDER BY postedat DESC",
+                userId
         );
     }
 
     /**
      * Search newsletters by title or content
      * @param searchTerm The search term
-     * @param publishedOnly Whether to include only published newsletters
+     * @param publishedOnly Whether to include only published newsletters (ignored since all are published)
      * @return List of matching newsletters
      */
     public List<Newsletter> searchNewsletters(String searchTerm, boolean publishedOnly) {
-        String sql;
-        if (publishedOnly) {
-            sql = "SELECT * FROM mod4db.newsletter WHERE is_published = TRUE AND " +
-                  "(title ILIKE ? OR content ILIKE ?) ORDER BY published_at DESC";
-        } else {
-            sql = "SELECT * FROM mod4db.newsletter WHERE " +
-                  "(title ILIKE ? OR content ILIKE ?) ORDER BY created_at DESC";
-        }
+        String sql = "SELECT * FROM mod4db.newsletter WHERE " +
+                "(title ILIKE ? OR content ILIKE ?) ORDER BY postedat DESC";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -215,58 +198,6 @@ public class NewsletterDAO {
         }
 
         return new ArrayList<>();
-    }
-
-    /**
-     * Update the published_at timestamp for a newsletter if it's not already set
-     * @param newsletterId The newsletter ID
-     * @return true if successful, false otherwise
-     */
-    private boolean updatePublishedAtIfNeeded(int newsletterId) {
-        String checkSql = "SELECT published_at FROM mod4db.newsletter WHERE newsletter_id = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-
-            checkStmt.setInt(1, newsletterId);
-
-            try (ResultSet rs = checkStmt.executeQuery()) {
-                if (rs.next() && rs.getTimestamp("published_at") == null) {
-                    // Published_at not set, update it
-                    return updatePublishedAt(newsletterId);
-                }
-            }
-
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error checking published_at for newsletter ID " + newsletterId, e);
-        }
-
-        return false;
-    }
-
-    /**
-     * Update the published_at timestamp for a newsletter
-     * @param newsletterId The newsletter ID
-     * @return true if successful, false otherwise
-     */
-    private boolean updatePublishedAt(int newsletterId) {
-        String updateSql = "UPDATE mod4db.newsletter SET published_at = CURRENT_TIMESTAMP " +
-                           "WHERE newsletter_id = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-
-            updateStmt.setInt(1, newsletterId);
-            int rowsAffected = updateStmt.executeUpdate();
-
-            logger.info("Updated published_at for newsletter ID " + newsletterId +
-                       ", rows affected: " + rowsAffected);
-            return rowsAffected > 0;
-
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error updating published_at for newsletter ID " + newsletterId, e);
-            return false;
-        }
     }
 
     /**
@@ -309,23 +240,20 @@ public class NewsletterDAO {
      */
     private Newsletter extractNewsletterFromResultSet(ResultSet rs) throws SQLException {
         Newsletter newsletter = new Newsletter();
-        newsletter.setId(rs.getInt("newsletter_id"));
+        newsletter.setId(rs.getInt("letter_id"));
         newsletter.setTitle(rs.getString("title"));
         newsletter.setContent(rs.getString("content"));
-        newsletter.setCreatedBy(rs.getInt("created_by"));
+        newsletter.setCreatedBy(rs.getInt("postedby"));
 
-        // Handle timestamps
-        Timestamp createdAt = rs.getTimestamp("created_at");
-        if (createdAt != null) {
-            newsletter.setCreatedAt(createdAt.toLocalDateTime());
+        // Handle timestamp
+        Timestamp postedAt = rs.getTimestamp("postedat");
+        if (postedAt != null) {
+            newsletter.setCreatedAt(postedAt.toLocalDateTime());
+            newsletter.setPublishedAt(postedAt.toLocalDateTime()); // Use same timestamp for both
         }
 
-        Timestamp publishedAt = rs.getTimestamp("published_at");
-        if (publishedAt != null) {
-            newsletter.setPublishedAt(publishedAt.toLocalDateTime());
-        }
-
-        newsletter.setPublished(rs.getBoolean("is_published"));
+        // All newsletters are considered published in this schema
+        newsletter.setPublished(true);
 
         return newsletter;
     }

@@ -320,6 +320,11 @@
     let events = [];
     const contextPath = '/tegel_webapp'; // Define the application context path
 
+    // Initialize notification system on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        notificationSystem.init();
+    });
+
     // Load users from database - completely rewritten
     function loadUsers() {
         console.log("Loading users...");
@@ -457,7 +462,7 @@
         });
     }
 
-    // Existing user management functions
+    // Update role management to use new notification system
     function updateUserRole(userId, newRole) {
         fetch(`${contextPath}/admin/users/role/${userId}`, {
             method: 'PUT',
@@ -467,53 +472,107 @@
             body: JSON.stringify({ role: newRole }),
             credentials: 'include'
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const user = users.find(u => u.userId === userId);
-                if (user) {
-                    user.role = newRole;
-                    alert(`Role updated successfully.`);
-                }
-            } else {
-                alert('Failed to update role: ' + (data.error || 'Unknown error'));
-                loadUsers(); // Reload to reset the dropdown
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating role.');
-            loadUsers(); // Reload to reset the dropdown
-        });
-    }
-
-    function deleteUser(userId) {
-        if (confirm("Are you sure you want to delete this user?")) {
-            fetch(`${contextPath}/admin/users/${userId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    users = users.filter(u => u.userId !== userId);
-                    renderUsers();
-                    alert('User deleted successfully.');
+                    const user = users.find(u => u.userId === userId);
+                    if (user) {
+                        user.role = newRole;
+                        notificationSystem.success(`Role updated successfully to ${newRole}.`);
+                    }
                 } else {
-                    alert('Failed to delete user: ' + (data.error || 'Unknown error'));
+                    notificationSystem.error(data.error || 'Failed to update role.');
+                    loadUsers(); // Reload to reset the dropdown
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting user.');
+                notificationSystem.error('Error updating role.');
+                loadUsers(); // Reload to reset the dropdown
             });
-        }
     }
 
+    // Update user management functions to use new notification system
+    function deleteUser(userId) {
+        notificationSystem.confirm(
+            "Delete User",
+            "Are you sure you want to delete this user? This action cannot be undone.",
+            function() {
+                fetch(`${contextPath}/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            notificationSystem.success('User deleted successfully.');
+                            users = users.filter(u => u.userId !== userId);
+                            renderUsers();
+                        } else {
+                            notificationSystem.error(data.error || 'Failed to delete user.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        notificationSystem.error('Error deleting user.');
+                    });
+            }
+        );
+    }
+
+    // Update the user details view to use a modal instead of alert
     function viewUser(userId) {
         const user = users.find(u => u.userId === userId);
         if (user) {
-            alert(`User Details:\n\nName: ${user.fullName || 'N/A'}\nEmail: ${user.email}\nRole: ${user.role}\nPhone: ${user.phoneNumber || 'N/A'}\nDiet: ${user.dietRes || 'None'}`);
+            // Create modal if it doesn't exist
+            let userModal = document.getElementById('userDetailsModal');
+
+            if (!userModal) {
+                const modalHtml = `
+                <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="user-details-content"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                userModal = document.getElementById('userDetailsModal');
+            }
+
+            // Update modal content
+            const detailsContent = userModal.querySelector('.user-details-content');
+            detailsContent.innerHTML = `
+            <div class="mb-3">
+                <strong>Name:</strong> ${user.fullName || 'N/A'}
+            </div>
+            <div class="mb-3">
+                <strong>Email:</strong> ${user.email}
+            </div>
+            <div class="mb-3">
+                <strong>Role:</strong> <span class="badge bg-primary">${user.role}</span>
+            </div>
+            <div class="mb-3">
+                <strong>Phone:</strong> ${user.phoneNumber || 'N/A'}
+            </div>
+            <div class="mb-3">
+                <strong>Dietary Restrictions:</strong> ${user.dietRes || 'None'}
+            </div>
+        `;
+
+            // Show modal
+            new bootstrap.Modal(userModal).show();
         }
     }
 
@@ -763,25 +822,30 @@
     }
 
     function deleteEvent(eventId) {
-        if (confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-            fetch(`/tegel_webapp/admin/events/${eventId}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert('Event deleted successfully!');
-                    events = events.filter(e => e.eventId !== eventId);
-                    renderEvents();
-                } else {
-                    alert(data.error || 'Failed to delete event.');
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting event:', error);
-                alert('Error deleting event. Please try again.');
-            });
-        }
+        notificationSystem.confirm(
+            "Delete Event",
+            "Are you sure you want to delete this event? This action cannot be undone.",
+            function() {
+                fetch(`${contextPath}/admin/events/${eventId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                    .then(response => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            notificationSystem.success('Event deleted successfully!');
+                            events = events.filter(e => e.eventId !== eventId);
+                            renderEvents();
+                        } else {
+                            notificationSystem.error(data.error || 'Failed to delete event.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting event:', error);
+                        notificationSystem.error('Error deleting event. Please try again.');
+                    });
+            }
+        );
     }
 
     function viewEventDetails(eventId) {
@@ -791,168 +855,108 @@
 
     function toggleEventStatus(eventId, newStatus) {
         const action = newStatus ? 'activate' : 'deactivate';
-        if (confirm(`Are you sure you want to ${action} this event?`)) {
-            // Get the current event to retain all its properties
-            const event = events.find(e => e.eventId === eventId);
-            if (!event) {
-                alert("Event not found");
-                return;
-            }
 
-            // Create a form data with all event properties
-            const formData = new FormData();
-            formData.append('title', event.title);
-            formData.append('date', event.date);
-            formData.append('location', event.location || '');
-            formData.append('description', event.description || '');
-            formData.append('maxParticipants', event.maxParticipants || '');
-            formData.append('image', event.image || '');
-            formData.append('price', event.price || 0);
-            formData.append('hasFoodOption', event.hasFoodOption || false);
-            formData.append('isPublic', event.isPublic || false);
-            formData.append('isActive', newStatus); // Update status
-
-            // Use the standard event update endpoint
-            fetch(`${contextPath}/admin/events/${eventId}`, {
-                method: 'PUT',
-                body: formData,
-                credentials: 'include'
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error(`Server responded with status: ${response.status}`);
-                        return response.text().then(text => {
-                            throw new Error(text || `Server error: ${response.status}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert(`Event ${action}d successfully!`);
-                    event.isActive = newStatus;
-                    renderEvents();
-                })
-                .catch(error => {
-                    console.error('Error updating event status:', error);
-                    alert(`Error updating event status: ${error.message}`);
-                });
-        }
-    }
-
-    // Existing user management functions
-    function updateUserRole(userId, newRole) {
-        fetch(`${contextPath}/admin/users/role/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ role: newRole }),
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const user = users.find(u => u.userId === userId);
-                if (user) {
-                    user.role = newRole;
-                    alert(`Role updated successfully.`);
+        notificationSystem.confirm(
+            `${action.charAt(0).toUpperCase() + action.slice(1)} Event`,
+            `Are you sure you want to ${action} this event?`,
+            function() {
+                // Get the current event to retain all its properties
+                const event = events.find(e => e.eventId === eventId);
+                if (!event) {
+                    notificationSystem.error("Event not found");
+                    return;
                 }
-            } else {
-                alert('Failed to update role: ' + (data.error || 'Unknown error'));
-                loadUsers(); // Reload to reset the dropdown
+
+                // Create a form data with all event properties
+                const formData = new FormData();
+                formData.append('title', event.title);
+                formData.append('date', event.date);
+                formData.append('location', event.location || '');
+                formData.append('description', event.description || '');
+                formData.append('maxParticipants', event.maxParticipants || '');
+                formData.append('image', event.image || '');
+                formData.append('price', event.price || 0);
+                formData.append('hasFoodOption', event.hasFoodOption || false);
+                formData.append('isPublic', event.isPublic || false);
+                formData.append('isActive', newStatus); // Update status
+
+                // Use the standard event update endpoint
+                fetch(`${contextPath}/admin/events/${eventId}`, {
+                    method: 'PUT',
+                    body: formData,
+                    credentials: 'include'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(text || `Server error: ${response.status}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        notificationSystem.success(`Event ${action}d successfully!`);
+                        event.isActive = newStatus;
+                        renderEvents();
+                    })
+                    .catch(error => {
+                        console.error('Error updating event status:', error);
+                        notificationSystem.error(`Error updating event status: ${error.message}`);
+                    });
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating role.');
-            loadUsers(); // Reload to reset the dropdown
-        });
-    }
+        );
+    }function toggleEventStatus(eventId, newStatus) {
+        const action = newStatus ? 'activate' : 'deactivate';
 
-    function deleteUser(userId) {
-        if (confirm("Are you sure you want to delete this user?")) {
-            fetch(`${contextPath}/admin/users/${userId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    users = users.filter(u => u.userId !== userId);
-                    renderUsers();
-                    alert('User deleted successfully.');
-                } else {
-                    alert('Failed to delete user: ' + (data.error || 'Unknown error'));
+        notificationSystem.confirm(
+            `${action.charAt(0).toUpperCase() + action.slice(1)} Event`,
+            `Are you sure you want to ${action} this event?`,
+            function() {
+                // Get the current event to retain all its properties
+                const event = events.find(e => e.eventId === eventId);
+                if (!event) {
+                    notificationSystem.error("Event not found");
+                    return;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error deleting user.');
-            });
-        }
-    }
 
-    function viewUser(userId) {
-        const user = users.find(u => u.userId === userId);
-        if (user) {
-            alert(`User Details:\n\nName: ${user.fullName || 'N/A'}\nEmail: ${user.email}\nRole: ${user.role}\nPhone: ${user.phoneNumber || 'N/A'}\nDiet: ${user.dietRes || 'None'}`);
-        }
-    }
+                // Create a form data with all event properties
+                const formData = new FormData();
+                formData.append('title', event.title);
+                formData.append('date', event.date);
+                formData.append('location', event.location || '');
+                formData.append('description', event.description || '');
+                formData.append('maxParticipants', event.maxParticipants || '');
+                formData.append('image', event.image || '');
+                formData.append('price', event.price || 0);
+                formData.append('hasFoodOption', event.hasFoodOption || false);
+                formData.append('isPublic', event.isPublic || false);
+                formData.append('isActive', newStatus); // Update status
 
-    // Search and filter users
-    function searchUsers() {
-        const query = document.getElementById('userSearchInput').value.toLowerCase();
-        const filteredUsers = users.filter(user => {
-            return (user.fullName && user.fullName.toLowerCase().includes(query)) ||
-                   user.email.toLowerCase().includes(query);
-        });
-        renderUserTable(filteredUsers);
-    }
-
-    function resetUserSearch() {
-        document.getElementById('userSearchInput').value = '';
-        renderUsers();
-    }
-
-    function renderUserTable(usersToRender) {
-        const tbody = document.getElementById('userTableBody');
-        tbody.innerHTML = '';
-
-        if (usersToRender.length === 0) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = '<td colspan="4" class="text-center">No users found</td>';
-            tbody.appendChild(tr);
-            return;
-        }
-
-        usersToRender.forEach(user => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${user.fullName || user.email}</td>
-                <td>${user.email}</td>
-                <td>
-                    <select class="form-select btn-role" data-id="${user.userId}">
-                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
-                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="btn btn-info btn-sm me-2" onclick="viewUser(${user.userId})">View</button>
-                    <button class="btn btn-delete btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        // Add event listeners for role change
-        document.querySelectorAll('.btn-role').forEach(select => {
-            select.addEventListener('change', function() {
-                const userId = parseInt(this.getAttribute('data-id'));
-                const newRole = this.value;
-                updateUserRole(userId, newRole);
-            });
-        });
+                // Use the standard event update endpoint
+                fetch(`${contextPath}/admin/events/${eventId}`, {
+                    method: 'PUT',
+                    body: formData,
+                    credentials: 'include'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(text || `Server error: ${response.status}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        notificationSystem.success(`Event ${action}d successfully!`);
+                        event.isActive = newStatus;
+                        renderEvents();
+                    })
+                    .catch(error => {
+                        console.error('Error updating event status:', error);
+                        notificationSystem.error(`Error updating event status: ${error.message}`);
+                    });
+            }
+        );
     }
 
     // Search and filter events
@@ -1096,6 +1100,136 @@
             window.location.href = 'login.html';
         });
     }
+
+    // Notification system for admin interface
+    const notificationSystem = {
+        // Container for toast notifications
+        toastContainer: null,
+
+        // Initialize the notification system
+        init: function() {
+            // Create toast container if it doesn't exist
+            if (!this.toastContainer) {
+                this.toastContainer = document.createElement('div');
+                this.toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                this.toastContainer.style.zIndex = "1070";
+                document.body.appendChild(this.toastContainer);
+            }
+        },
+
+        // Show a toast notification
+        toast: function(message, type = 'info', autoDismiss = true) {
+            this.init();
+
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' :
+                type === 'error' ? 'bg-danger' :
+                    type === 'warning' ? 'bg-warning' : 'bg-info';
+
+            const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center ${bgClass} text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+
+            this.toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, {
+                autohide: autoDismiss,
+                delay: 5000
+            });
+
+            toast.show();
+
+            // Remove from DOM after hiding
+            toastElement.addEventListener('hidden.bs.toast', function() {
+                toastElement.remove();
+            });
+
+            return toast;
+        },
+
+        // Show success notification
+        success: function(message) {
+            return this.toast(message, 'success');
+        },
+
+        // Show error notification
+        error: function(message) {
+            return this.toast(message, 'error');
+        },
+
+        // Show warning notification
+        warning: function(message) {
+            return this.toast(message, 'warning');
+        },
+
+        // Show confirmation dialog
+        confirm: function(title, message, confirmCallback, cancelCallback = null) {
+            // Create modal if it doesn't exist
+            let confirmModal = document.getElementById('confirmActionModal');
+
+            if (!confirmModal) {
+                const modalHtml = `
+                <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-labelledby="confirmActionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmActionModalLabel"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body"></div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="confirmActionButton">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                confirmModal = document.getElementById('confirmActionModal');
+            }
+
+            // Update modal content
+            const modalTitle = confirmModal.querySelector('.modal-title');
+            const modalBody = confirmModal.querySelector('.modal-body');
+            const confirmButton = confirmModal.querySelector('#confirmActionButton');
+
+            modalTitle.textContent = title;
+            modalBody.textContent = message;
+
+            // Create modal instance
+            const modal = new bootstrap.Modal(confirmModal);
+
+            // Set up confirm action
+            const handleConfirm = function() {
+                confirmCallback();
+                modal.hide();
+                confirmButton.removeEventListener('click', handleConfirm);
+            };
+
+            // Remove previous event listeners and add new one
+            confirmButton.removeEventListener('click', handleConfirm);
+            confirmButton.addEventListener('click', handleConfirm);
+
+            // Handle cancel if provided
+            if (cancelCallback) {
+                confirmModal.addEventListener('hidden.bs.modal', function onHidden() {
+                    cancelCallback();
+                    confirmModal.removeEventListener('hidden.bs.modal', onHidden);
+                });
+            }
+
+            modal.show();
+        }
+    };
 </script>
 <script src="js/session-manager.js"></script>
 </body>

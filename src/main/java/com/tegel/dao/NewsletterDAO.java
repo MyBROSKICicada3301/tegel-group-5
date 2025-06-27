@@ -14,6 +14,12 @@ import java.util.logging.Logger;
 public class NewsletterDAO {
     private static final Logger logger = Logger.getLogger(NewsletterDAO.class.getName());
 
+    // Add this method to NewsletterDAO.java
+    private String stripHtmlTags(String html) {
+        if (html == null) return null;
+        // Simple HTML tag removal - you might want to use a more robust solution
+        return html.replaceAll("<[^>]*>", "").trim();
+    }
     /**
      * Create a new newsletter.
      *
@@ -28,7 +34,8 @@ public class NewsletterDAO {
 
             // Set input parameters
             stmt.setString(1, newsletter.getTitle());
-            stmt.setString(2, newsletter.getContent());
+            // Strip HTML tags before storing
+            stmt.setString(2, stripHtmlTags(newsletter.getContent()));
             stmt.setInt(3, newsletter.getCreatedBy());
 
             // Register the OUT parameter for the generated ID

@@ -110,7 +110,7 @@ public class AdminServlet extends HttpServlet {
                 event.setMaxParticipants(0); // 0 = unlimited
             }
 
-            event.setImage(Integer.parseInt(image));
+            event.setImage(String.valueOf(Integer.parseInt(image)));
             event.setActive("true".equalsIgnoreCase(isActiveStr)|| "on".equals(isActiveStr));
 
             // set public visibility

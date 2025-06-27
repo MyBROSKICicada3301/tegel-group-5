@@ -22,6 +22,7 @@ public class Event {
     private boolean hasFoodOption;
     private double price;
     private boolean isPublic;
+    private String approvalStatus;
 
     // Constructors
     public Event() {
@@ -163,5 +164,12 @@ public class Event {
 
     public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }

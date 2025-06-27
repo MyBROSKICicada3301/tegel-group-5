@@ -803,7 +803,6 @@
         otherIndexLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
     }
 
-    // Keep event rendering functions
     function renderEvents() {
         const tbody = document.getElementById('eventTableBody');
         tbody.innerHTML = '';
@@ -811,8 +810,8 @@
         // Sort events by date (latest on top)
         const sortedEvents = [...events].sort((a, b) => {
             // Handle events without dates
-            if (!a.date) return 1;  // No date goes to the bottom
-            if (!b.date) return -1; // No date goes to the bottom
+            if (!a.date) return 1;
+            if (!b.date) return -1;
 
             // Sort in descending order (newest first)
             return new Date(b.date) - new Date(a.date);
@@ -821,27 +820,39 @@
         sortedEvents.forEach(event => {
             const tr = document.createElement('tr');
             const eventDate = event.date ? new Date(event.date).toLocaleDateString() : 'TBA';
-            const statusBadge = event.isActive ? 
-                '<span class="badge bg-success">Active</span>' : 
+            const statusBadge = event.isActive ?
+                '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
-                
+
+            // Add approval status badge if exists
+            let approvalBadge = '';
+            if (event.approvalStatus) {
+                approvalBadge = event.approvalStatus === 'PENDING' ?
+                    '<span class="badge bg-warning me-1">Pending</span>' :
+                    '<span class="badge bg-info me-1">Approved</span>';
+            }
+
             tr.innerHTML = `
-                <td>${event.title}</td>
-                <td>${eventDate}</td>
-                <td>${event.location || 'TBA'}</td>
-                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
-                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
-                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
-                            ${event.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
-                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
-                    </div>
-                </td>
-            `;
+            <td>${event.title}</td>
+            <td>${eventDate}</td>
+            <td>${event.location || 'TBA'}</td>
+            <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
+            <td>${approvalBadge} ${statusBadge}</td>
+            <td>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                    <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                    <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                        ${event.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    ${event.approvalStatus === 'PENDING' ?
+                `<button class="btn btn-success btn-sm me-1" onclick="approveEvent(${event.eventId})">
+                            <i class="bi bi-check-circle me-1"></i>Approve
+                        </button>` : ''}
+                    <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                </div>
+            </td>
+        `;
             tbody.appendChild(tr);
         });
     }
@@ -896,6 +907,36 @@
         document.getElementById('editEventDate').min = new Date().toISOString().split('T')[0];
 
         new bootstrap.Modal(document.getElementById('editEventModal')).show();
+    }
+
+    function approveEvent(eventId) {
+        notificationSystem.confirm(
+            "Approve Event",
+            "Are you sure you want to approve this event? It will become visible to members based on its public/private status.",
+            function() {
+                fetch(`/admin/events/approve/${eventId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => Promise.reject(err));
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        notificationSystem.success("Event approved successfully");
+                        // Refresh the events list to update UI
+                        fetchEvents();
+                    })
+                    .catch(error => {
+                        console.error('Error approving event:', error);
+                        notificationSystem.error(`Error approving event: ${error.message || 'Unknown error'}`);
+                    });
+            }
+        );
     }
 
     function updateEvent() {
@@ -1064,23 +1105,35 @@
                 '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
 
+            // Add approval status badge if exists
+            let approvalBadge = '';
+            if (event.approvalStatus) {
+                approvalBadge = event.approvalStatus === 'PENDING' ?
+                    '<span class="badge bg-warning me-1">Pending</span>' :
+                    '<span class="badge bg-info me-1">Approved</span>';
+            }
+
             tr.innerHTML = `
-                <td>${event.title}</td>
-                <td>${eventDate}</td>
-                <td>${event.location || 'TBA'}</td>
-                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
-                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
-                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
-                            ${event.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
-                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
-                    </div>
-                </td>
-            `;
+            <td>${event.title}</td>
+            <td>${eventDate}</td>
+            <td>${event.location || 'TBA'}</td>
+            <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
+            <td>${approvalBadge} ${statusBadge}</td>
+            <td>
+                <div class="btn-group" role="group">
+                    <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                    <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                    <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                        ${event.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    ${event.approvalStatus === 'PENDING' ?
+                `<button class="btn btn-success btn-sm me-1" onclick="approveEvent(${event.eventId})">
+                            <i class="bi bi-check-circle me-1"></i>Approve
+                        </button>` : ''}
+                    <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                </div>
+            </td>
+        `;
             tbody.appendChild(tr);
         });
     }

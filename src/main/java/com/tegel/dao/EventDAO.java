@@ -504,6 +504,7 @@ public class EventDAO {
             event.setPrice(rs.getDouble("price"));
             event.setHasFoodOption(rs.getBoolean("hasfoodoption"));
 
+
             // Set ispublic if it exists in the result set
             try {
                 event.setPublic(rs.getBoolean("ispublic"));
@@ -511,6 +512,18 @@ public class EventDAO {
                 // Column might not exist in some queries, set default value
                 event.setPublic(true);
                 logger.fine("ispublic column not found in result set");
+            }
+            try {
+                String approvalStatus = rs.getString("approvalstatus");
+                if (approvalStatus != null) {
+                    event.setApprovalStatus(approvalStatus);
+                } else {
+                    event.setApprovalStatus("APPROVED"); // Default for legacy events
+                }
+            } catch (SQLException e) {
+                // Column might not exist in some queries
+                event.setApprovalStatus("APPROVED"); // Default value
+                logger.fine("approvalstatus column not found in result set");
             }
 
             return event;
@@ -697,6 +710,35 @@ public class EventDAO {
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database error while de-enrolling user from event", e);
+            return false;
+        }
+    }
+    /**
+     * Updates the approval status of an event to APPROVED.
+     *
+     * @param eventId The ID of the event to approve
+     * @return true if the update was successful, false otherwise
+     */
+    public boolean approveEvent(int eventId) {
+        String sql = "UPDATE " + SCHEMA + ".event SET approvalstatus = ? WHERE event_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "APPROVED");
+            stmt.setInt(2, eventId);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                logger.info("Event approval status updated successfully: " + eventId);
+                return true;
+            } else {
+                logger.warning("No event found with ID: " + eventId);
+                return false;
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error updating event approval status", e);
             return false;
         }
     }

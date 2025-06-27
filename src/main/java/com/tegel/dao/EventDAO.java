@@ -223,8 +223,15 @@ public class EventDAO {
 
         String sql = "UPDATE " + SCHEMA +
                 ".event SET title = ?, description = ?, date = ?, location = ?, " +
+                "maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
+                ", ispublic = ? WHERE event_id = ?";
+
+        if (event.getImageId() != null) {
+            sql = "UPDATE " + SCHEMA +
+                ".event SET title = ?, description = ?, date = ?, location = ?, " +
                 "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
                 ", ispublic = ? WHERE event_id = ?";
+        }
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -238,14 +245,19 @@ public class EventDAO {
                 stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
                 stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setString(5, event.getImage() != null ?
-                        SecurityUtils.sanitizeInput(event.getImage()) : null);
-                stmt.setInt(6, event.getMaxParticipants());
-                stmt.setBoolean(7, event.isActive());
-                stmt.setDouble(8, event.getPrice());
-                stmt.setBoolean(9, event.isHasFoodOption());
-                stmt.setBoolean(10, event.isPublic());
-                stmt.setInt(11, event.getEventId());
+
+                int paramIndex = 5;
+                if (event.getImageId() != null) {
+                    // Set image ID as an integer
+                    stmt.setInt(paramIndex++, event.getImageId());
+                }
+
+                stmt.setInt(paramIndex++, event.getMaxParticipants());
+                stmt.setBoolean(paramIndex++, event.isActive());
+                stmt.setDouble(paramIndex++, event.getPrice());
+                stmt.setBoolean(paramIndex++, event.isHasFoodOption());
+                stmt.setBoolean(paramIndex++, event.isPublic());
+                stmt.setInt(paramIndex, event.getEventId());
 
                 int rowsAffected = stmt.executeUpdate();
 

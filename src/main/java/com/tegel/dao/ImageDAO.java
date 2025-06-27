@@ -172,10 +172,10 @@ public class ImageDAO {
             statement.setInt(1, eventId);
             statement.setInt(2, imageId);
 
-            int rowsUpdated = statement.executeUpdate();
-            return rowsUpdated > 0;
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Log the exception
             return false;
         }
     }

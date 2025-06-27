@@ -254,6 +254,47 @@ public class EventManagementServlet extends HttpServlet {
                 return;
             }
             
+            // Process the image upload first to get the image ID for the event update
+            Part imagePart = request.getPart("eventImage");
+            Integer newImageId = null;
+
+            // If an image was uploaded, save it first
+            if (imagePart != null && imagePart.getSize() > 0) {
+                try (InputStream fileContent = imagePart.getInputStream()) {
+                    String fileName = imagePart.getSubmittedFileName();
+                    String contentType = imagePart.getContentType();
+
+                    // Validate file is an image
+                    if (contentType == null || !contentType.startsWith("image/")) {
+                        logger.warning("Uploaded file is not an image: " + contentType);
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("{\"error\":\"Only image files are allowed\"}");
+                        return;
+                    }
+
+                    byte[] imageData = fileContent.readAllBytes();
+
+                    Image imageObj = new Image();
+                    imageObj.setName(fileName);
+                    imageObj.setContentType(contentType);
+                    imageObj.setData(imageData);
+
+                    // Save the image first to get its ID
+                    int imgId = imageDAO.saveImage(imageObj);
+
+                    if (imgId <= 0) {
+                        logger.warning("Failed to save image for event update");
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\":\"Failed to save event image\"}");
+                        return;
+                    }
+
+                    // Store the image ID as an Integer object
+                    newImageId = Integer.valueOf(imgId);
+                    logger.info("Successfully saved new event image with ID: " + newImageId);
+                }
+            }
+
             // Create updated event from request
             Event updatedEvent = createEventFromRequest(request);
             if (updatedEvent == null) {
@@ -262,6 +303,15 @@ public class EventManagementServlet extends HttpServlet {
                 return;
             }
             
+            // Set the new image ID if we have one, otherwise preserve the existing one
+            if (newImageId != null) {
+                updatedEvent.setImageId(newImageId);
+                logger.info("Setting updated event image ID to: " + newImageId);
+            } else {
+                // Preserve existing image ID if no new image was uploaded
+                updatedEvent.setImageId(existingEvent.getImageId());
+            }
+
             // Preserve original creation info
             updatedEvent.setEventId(eventId);
             updatedEvent.setCreatedBy(existingEvent.getCreatedBy());
@@ -269,6 +319,13 @@ public class EventManagementServlet extends HttpServlet {
             
             if (eventDAO.updateEvent(updatedEvent)) {
                 logger.info("Event updated successfully: " + eventId);
+
+                // If we have a new image ID, update the image record to associate it with the event
+                if (newImageId != null) {
+                    imageDAO.updateEventIdForImage(newImageId, eventId);
+                    logger.info("Updated image " + newImageId + " with event ID " + eventId);
+                }
+
                 response.getWriter().write(gson.toJson(updatedEvent));
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

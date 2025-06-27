@@ -84,23 +84,54 @@
 
         /* Footer styles */
         .footer {
-            background-color: #f8f9fa;
+            background-color: #343a40;
+            color: #ffffff;
             padding: 30px 0;
             margin-top: auto;
         }
 
-        .social-links a {
-            display: inline-block;
-            margin-right: 10px;
+        .footer .social-links a {
+            color: #ffc107;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .address-text {
-            color: #666;
+        .footer .social-links a:hover {
+            color: #ffeb3b;
+            transform: translateY(-2px);
+        }
+
+        .footer .address-text {
+            color: #adb5bd;
             font-size: 14px;
+            margin: 0;
         }
 
-        .footer-brand {
-            height: 40px;
+        .footer .footer-brand {
+            max-width: 90px;
+            height: auto;
+        }
+
+        /* Footer responsive adjustments */
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 0;
+                text-align: center;
+            }
+
+            .footer .social-links {
+                margin-bottom: 15px;
+            }
+
+            .footer .social-links a {
+                margin: 0 10px;
+            }
+
+            .footer .address-text {
+                margin-bottom: 15px;
+            }
         }
 
         /* Form styles */
@@ -169,26 +200,31 @@
     <script src="js/session-manager.js"></script>
 </head>
 <body>
-    <header>
-        <div class="nav-container">
-            <div class="logo">
-                <img src="images/TEGEL LOGO.png" alt="TEGEL Logo">
-            </div>
-            <nav id="navBar">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="events.html">Events</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="announcements.html">Announcements</a></li>
-                    <li><a href="newsletters.html" class="active">Newsletters</a></li>
-                    <li id="loginLink"><a href="login.html">Login</a></li>
-                    <li id="signupLink"><a href="signup.html">Sign Up</a></li>
-                    <li id="accountLink" style="display: none;"><a href="account.html">My Account</a></li>
-                    <li id="logoutLink" style="display: none;"><a href="#" onclick="logout()">Logout</a></li>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="newsletters.html" aria-current="page">Newsletters</a></li>
                 </ul>
-            </nav>
+                <div id="authButtons">
+                    <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
+                    <a href="login.html" class="btn btn-light">Login</a>
+                </div>
+            </div>
         </div>
-    </header>
+    </nav>
 
     <main class="container py-5">
         <h1 class="mb-4">TEGEL Newsletters</h1>
@@ -273,6 +309,17 @@
                     if (user.admin) {
                         document.getElementById('adminControls').style.display = 'block';
                     }
+
+                    // Update auth buttons
+                    document.getElementById('authButtons').innerHTML = `
+                        <a href="account.html" class="btn btn-light me-2">My Account</a>
+                        <a href="#" class="btn btn-light" id="signoutBtn">Sign Out</a>
+                    `;
+
+                    // Add sign out functionality
+                    document.getElementById('signoutBtn').addEventListener('click', function() {
+                        logout();
+                    });
                 }
             });
 

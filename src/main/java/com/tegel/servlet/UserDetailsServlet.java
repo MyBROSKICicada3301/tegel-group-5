@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.format.DateTimeFormatter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,18 +22,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Servlet to provide detailed user information for the account page
+ * Servlet to provide detailed user information for the account page.
  */
 @WebServlet("/user-details")
 public class UserDetailsServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(UserDetailsServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     // Configure Gson with adapters for proper date/time serialization
-    private Gson gson = new GsonBuilder()
-        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-        .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -67,7 +65,7 @@ public class UserDetailsServlet extends HttpServlet {
                 out.print("{\"error\": \"Not authenticated\"}");
                 logger.info("Unauthenticated user details request");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error retrieving user details", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\": \"Server error occurred\"}");

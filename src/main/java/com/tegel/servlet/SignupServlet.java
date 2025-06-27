@@ -4,7 +4,6 @@ import jakarta.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.tegel.dao.UserDAO;
@@ -17,12 +16,21 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet to handle user signup functionality.
+ * Validates user inputs, creates a new user, and saves it to the database.
+ */
 @MultipartConfig
 @WebServlet("/signup")
 public class SignupServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(SignupServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
+    /**
+     * Handles POST requests for user signup.
+     * Validates inputs, sanitizes data, checks for existing users,
+     * and creates a new user if all validations pass.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -143,7 +151,7 @@ public class SignupServlet extends HttpServlet {
             try {
                 hashedPassword = SecurityUtils.hashPassword(password);
                 System.out.println("✅ Password hashed");
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 System.out.println("❌ Password hashing failed");
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -151,7 +159,8 @@ public class SignupServlet extends HttpServlet {
                 return;
             }
 
-            User user = new User(email, hashedPassword, phone, dateOfBirth, dietary, fullName, nickname);
+            User user = new User(email, hashedPassword, phone, dateOfBirth, dietary, fullName,
+                                 nickname);
             System.out.println("✅ User object created");
 
             if (userDAO.createUser(user)) {
@@ -163,7 +172,9 @@ public class SignupServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Registration failed\"}");
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             System.out.println("❌ Unexpected error");
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -171,6 +182,16 @@ public class SignupServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Validates required fields for user signup.
+     *
+     * @param fullName the full name of the user
+     * @param email    the email address of the user
+     * @param password the password for the user
+     * @param dob      the date of birth of the user
+     * @param phone    the phone number of the user
+     * @return true if all required fields are valid, false otherwise
+     */
     private boolean isValidRequiredFields(String fullName, String email, String password,
                                           String dob, String phone) {
         return fullName != null && !fullName.trim().isEmpty() && email != null &&
@@ -178,6 +199,15 @@ public class SignupServlet extends HttpServlet {
                 dob != null && !dob.trim().isEmpty() && phone != null && !phone.trim().isEmpty();
     }
 
+    /**
+     * Handles GET requests for the signup page.
+     * Redirects to the signup HTML page.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if an error occurs during request processing
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

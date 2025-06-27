@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Tegel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Main body styling */
         body {
@@ -204,34 +207,7 @@
             box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
         }
 
-        .form-label {
-            font-weight: 500;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .form-text {
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
         /* Error and success messages */
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
@@ -255,18 +231,22 @@
 <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
     <div class="container">
         <a class="navbar-brand" href="index.html">
-            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
+            <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40"
+                 class="d-inline-block align-middle">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a>
+                </li>
                 <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcements</a>
+                </li>
             </ul>
             <div id="authButtons">
                 <a href="signup.html" class="btn btn-light me-2">Sign Up</a>
@@ -293,10 +273,14 @@
                 <div id="loginAlert"></div>
 
                 <form id="loginForm">
-                    <input id="email" name="email" class="form-control" type="email" placeholder="Email" required>
+                    <label for="email"></label><input id="email" name="email" class="form-control"
+                                                      type="email"
+                                                      placeholder="Email" required>
 
                     <div class="input-group mb-3">
-                        <input id="password" name="password" class="form-control" type="password" placeholder="Password" required>
+                        <label for="password"></label><input id="password" name="password"
+                                                             class="form-control" type="password"
+                                                             placeholder="Password" required>
                         <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
                             <i class="fas fa-eye-slash"></i>
                         </span>
@@ -337,7 +321,9 @@
                 </div>
             </div>
             <div class="col-md-4 text-center mb-3 mb-md-0">
-                <div class="address-text text-white"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                <div class="address-text text-white"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan
+                    5, 7522 NB Enschede
+                </div>
             </div>
             <div class="col-md-4 text-center text-md-end">
                 <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
@@ -351,7 +337,7 @@
 <script src="js/session-manager.js"></script>
 <script>
     // Check for error parameters in URL and display appropriate message
-    window.onload = function() {
+    window.onload = function () {
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
 
@@ -390,7 +376,7 @@
     }
 
     // Form submission handler
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
         // Show loading state
@@ -413,27 +399,27 @@
             method: 'POST',
             body: formData
         })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else {
-                // Client-side validation - the server should handle most cases
-                console.error('Login failed: Server returned non-redirect response');
-                showAlert('Login failed. Please try again.', 'danger');
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    // Client-side validation - the server should handle most cases
+                    console.error('Login failed: Server returned non-redirect response');
+                    showAlert('Login failed. Please try again.', 'danger');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Login failed. Please check your connection and try again.', 'danger');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('Login failed. Please check your connection and try again.', 'danger');
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        });
+            });
     });
 
     // Password toggle functionality
-    document.getElementById('togglePassword').addEventListener('click', function() {
+    document.getElementById('togglePassword').addEventListener('click', function () {
         const passwordInput = document.getElementById('password');
         const icon = this.querySelector('i');
 

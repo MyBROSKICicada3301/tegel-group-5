@@ -4,7 +4,6 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.tegel.dao.UserDAO;
@@ -17,12 +16,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Servlet to handle admin functionalities such as user management and event creation.
+ */
 @WebServlet("/admin/*")
 public class AdminServlet extends HttpServlet {
 
 
-    private UserDAO userDAO = new UserDAO();
-    private Gson gson = new Gson();
+    private final UserDAO userDAO = new UserDAO();
+    private final Gson gson = new Gson();
     private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
 
     @Override
@@ -66,6 +68,13 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles event creation by an admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     private void handleEventCreation(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
@@ -111,10 +120,10 @@ public class AdminServlet extends HttpServlet {
             }
 
             event.setImage(String.valueOf(Integer.parseInt(image)));
-            event.setActive("true".equalsIgnoreCase(isActiveStr)|| "on".equals(isActiveStr));
+            event.setActive("true".equalsIgnoreCase(isActiveStr) || "on".equals(isActiveStr));
 
             // set public visibility
-            event.setPublic("true".equalsIgnoreCase(isPublicStr)|| "on".equals(isPublicStr));
+            event.setPublic("true".equalsIgnoreCase(isPublicStr) || "on".equals(isPublicStr));
 
             // set price, default to 0
             if (priceStr != null && !priceStr.trim().isEmpty()) {
@@ -129,7 +138,8 @@ public class AdminServlet extends HttpServlet {
             }
             logger.info("hasFoodOptionStr received: " + hasFoodOptionStr);
             logger.info("hasFoodOption value calculated: " + "on".equals(hasFoodOptionStr));
-            event.setHasFoodOption("true".equalsIgnoreCase(hasFoodOptionStr) || "on".equals(hasFoodOptionStr));
+            event.setHasFoodOption(
+                    "true".equalsIgnoreCase(hasFoodOptionStr) || "on".equals(hasFoodOptionStr));
             logger.info("Event hasFoodOption after setting: " + event.isHasFoodOption());
 
             event.setCreatedBy((Integer) session.getAttribute("userId"));
@@ -144,6 +154,8 @@ public class AdminServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Failed to create event\"}");
             }
 
+        } catch (NumberFormatException | IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.severe("Error creating event: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -151,6 +163,13 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles role update for a user by an admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     private void handleRoleUpdate(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
@@ -161,21 +180,37 @@ public class AdminServlet extends HttpServlet {
         response.getWriter().write("{\"success\":" + success + "}");
     }
 
+    /**
+     * Handles getting all users for admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     private void handleGetAllUsers(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
             List<User> users = userDAO.getAllUsers();
             response.getWriter().write(gson.toJson(users));
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.severe("Error getting users: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error\"}");
         }
     }
 
+    /**
+     * Handles user deletion by an admin.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");

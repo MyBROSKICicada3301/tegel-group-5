@@ -1,5 +1,6 @@
 package com.tegel.servlet;
 
+import com.google.gson.JsonSyntaxException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,14 +20,18 @@ import com.tegel.model.User;
 import com.tegel.util.SecurityUtils;
 
 /**
- * Servlet to handle password changes
+ * Servlet to handle password changes.
  */
 @WebServlet("/change-password")
 public class ChangePasswordServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(ChangePasswordServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
-    private Gson gson = new Gson();
+    private final UserDAO userDAO = new UserDAO();
+    private final Gson gson = new Gson();
 
+    /**
+     * Handles POST requests to change the user's password.
+     * Expects current and new passwords in the request body as JSON.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -74,12 +79,14 @@ public class ChangePasswordServlet extends HttpServlet {
 
             // Validate new password
             if (newPassword.length() < 8) {
-                out.print("{\"success\": false, \"message\": \"New password must be at least 8 characters long\"}");
+                out.print(
+                        "{\"success\": false, \"message\": \"New password must be at least 8 characters long\"}");
                 return;
             }
 
             if (!newPassword.matches(".*[A-Za-z].*") || !newPassword.matches(".*[0-9].*")) {
-                out.print("{\"success\": false, \"message\": \"New password must include at least one letter and one number\"}");
+                out.print(
+                        "{\"success\": false, \"message\": \"New password must include at least one letter and one number\"}");
                 return;
             }
 
@@ -99,6 +106,8 @@ public class ChangePasswordServlet extends HttpServlet {
                 logger.warning("Password change failed for user ID: " + userId);
             }
 
+        } catch (JsonSyntaxException | IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error changing password", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

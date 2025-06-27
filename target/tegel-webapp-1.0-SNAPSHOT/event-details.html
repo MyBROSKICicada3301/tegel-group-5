@@ -277,44 +277,42 @@
 
 
             <div class="card-body">
-                <div class="row event-info mb-4">
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="info-section p-3 border rounded bg-light">
-                            <div class="info-label text-muted mb-1"><i
-                                    class="bi bi-calendar-event text-orange me-2"></i>Date
-                            </div>
-                            <div class="info-value fw-bold event-date"></div>
+                <div class="d-flex flex-wrap justify-content-between mb-4">
+                    <div class="info-box p-3 border rounded bg-light m-2" style="flex: 1; min-width: 180px;">
+                        <div class="info-label text-muted mb-1">
+                            <i class="bi bi-calendar-event text-orange me-2"></i>Date
+                        </div>
+                        <div class="info-value fw-bold event-date"></div>
+                    </div>
+
+                    <div class="info-box p-3 border rounded bg-light m-2" style="flex: 1; min-width: 180px;">
+                        <div class="info-label text-muted mb-1">
+                            <i class="bi bi-geo-alt text-orange me-2"></i>Location
+                        </div>
+                        <div class="info-value fw-bold event-location"></div>
+                    </div>
+
+                    <div class="info-box p-3 border rounded bg-light m-2" style="flex: 1; min-width: 180px;">
+                        <div class="info-label text-muted mb-1">
+                            <i class="bi bi-people text-orange me-2"></i>Participants
+                        </div>
+                        <div class="info-value fw-bold">
+                            <span class="current-participants"></span> / <span class="max-participants"></span>
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="info-section p-3 border rounded bg-light">
-                            <div class="info-label text-muted mb-1"><i
-                                    class="bi bi-clock text-orange me-2"></i>Time
-                            </div>
-                            <div class="info-value fw-bold event-duration"></div>
+                    <div class="info-box p-3 border rounded bg-light m-2" style="flex: 1; min-width: 180px;">
+                        <div class="info-label text-muted mb-1">
+                            <i class="bi bi-currency-euro text-orange me-2"></i>Price
                         </div>
+                        <div class="info-value fw-bold" id="event-price">Free</div>
                     </div>
 
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="info-section p-3 border rounded bg-light">
-                            <div class="info-label text-muted mb-1"><i
-                                    class="bi bi-geo-alt text-orange me-2"></i>Location
-                            </div>
-                            <div class="info-value fw-bold event-location"></div>
+                    <div class="info-box p-3 border rounded bg-light m-2" style="flex: 1; min-width: 180px;">
+                        <div class="info-label text-muted mb-1">
+                            <i class="bi bi-cup-hot text-orange me-2"></i>Food
                         </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="info-section p-3 border rounded bg-light">
-                            <div class="info-label text-muted mb-1"><i
-                                    class="bi bi-people text-orange me-2"></i>Participants
-                            </div>
-                            <div class="info-value fw-bold">
-                                <span class="current-participants"></span> / <span
-                                    class="max-participants"></span>
-                            </div>
-                        </div>
+                        <div class="info-value fw-bold" id="event-food">Not provided</div>
                     </div>
                 </div>
 
@@ -327,8 +325,7 @@
                 <div class="enrollment-section text-center p-4 bg-light rounded border">
                     <h2 class="enrollment-title h3 mb-3">Ready to Join?</h2>
                     <p class="enrollment-info lead mb-4"></p>
-                    <button type="button" class="btn btn-orange btn-lg px-4 py-2"
-                            data-bs-toggle="modal" data-bs-target="#enrollmentModal">
+                    <button type="button" class="btn btn-orange btn-lg px-4 py-2" id="enrollButton">
                         <i class="bi bi-person-plus me-2"></i> Enroll Now
                     </button>
                 </div>
@@ -372,7 +369,7 @@
                         <div class="mb-3">
                             <label for="specialRequests" class="form-label">
                                 <i class="bi bi-chat-left-text text-orange me-2"></i> Special Notes
-                                or Requests
+                                or Requests <span class="text-muted">(optional)</span>
                             </label>
                             <textarea class="form-control" id="specialRequests" rows="3"
                                       placeholder="Any special requests or notes for the organizers?"></textarea>
@@ -584,37 +581,20 @@
                 content.querySelector('.current-participants').textContent = currentParticipants;
                 content.querySelector('.max-participants').textContent = maxParticipants > 0 ? maxParticipants : 'Unlimited';
 
-                if (event.duration) {
-                    content.querySelector('.event-duration').textContent = event.duration;
-                } else {
-                    content.querySelector('.event-duration').textContent = 'Time not specified';
+                // Set price and food information
+                const priceElement = content.querySelector('#event-price');
+                if (priceElement) {
+                    priceElement.textContent = priceDisplay;
+                }
+
+                const foodElement = content.querySelector('#event-food');
+                if (foodElement) {
+                    foodElement.textContent = foodOptionDisplay;
                 }
 
                 // Set description with fallback
                 content.querySelector('.event-description').textContent = event.description || 'No description available for this event.';
 
-                // Add price info to event info section
-                const eventInfoDiv = content.querySelector('.event-info');
-                const priceSection = document.createElement('div');
-                priceSection.className = 'col-md-6 col-lg-3 mb-3';
-                priceSection.innerHTML = `
-                    <div class="info-section p-3 border rounded bg-light">
-                        <div class="info-label text-muted mb-1"><i class="bi bi-currency-euro me-2"></i>Price</div>
-                        <div class="info-value fw-bold">${priceDisplay}</div>
-                    </div>
-                `;
-                eventInfoDiv.appendChild(priceSection);
-
-                // Add food option info to event info section
-                const foodSection = document.createElement('div');
-                foodSection.className = 'col-md-6 col-lg-3 mb-3';
-                foodSection.innerHTML = `
-                    <div class="info-section p-3 border rounded bg-light">
-                        <div class="info-label text-muted mb-1"><i class="bi bi-cup-hot me-2"></i>Food</div>
-                        <div class="info-value fw-bold">${foodOptionDisplay}</div>
-                    </div>
-                `;
-                eventInfoDiv.appendChild(foodSection);
 
                 // Set enrollment section based on status
                 const enrollmentSection = content.querySelector('.enrollment-section');
@@ -622,41 +602,86 @@
                 const enrollmentInfo = enrollmentSection.querySelector('.enrollment-info');
                 const enrollButton = enrollmentSection.querySelector('button');
 
-                enrollmentTitle.textContent = isEnrolled ? 'Already Enrolled' : 'Ready to Join?';
-                enrollmentInfo.textContent = isEnrolled ? 'You are currently enrolled in this event' : enrollmentText;
+                // First check if user is logged in
+                fetch('/tegel_webapp/check-session', {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(sessionData => {
+                    if (!sessionData.loggedIn) {
+                        // User is not logged in - show login message
+                        enrollmentTitle.textContent = 'Want to Join?';
+                        enrollmentInfo.textContent = 'Please log in to enroll in this event.';
+                        enrollButton.outerHTML = `
+                            <a href="login.html?redirect=event-details.html?eventId=${event.eventId}" class="btn btn-orange btn-lg px-4 py-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Log In to Enroll
+                            </a>
+                            <a href="events.html" class="btn btn-outline-orange btn-lg px-4 py-2 ms-2">
+                                <i class="bi bi-calendar-event me-2"></i> Browse Other Events
+                            </a>
+                        `;
+                    } else if (isEnrolled) {
+                        // User is enrolled - show de-enroll button
+                        enrollmentTitle.textContent = 'Already Enrolled';
+                        enrollmentInfo.textContent = 'You are currently enrolled in this event';
+                        enrollButton.outerHTML = `
+                            <button class="btn btn-danger btn-lg px-4 py-2" onclick="deEnrollFromEvent(${event.eventId})">
+                                <i class="bi bi-person-dash me-2"></i> De-enroll from Event
+                            </button>
+                            <a href="events.html" class="btn btn-outline-orange btn-lg px-4 py-2 ms-2">
+                                <i class="bi bi-calendar-event me-2"></i> Browse Other Events
+                            </a>
+                        `;
+                    } else if (enrollmentStatus === 'full') {
+                        // Event is full
+                        enrollmentTitle.textContent = 'Event Full';
+                        enrollmentInfo.textContent = 'This event has reached its capacity.';
+                        enrollButton.outerHTML = `
+                            <button class="btn btn-secondary btn-lg px-4 py-2" disabled>
+                                <i class="bi bi-x-circle me-2"></i> Event Full
+                            </button>
+                            <a href="events.html" class="btn btn-outline-orange btn-lg px-4 py-2 ms-2">
+                                <i class="bi bi-calendar-event me-2"></i> Browse Other Events
+                            </a>
+                        `;
+                    } else {
+                        // User is logged in and event is available - keep the enrollment button
+                        enrollmentTitle.textContent = 'Ready to Join?';
+                        enrollmentInfo.textContent = 'Spots are still available for this event.';
+                        enrollButton.innerHTML = '<i class="bi bi-person-plus me-2"></i> Enroll Now';
 
-                // Replace the enrollment button based on status
-                if (isEnrolled) {
-                    // User is enrolled - show de-enroll button
+                        // Add event listener to the enroll button with proper event ID
+                        enrollButton.addEventListener('click', function() {
+                            directEnrollInEvent(event.eventId);
+                        });
+
+                        const browseButton = document.createElement('a');
+                        browseButton.href = 'events.html';
+                        browseButton.className = 'btn btn-outline-orange btn-lg px-4 py-2 ms-2';
+                        browseButton.innerHTML = '<i class="bi bi-calendar-event me-2"></i> Browse Other Events';
+
+                        // Make sure we don't append too many buttons if this code runs multiple times
+                        const existingBrowseButton = enrollmentSection.querySelector('a.btn-outline-orange');
+                        if (!existingBrowseButton) {
+                            enrollmentSection.appendChild(browseButton);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking login status:", error);
+                    // If there's an error checking login status, default to requiring login
+                    enrollmentTitle.textContent = 'Want to Join?';
+                    enrollmentInfo.textContent = 'Please log in to enroll in this event.';
                     enrollButton.outerHTML = `
-                        <button class="btn btn-danger btn-lg px-4 py-2" onclick="deEnrollFromEvent(${event.eventId})">
-                            <i class="bi bi-person-dash me-2"></i> De-enroll from Event
-                        </button>
+                        <a href="login.html?redirect=event-details.html?eventId=${event.eventId}" class="btn btn-orange btn-lg px-4 py-2">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Log In to Enroll
+                        </a>
                         <a href="events.html" class="btn btn-outline-orange btn-lg px-4 py-2 ms-2">
                             <i class="bi bi-calendar-event me-2"></i> Browse Other Events
                         </a>
                     `;
-                } else if (enrollmentStatus === 'full') {
-                    // Event is full
-                    enrollButton.outerHTML = `
-                        <button class="btn btn-secondary btn-lg px-4 py-2" disabled>
-                            <i class="bi bi-x-circle me-2"></i> Event Full
-                        </button>
-                        <a href="events.html" class="btn btn-outline-orange btn-lg px-4 py-2 ms-2">
-                            <i class="bi bi-calendar-event me-2"></i> Browse Other Events
-                        </a>
-                    `;
-                } else {
-                    // Event is available - keep the original button and add browse button
-                    enrollButton.innerHTML = '<i class="bi bi-person-plus me-2"></i> Enroll Now';
-
-                    const browseButton = document.createElement('a');
-                    browseButton.href = 'events.html';
-                    browseButton.className = 'btn btn-outline-orange btn-lg px-4 py-2 ms-2';
-                    browseButton.innerHTML = '<i class="bi bi-calendar-event me-2"></i> Browse Other Events';
-
-                    enrollmentSection.appendChild(browseButton);
-                }
+                });
 
                 // Clear the content div and append the template content
                 eventContentDiv.innerHTML = '';
@@ -1075,12 +1100,90 @@
         const payload = {
             eventId: parseInt(eventId, 10),
             userId: parseInt(userId, 10),
-            wantsFoodOption: wantsFoodOption,
-            dietaryRestrictions: dietaryRestrictions,
-            specialRequests: specialRequests
+            wantsFoodOption: wantsFoodOption
         };
 
+        // Only add dietary restrictions if food option is checked
+        if (wantsFoodOption && dietaryRestrictions) {
+            payload.dietaryRestrictions = dietaryRestrictions;
+        }
+
+        // Add special requests only if provided (it's optional)
+        if (specialRequests) {
+            payload.specialRequests = specialRequests;
+        }
+
         console.log("Sending enrollment request with payload:", payload);
+
+        // Show loading state
+        const confirmButton = document.getElementById('confirmEnrollment');
+        const originalButtonText = confirmButton.innerHTML;
+        confirmButton.disabled = true;
+        confirmButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enrolling...';
+
+        // Send enrollment request to server
+        fetch('/tegel_webapp/events/enroll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server returned status ' + response.status);
+                }
+                return response.json();
+            })
+            .then((responseData) => {
+                if (responseData.success) {
+                    // Close the modal
+                    bootstrap.Modal.getInstance(document.getElementById('enrollmentModal')).hide();
+
+                    // Show success message
+                    alert('Successfully enrolled in the event!');
+
+                    // Refresh the page to show updated enrollment status
+                    window.location.reload();
+                } else {
+                    // Reset button state
+                    confirmButton.disabled = false;
+                    confirmButton.innerHTML = originalButtonText;
+
+                    // Show error message
+                    alert(responseData.message || 'Failed to enroll in the event');
+                }
+            })
+            .catch(error => {
+                console.error("Error during enrollment:", error);
+
+                // Reset button state
+                confirmButton.disabled = false;
+                confirmButton.innerHTML = originalButtonText;
+
+                alert('An error occurred during enrollment. Please try again.');
+            });
+    }
+
+    function directEnrollInEvent(eventId) {
+        console.log("Directly enrolling in event ID:", eventId);
+
+        // Get user ID from localStorage
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert('You must be logged in to enroll in events');
+            return;
+        }
+
+        // Create payload for enrollment
+        const payload = {
+            eventId: parseInt(eventId, 10),
+            userId: parseInt(userId, 10)
+        };
+
+        console.log("Sending direct enrollment request with payload:", payload);
 
         // Send enrollment request to server
         fetch('/tegel_webapp/events/enroll', {
@@ -1092,20 +1195,18 @@
             credentials: 'include'
         })
             .then(response => response.json())
-            .then((responseData) => {
+            .then(responseData => {
+                console.log("Direct enrollment response:", responseData);
                 if (responseData.success) {
-                    // Close the modal
-                    bootstrap.Modal.getInstance(document.getElementById('enrollmentModal')).hide();
-
-                    // Refresh the page to show updated enrollment status
-                    window.location.reload();
+                    alert('Successfully enrolled in the event!');
+                    loadEventDetails(); // Reload to update participant count
                 } else {
-                    alert(responseData.message || 'Failed to enroll in the event');
+                    alert(responseData.message || 'Failed to enroll in the event.');
                 }
             })
             .catch(error => {
-                console.error("Error during enrollment:", error);
-                alert('An error occurred during enrollment. Please try again.');
+                console.error("Error during direct enrollment:", error);
+                alert('An error occurred while enrolling. Please try again later.');
             });
     }
 

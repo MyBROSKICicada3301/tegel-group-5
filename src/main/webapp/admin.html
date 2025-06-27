@@ -128,6 +128,13 @@
                 font-size: 14px;
             }
         }
+
+        .event-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -803,6 +810,7 @@
         otherIndexLinks.forEach(link => link.setAttribute('href', 'adminindex.html'));
     }
 
+    // Keep event rendering functions
     function renderEvents() {
         const tbody = document.getElementById('eventTableBody');
         tbody.innerHTML = '';
@@ -810,8 +818,8 @@
         // Sort events by date (latest on top)
         const sortedEvents = [...events].sort((a, b) => {
             // Handle events without dates
-            if (!a.date) return 1;
-            if (!b.date) return -1;
+            if (!a.date) return 1;  // No date goes to the bottom
+            if (!b.date) return -1; // No date goes to the bottom
 
             // Sort in descending order (newest first)
             return new Date(b.date) - new Date(a.date);
@@ -830,6 +838,16 @@
                 approvalBadge = event.approvalStatus === 'PENDING' ?
                     '<span class="badge bg-warning me-1">Pending</span>' :
                     '<span class="badge bg-info me-1">Approved</span>';
+            }
+
+
+            // Determine image source and create image HTML if available
+            let imageHtml = '';
+            if (event.imageId) {
+                imageHtml = `<img src="${contextPath}/images/${event.imageId}" alt="Event thumbnail" class="event-thumbnail">`;
+            } else if (event.image && !isNaN(parseInt(event.image))) {
+                // For legacy format where image might be stored as a string ID
+                imageHtml = `<img src="${contextPath}/images/${event.image}" alt="Event thumbnail" class="event-thumbnail">`;
             }
 
             tr.innerHTML = `
@@ -853,6 +871,27 @@
                 </div>
             </td>
         `;
+                <td>
+                    <div class="d-flex align-items-center">
+                        ${imageHtml ? `<div class="me-2">${imageHtml}</div>` : ''}
+                        <div>${event.title}</div>
+                    </div>
+                </td>
+                <td>${eventDate}</td>
+                <td>${event.location || 'TBA'}</td>
+                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                            ${event.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                    </div>
+                </td>
+            `;
             tbody.appendChild(tr);
         });
     }

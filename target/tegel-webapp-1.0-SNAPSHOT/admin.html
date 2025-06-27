@@ -128,6 +128,13 @@
                 font-size: 14px;
             }
         }
+
+        .event-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -825,8 +832,22 @@
                 '<span class="badge bg-success">Active</span>' : 
                 '<span class="badge bg-secondary">Inactive</span>';
                 
+            // Determine image source and create image HTML if available
+            let imageHtml = '';
+            if (event.imageId) {
+                imageHtml = `<img src="${contextPath}/images/${event.imageId}" alt="Event thumbnail" class="event-thumbnail">`;
+            } else if (event.image && !isNaN(parseInt(event.image))) {
+                // For legacy format where image might be stored as a string ID
+                imageHtml = `<img src="${contextPath}/images/${event.image}" alt="Event thumbnail" class="event-thumbnail">`;
+            }
+
             tr.innerHTML = `
-                <td>${event.title}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        ${imageHtml ? `<div class="me-2">${imageHtml}</div>` : ''}
+                        <div>${event.title}</div>
+                    </div>
+                </td>
                 <td>${eventDate}</td>
                 <td>${event.location || 'TBA'}</td>
                 <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>

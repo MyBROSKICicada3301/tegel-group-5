@@ -266,7 +266,8 @@
                 .then(data => {
                     console.log("Session data:", data);
                     if (data.loggedIn) {
-                        currentUserId = data.userId;
+                        // Make sure currentUserId is set correctly
+                        currentUserId = parseInt(data.userId);
                         isAdmin = data.role === 'admin';
                         console.log(`User is logged in, userId: ${currentUserId}, isAdmin: ${isAdmin}`);
                         updateAuthUI(data);
@@ -293,7 +294,7 @@
                 logout();
             });
 
-            // If admin, show additional controls and update navigation
+            // If admin, update navigation for admin users
             if (isAdmin) {
                 document.getElementById('createAnnouncementBtn').classList.remove('d-none');
 
@@ -305,6 +306,10 @@
                     <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletters</a></li>
                     <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
                 `;
+            }
+            // For members, show the create announcement button but keep regular navigation
+            else if (userData.role === 'member') {
+                document.getElementById('createAnnouncementBtn').classList.remove('d-none');
             }
         }
 
@@ -390,23 +395,20 @@
                     });
                 }
 
-                // Create the card content
+                // Create the card content with author placeholder
                 card.innerHTML = `
                     <div class="announcement-header">
                         <div class="announcement-title">${announcement.title}</div>
-                        ${!announcement.public ? '<span class="badge bg-warning text-dark">Private</span>' : ''}
                     </div>
                     <div class="announcement-meta">
                         <div class="announcement-date">${formattedDate}</div>
-                        <div class="announcement-author" data-user-id="${announcement.postedBy}">
-                            Posted by: User #${announcement.postedBy}
-                        </div>
+                        <div class="announcement-author">${currentUserId ? 'Posted by: User' : ''}</div>
                     </div>
                     <div class="announcement-content">${announcement.content}</div>
                 `;
 
-                // Add admin controls if user is admin
-                if (isAdmin) {
+                // Add controls for admins or for members who own the announcement
+                if (isAdmin || (currentUserId && announcement.postedBy === currentUserId)) {
                     const controls = document.createElement('div');
                     controls.className = 'admin-controls';
                     controls.innerHTML = `
@@ -419,7 +421,7 @@
                     `;
                     card.appendChild(controls);
 
-                    // Add event listeners for admin controls
+                    // Add event listeners for controls
                     controls.querySelector('.edit-btn').addEventListener('click', () => {
                         showEditAnnouncementModal(announcement);
                     });
@@ -432,27 +434,38 @@
 
                 container.appendChild(card);
 
-                // Fetch user details for "Posted by"
-                fetchUserDetails(announcement.postedBy, card.querySelector('.announcement-author'));
+                // Only fetch user details if the user is logged in
+                if (currentUserId) {
+                    fetchUserDetails(announcement.postedBy, card.querySelector('.announcement-author'));
+                }
             });
         }
 
         // Fetch user details to show poster's name
         function fetchUserDetails(userId, element) {
-            fetch(`/userdetails?id=${userId}`, { credentials: 'include' })
+            // Use the correct endpoint path for the UserInfoServlet
+            fetch(contextPath + `/userdetails?id=${userId}`, { credentials: 'include' })
                 .then(response => {
+                    console.log(`User details response for ID ${userId}:`, response.status);
                     if (!response.ok) {
-                        return null;
+                        throw new Error(`Error fetching user details: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(user => {
-                    if (user && user.firstName && user.lastName) {
-                        element.textContent = `Posted by: ${user.firstName} ${user.lastName}`;
+                    console.log(`User details received for ID ${userId}:`, user);
+                    if (user && user.fullName) {
+                        // Display the user's full name from the database
+                        element.textContent = `Posted by: ${user.fullName}`;
+                    } else {
+                        // Fallback only if user data cannot be retrieved
+                        element.textContent = `Posted by: Unknown User`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching user details:', error);
+                    console.error(`Error fetching user details for ID ${userId}:`, error);
+                    // Fallback in case of error
+                    element.textContent = `Posted by: Unknown User`;
                 });
         }
 
@@ -473,7 +486,8 @@
                 </div>
             `;
 
-            let url = `/announcement`;
+            // Build the URL with the correct context path
+            let url = contextPath + '/announcement';
 
             if (searchTerm) {
                 url += `?search=${encodeURIComponent(searchTerm)}`;
@@ -484,14 +498,18 @@
                 return;
             }
 
+            console.log("Searching announcements with URL:", url);
+
             fetch(url, { credentials: 'include' })
                 .then(response => {
+                    console.log("Search response status:", response.status);
                     if (!response.ok) {
                         throw new Error(`Server error: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(announcements => {
+                    console.log(`Found ${announcements.length} matching announcements`);
                     displayAnnouncements(announcements);
                 })
                 .catch(error => {
@@ -499,6 +517,7 @@
                     container.innerHTML = `
                         <div class="alert alert-danger">
                             Failed to search announcements. Please try again later.
+                            <br>Error details: ${error.message}
                         </div>
                     `;
                 });
@@ -528,11 +547,17 @@
 
         // Show the modal for editing an existing announcement
         function showEditAnnouncementModal(announcement) {
+            console.log("Editing announcement:", announcement); // Add debug info
+
             // Set form fields
             document.getElementById('announcementId').value = announcement.announcementId;
             document.getElementById('announcementTitle').value = announcement.title;
             document.getElementById('announcementContent').value = announcement.content;
-            document.getElementById('announcementIsPublic').checked = announcement.public;
+
+            // Use the correct property - could be public or isPublic depending on how backend serializes it
+            document.getElementById('announcementIsPublic').checked = announcement.isPublic !== undefined ?
+                announcement.isPublic : announcement.public;
+
             document.getElementById('modalErrorMsg').textContent = '';
 
             // Update modal title
@@ -560,13 +585,14 @@
                 return;
             }
 
+            // Make sure we send isPublic as a property (backend expects this)
             const announcement = {
                 title: title,
                 content: content,
-                public: isPublic
+                isPublic: isPublic // Changed from 'public' to 'isPublic' to match the Java model
             };
 
-            let url = `/announcement`;
+            let url = `${contextPath}/announcement`;
             let method = 'POST';
 
             // If ID exists, we're updating an existing announcement
@@ -574,6 +600,8 @@
                 announcement.announcementId = parseInt(id);
                 method = 'PUT';
             }
+
+            console.log("Saving announcement with data:", announcement); // Debug info
 
             fetch(url, {
                 method: method,
@@ -625,7 +653,7 @@
         function deleteAnnouncement() {
             if (!announcementToDelete) return;
 
-            fetch(`/announcement?id=${announcementToDelete}`, {
+            fetch(`${contextPath}/announcement?id=${announcementToDelete}`, {
                 method: 'DELETE',
                 credentials: 'include'
             })

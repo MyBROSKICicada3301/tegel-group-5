@@ -131,45 +131,8 @@
 </main>
 
 <script>
-    // Dummy events for testing
-    const dummyEvents = [
-        {
-            eventId: 1,
-            id: 1,
-            title: "Group Game",
-            description: "Join us for an exciting evening of team-building games and friendly competition. We'll have board games, video games, and interactive group activities that will bring everyone together for a fun-filled experience.",
-            date: "2025-01-15",
-            location: "Tegel Community Center",
-            maxParticipants: 25,
-            currentParticipants: 8,
-            duration: "18:00 - 22:00"
-        },
-        {
-            eventId: 2,
-            id: 2,
-            title: "Outdoor Trek",
-            description: "Experience the beautiful nature around Enschede with a guided hiking adventure. We'll explore scenic trails, enjoy fresh air, and capture amazing photos while building lasting memories with fellow Tegel members.",
-            date: "2025-01-22",
-            location: "Lonnekerberg Trail, Enschede",
-            maxParticipants: 15,
-            currentParticipants: 12,
-            duration: "09:00 - 16:00"
-        },
-        {
-            eventId: 3,
-            id: 3,
-            title: "Module Ending Party",
-            description: "Celebrate the successful completion of another academic module with an unforgettable party! Dancing, great food, drinks, and the perfect opportunity to unwind and socialize with friends after all the hard work.",
-            date: "2025-02-05",
-            location: "Inter-Actief Main Hall",
-            maxParticipants: 50,
-            currentParticipants: 23,
-            duration: "20:00 - 02:00"
-        }
-    ];
-
     function loadEvents() {
-        console.log('Loading events...');
+        console.log('Loading events from server...');
         fetch('/tegel_webapp/events')
             .then(response => {
                 console.log('Response status:', response.status);
@@ -188,17 +151,24 @@
                     displayEvents(events);
                 } catch (e) {
                     console.error('JSON parse error:', e);
-                    displayEvents(dummyEvents);
+                    console.log('Showing empty events list due to error');
+                    displayEvents([]);  // Display empty array instead of dummy events
                 }
             })
             .catch(error => {
-                console.error('Error loading events from server, using dummy data:', error);
-                // Use dummy data as fallback
-                displayEvents(dummyEvents);
+                console.error('Error loading events from server:', error);
+                // Show empty state instead of dummy data
+                console.log('Showing empty events list due to server error');
+                displayEvents([]);
             });
     }
 
+    // Store the current events that are displayed
+    let currentEvents = [];
+
+    // Update displayEvents to store the events in currentEvents
     function displayEvents(events) {
+        currentEvents = events; // Store the events for search functionality
         const container = document.getElementById('eventsContainer');
         container.innerHTML = '';
 
@@ -267,18 +237,31 @@
 
     function searchEvents() {
         const query = document.getElementById('eventSearchInput').value.toLowerCase();
-        const filteredEvents = dummyEvents.filter(event => {
+        if (!query) {
+            // If search is empty, reload all events
+            loadEvents();
+            return;
+        }
+
+        const filteredEvents = currentEvents.filter(event => {
             return event.title.toLowerCase().includes(query) ||
-                   event.location.toLowerCase().includes(query) ||
+                   (event.location && event.location.toLowerCase().includes(query)) ||
                    (event.description && event.description.toLowerCase().includes(query));
         });
-        displayEvents(filteredEvents);
-    }
 
+        if (filteredEvents.length === 0) {
+            // No matching events found
+            const container = document.getElementById('eventsContainer');
+            container.innerHTML = '<div class="col-12"><p class="text-center">Event not found⚠️!</p></div>';
+        } else {
+            displayEvents(filteredEvents);
+        }
+    }
 
     function resetEventSearch() {
         document.getElementById('eventSearchInput').value = '';
-        displayEvents(dummyEvents);
+        // Reload all events from server
+        loadEvents();
     }
 
     function createEvent(event) {

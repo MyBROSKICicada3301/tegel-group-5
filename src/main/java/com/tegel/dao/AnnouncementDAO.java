@@ -16,12 +16,14 @@ public class AnnouncementDAO {
     private static final Logger logger = Logger.getLogger(AnnouncementDAO.class.getName());
 
     /**
-     * Get all public announcements (for non-authenticated users)
-     * @return List of public announcements ordered by latest first
+     * Get all public announcements ordered by latest first.
+     *
+     * @return List of public announcements
      */
     public List<Announcement> getPublicAnnouncements() {
         List<Announcement> announcements = new ArrayList<>();
-        String sql = "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE ORDER BY postedat DESC";
+        String sql =
+                "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE ORDER BY postedat DESC";
 
         logger.info("AnnouncementDAO.getPublicAnnouncements() - START");
         logger.info("SQL: " + sql);
@@ -40,8 +42,9 @@ public class AnnouncementDAO {
                         count++;
                         Announcement announcement = mapResultSetToAnnouncement(rs);
                         announcements.add(announcement);
-                        logger.info("Processed announcement: ID=" + announcement.getAnnouncementId() +
-                                   ", Title=" + announcement.getTitle());
+                        logger.info(
+                                "Processed announcement: ID=" + announcement.getAnnouncementId() +
+                                        ", Title=" + announcement.getTitle());
                     }
 
                     logger.info("Total announcements found: " + count);
@@ -54,12 +57,14 @@ public class AnnouncementDAO {
             logger.log(Level.SEVERE, "Database error in getPublicAnnouncements", e);
         }
 
-        logger.info("AnnouncementDAO.getPublicAnnouncements() - END - returning " + announcements.size() + " announcements");
+        logger.info("AnnouncementDAO.getPublicAnnouncements() - END - returning " +
+                            announcements.size() + " announcements");
         return announcements;
     }
 
     /**
-     * Get all announcements (both public and private) for authenticated users
+     * Get all announcements (both public and private) for authenticated users.
+     *
      * @return List of all announcements ordered by latest first
      */
     public List<Announcement> getAllAnnouncements() {
@@ -83,8 +88,9 @@ public class AnnouncementDAO {
                         count++;
                         Announcement announcement = mapResultSetToAnnouncement(rs);
                         announcements.add(announcement);
-                        logger.info("Processed announcement: ID=" + announcement.getAnnouncementId() +
-                                   ", Title=" + announcement.getTitle());
+                        logger.info(
+                                "Processed announcement: ID=" + announcement.getAnnouncementId() +
+                                        ", Title=" + announcement.getTitle());
                     }
 
                     logger.info("Total announcements found: " + count);
@@ -97,12 +103,15 @@ public class AnnouncementDAO {
             logger.log(Level.SEVERE, "Database error in getAllAnnouncements", e);
         }
 
-        logger.info("AnnouncementDAO.getAllAnnouncements() - END - returning " + announcements.size() + " announcements");
+        logger.info(
+                "AnnouncementDAO.getAllAnnouncements() - END - returning " + announcements.size() +
+                        " announcements");
         return announcements;
     }
 
     /**
-     * Get a specific announcement by ID
+     * Get a specific announcement by ID.
+     *
      * @param announcementId the ID of the announcement to retrieve
      * @return the announcement, or null if not found
      */
@@ -128,12 +137,14 @@ public class AnnouncementDAO {
     }
 
     /**
-     * Create a new announcement
+     * Create a new announcement.
+     *
      * @param announcement the announcement to create
      * @return true if successful, false otherwise
      */
     public boolean createAnnouncement(Announcement announcement) {
-        String sql = "INSERT INTO mod4db.announcement (title, content, postedby, ispublic) VALUES (?, ?, ?, ?)";
+        String sql =
+                "INSERT INTO mod4db.announcement (title, content, postedby, ispublic) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -153,12 +164,14 @@ public class AnnouncementDAO {
     }
 
     /**
-     * Update an existing announcement
+     * Update an existing announcement.
+     *
      * @param announcement the announcement with updated data
      * @return true if successful, false otherwise
      */
     public boolean updateAnnouncement(Announcement announcement) {
-        String sql = "UPDATE mod4db.announcement SET title = ?, content = ?, ispublic = ? WHERE announcement_id = ?";
+        String sql =
+                "UPDATE mod4db.announcement SET title = ?, content = ?, ispublic = ? WHERE announcement_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -172,13 +185,16 @@ public class AnnouncementDAO {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error updating announcement with ID " + announcement.getAnnouncementId(), e);
+            logger.log(Level.SEVERE,
+                       "Error updating announcement with ID " + announcement.getAnnouncementId(),
+                       e);
             return false;
         }
     }
 
     /**
-     * Delete an announcement by ID
+     * Delete an announcement by ID.
+     *
      * @param announcementId the ID of the announcement to delete
      * @return true if successful, false otherwise
      */
@@ -200,8 +216,9 @@ public class AnnouncementDAO {
     }
 
     /**
-     * Search announcements by keyword in title or content
-     * @param keyword the search term
+     * Search announcements by keyword in title or content.
+     *
+     * @param keyword           the search term
      * @param authenticatedUser whether the user is authenticated
      * @return list of matching announcements
      */
@@ -211,10 +228,12 @@ public class AnnouncementDAO {
 
         if (authenticatedUser) {
             // Authenticated users can search all announcements
-            sql = "SELECT * FROM mod4db.announcement WHERE title LIKE ? OR content LIKE ? ORDER BY postedat DESC";
+            sql =
+                    "SELECT * FROM mod4db.announcement WHERE title LIKE ? OR content LIKE ? ORDER BY postedat DESC";
         } else {
             // Non-authenticated users can only search public announcements
-            sql = "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE AND (title LIKE ? OR content LIKE ?) ORDER BY postedat DESC";
+            sql =
+                    "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE AND (title LIKE ? OR content LIKE ?) ORDER BY postedat DESC";
         }
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -230,7 +249,8 @@ public class AnnouncementDAO {
                 }
             }
 
-            logger.info("Found " + announcements.size() + " announcements matching search: " + keyword);
+            logger.info(
+                    "Found " + announcements.size() + " announcements matching search: " + keyword);
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error searching announcements for: " + keyword, e);
         }
@@ -239,21 +259,25 @@ public class AnnouncementDAO {
     }
 
     /**
-     * Search announcements by date
-     * @param date the date to search for
+     * Search announcements by date.
+     *
+     * @param date              the date to search for
      * @param authenticatedUser whether the user is authenticated
      * @return list of matching announcements
      */
-    public List<Announcement> searchAnnouncementsByDate(LocalDateTime date, boolean authenticatedUser) {
+    public List<Announcement> searchAnnouncementsByDate(LocalDateTime date,
+                                                        boolean authenticatedUser) {
         List<Announcement> announcements = new ArrayList<>();
         String sql;
 
         if (authenticatedUser) {
             // Authenticated users can search all announcements
-            sql = "SELECT * FROM mod4db.announcement WHERE DATE(postedat) = DATE(?) ORDER BY postedat DESC";
+            sql =
+                    "SELECT * FROM mod4db.announcement WHERE DATE(postedat) = DATE(?) ORDER BY postedat DESC";
         } else {
             // Non-authenticated users can only search public announcements
-            sql = "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE AND DATE(postedat) = DATE(?) ORDER BY postedat DESC";
+            sql =
+                    "SELECT * FROM mod4db.announcement WHERE ispublic = TRUE AND DATE(postedat) = DATE(?) ORDER BY postedat DESC";
         }
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -267,16 +291,19 @@ public class AnnouncementDAO {
                 }
             }
 
-            logger.info("Found " + announcements.size() + " announcements on date: " + date.toLocalDate());
+            logger.info("Found " + announcements.size() + " announcements on date: " +
+                                date.toLocalDate());
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error searching announcements by date: " + date.toLocalDate(), e);
+            logger.log(Level.SEVERE, "Error searching announcements by date: " + date.toLocalDate(),
+                       e);
         }
 
         return announcements;
     }
 
     /**
-     * Helper method to map a ResultSet row to an Announcement object
+     * Helper method to map a ResultSet row to an Announcement object.
+     *
      * @param rs the ResultSet positioned at the current row
      * @return a new Announcement object with data from the ResultSet
      * @throws SQLException if a database error occurs

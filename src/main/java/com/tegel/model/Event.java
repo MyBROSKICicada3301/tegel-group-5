@@ -9,7 +9,7 @@ public class Event {
     private String description;
     private LocalDate date;
     private String location;
-    private String image;
+    private int image;
     private int maxParticipants;
     private int currentParticipants;
     private int createdBy;
@@ -23,7 +23,7 @@ public class Event {
     public Event() {}
     
     public Event(String title, String description, LocalDate date, String location, 
-                 String image, int maxParticipants, int createdBy, boolean isActive,
+                 int image, int maxParticipants, int createdBy, boolean isActive,
                  boolean hasFoodOption, double price, boolean isPublic) {
         this.title = title;
         this.description = description;
@@ -55,8 +55,8 @@ public class Event {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
     
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    public int getImage() { return image; }
+    public void setImage(int image) { this.image = image; }
     
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }

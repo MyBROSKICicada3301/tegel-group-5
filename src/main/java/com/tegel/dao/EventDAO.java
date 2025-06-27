@@ -18,33 +18,36 @@ import com.tegel.util.SecurityUtils;
 
 import static com.tegel.dao.DatabaseManager.getConnection;
 
+/**
+ * EventDAO is responsible for managing event-related database operations.
+ * It provides methods to create, read, update, and delete events,
+ * as well as manage user enrollments in events.
+ */
 public class EventDAO {
     public static final Logger logger = Logger.getLogger(EventDAO.class.getName());
-    private static final String SCHEMA = "mod4db";
+    private static final String SCHEMA = "mod4db"; // name of the database schema
 
+    /**
+     * Creates a new event in the database.
+     *
+     * @param event The Event object containing event details
+     * @return true if the event was created successfully, false otherwise
+     */
     public boolean createEvent(Event event) {
         // Input validation before database operation
         if (event == null) {
             logger.warning("Attempted to create null event");
             return false;
         }
-        System.out.println("event food: " + event.isHasFoodOption());
-        System.out.println("event publicity: " + event.isPublic());
-        System.out.println("event active: " + event.isActive());
 
         // Validate required fields and format
         if (!isValidEventData(event)) {
             logger.warning("Invalid event data provided for creation");
             return false;
         }
+        // build SQL query for inserting a new event
+        String sql = "CALL " + SCHEMA + ".create_event(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String sql =
-                "INSERT INTO " + SCHEMA + ".event (title, description, date, location, image, " +
-                        "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        // Debug the hasFoodOption value before SQL execution
-        logger.info("Setting hasFoodOption to: " + event.isHasFoodOption());
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -59,8 +62,7 @@ public class EventDAO {
                 stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
                 stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setString(5, event.getImage() != null ?
-                        SecurityUtils.sanitizeInput(event.getImage()) : null);
+                stmt.setInt(5, event.getImage());
                 stmt.setInt(6, event.getMaxParticipants());
                 stmt.setInt(7, event.getCreatedBy());
                 stmt.setBoolean(8, event.isActive());
@@ -118,13 +120,18 @@ public class EventDAO {
         }
     }
 
+    /**
+     * Retrieves all active events from the database.
+     *
+     * @return a list of active Event objects
+     */
     public List<Event> getAllActiveEvents() {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " +
-                "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
+        // SQL query to get all active events with participant count
+        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " + "FROM " + SCHEMA +
+                ".event e LEFT JOIN " + SCHEMA +
+                ".eventregistration er ON e.event_id = er.event_id " +
                 "WHERE e.isactive = true GROUP BY e.event_id ORDER BY e.date";
-
-        logger.info("EventDAO: Executing SQL to get active events: " + sql);
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -141,7 +148,9 @@ public class EventDAO {
                     events.add(event);
                     logger.info("EventDAO: Mapped event: " + event.getEventId() + " - " +
                                         event.getTitle());
-                } catch (Exception e) {
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (RuntimeException e) {
                     logger.log(Level.SEVERE, "EventDAO: Error mapping event from ResultSet", e);
                 }
             }
@@ -156,6 +165,11 @@ public class EventDAO {
         return events;
     }
 
+    /**
+     * Retrieves all events from the database, ordered by date.
+     *
+     * @return a list of all Event objects
+     */
     public List<Event> getAllEvents() {
         List<Event> events = new ArrayList<>();
         String sql = "SELECT * FROM " + SCHEMA + ".event ORDER BY date";
@@ -176,13 +190,19 @@ public class EventDAO {
         return events;
     }
 
+    /**
+     * Retrieves an event by its ID, including the current participant count.
+     *
+     * @param eventId The ID of the event to retrieve
+     * @return the Event object if found, null otherwise
+     */
     public Event getEventById(int eventId) {
         // Validate event ID
         if (!SecurityUtils.isValidUserId(eventId)) { // Reusing validation for positive integers
             logger.warning("Invalid eventId provided: " + eventId);
             return null;
         }
-
+        // build SQL query
         String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " + "FROM " + SCHEMA +
                 ".event e LEFT JOIN " + SCHEMA +
                 ".eventregistration er ON e.event_id = er.event_id " +
@@ -204,6 +224,12 @@ public class EventDAO {
         return null;
     }
 
+    /**
+     * Updates an existing event in the database.
+     *
+     * @param event The Event object containing updated event details
+     * @return true if the event was updated successfully, false otherwise
+     */
     public boolean updateEvent(Event event) {
         // Input validation
         if (event == null || !SecurityUtils.isValidUserId(event.getEventId())) {
@@ -216,10 +242,8 @@ public class EventDAO {
             return false;
         }
 
-        String sql = "UPDATE " + SCHEMA +
-                ".event SET title = ?, description = ?, date = ?, location = ?, " +
-                "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
-                ", ispublic = ? WHERE event_id = ?";
+        String sql = "CALL " + SCHEMA + ".update_event(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false); // Start transaction
@@ -233,8 +257,7 @@ public class EventDAO {
                 stmt.setDate(3, event.getDate() != null ? Date.valueOf(event.getDate()) : null);
                 stmt.setString(4, event.getLocation() != null ?
                         SecurityUtils.sanitizeInput(event.getLocation()) : null);
-                stmt.setString(5, event.getImage() != null ?
-                        SecurityUtils.sanitizeInput(event.getImage()) : null);
+                stmt.setInt(5, event.getImage());
                 stmt.setInt(6, event.getMaxParticipants());
                 stmt.setBoolean(7, event.isActive());
                 stmt.setDouble(8, event.getPrice());
@@ -268,6 +291,12 @@ public class EventDAO {
         }
     }
 
+    /**
+     * Deletes an event from the database by its ID.
+     *
+     * @param eventId The ID of the event to delete
+     * @return true if the event was deleted successfully, false otherwise
+     */
     public boolean deleteEvent(int eventId) {
         // Validate event ID
         if (!SecurityUtils.isValidUserId(eventId)) {
@@ -306,35 +335,11 @@ public class EventDAO {
         }
     }
 
-    public List<Event> getEventsByCreator(int creatorId) {
-        // Validate creator ID
-        if (!SecurityUtils.isValidUserId(creatorId)) {
-            logger.warning("Invalid creatorId provided: " + creatorId);
-            return new ArrayList<>();
-        }
-
-        List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM " + SCHEMA + ".event WHERE createdby = ? ORDER BY date DESC";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, creatorId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                events.add(mapResultSetToEvent(rs));
-            }
-
-            logger.info("Retrieved " + events.size() + " events for creator: " + creatorId);
-
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database error retrieving events by creator", e);
-        }
-
-        return events;
-    }
-
+    /**
+     * Retrieves all upcoming events that are active and not in the past.
+     *
+     * @return a list of upcoming Event objects
+     */
     public List<Event> getUpcomingEvents() {
         List<Event> events = new ArrayList<>();
         String sql =
@@ -360,6 +365,12 @@ public class EventDAO {
         return events;
     }
 
+    /**
+     * Gets the count of participants enrolled in a specific event.
+     *
+     * @param eventId The ID of the event
+     * @return the number of participants, or -1 if an error occurs
+     */
     public int getEventParticipantCount(int eventId) {
         // Validate event ID
         if (!SecurityUtils.isValidUserId(eventId)) {
@@ -388,6 +399,12 @@ public class EventDAO {
         return -1;
     }
 
+    /**
+     * Checks if the provided event data is valid.
+     *
+     * @param event The Event object to validate
+     * @return true if the event data is valid, false otherwise
+     */
     private boolean isValidEventData(Event event) {
         // Validate required fields
         if (event.getTitle() == null || event.getTitle().trim().isEmpty()) {
@@ -434,6 +451,13 @@ public class EventDAO {
         return true;
     }
 
+    /**
+     * Maps a ResultSet row to an Event object.
+     *
+     * @param rs The ResultSet containing event data
+     * @return the Event object mapped from the ResultSet
+     * @throws SQLException if an error occurs while mapping
+     */
     private Event mapResultSetToEvent(ResultSet rs) throws SQLException {
         try {
             Event event = new Event();
@@ -447,7 +471,7 @@ public class EventDAO {
             }
 
             event.setLocation(rs.getString("location"));
-            event.setImage(rs.getString("image"));
+            event.setImage(rs.getInt("image"));
             event.setMaxParticipants(rs.getInt("maxparticipants"));
             event.setCreatedBy(rs.getInt("createdby"));
 
@@ -461,93 +485,16 @@ public class EventDAO {
             event.setHasFoodOption(rs.getBoolean("hasfoodoption"));
 
             return event;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error mapping ResultSet to Event", e);
             throw new SQLException("Error mapping event data", e);
         }
     }
 
-    public boolean enrollUserInEvent(int userId, int eventId) {
-        // Validate input IDs
-        if (!SecurityUtils.isValidUserId(userId) || !SecurityUtils.isValidUserId(eventId)) {
-            logger.warning("Invalid user ID or event ID for enrollment");
-            return false;
-        }
-
-        // First check if the event exists and has available slots
-        Event event = getEventById(eventId);
-        if (event == null) {
-            logger.warning("Cannot enroll: Event with ID " + eventId + " not found");
-            return false;
-        }
-
-        // Check if event is active
-        if (!event.isActive()) {
-            logger.warning("Cannot enroll: Event with ID " + eventId + " is not active");
-            return false;
-        }
-
-        // Check if event is full
-        if (event.getMaxParticipants() > 0 &&
-                event.getCurrentParticipants() >= event.getMaxParticipants()) {
-            logger.warning("Cannot enroll: Event with ID " + eventId + " is full");
-            return false;
-        }
-
-        // Check if user is already enrolled
-        String checkSql =
-                "SELECT * FROM " + SCHEMA + ".eventregistration WHERE user_id = ? AND event_id = ?";
-
-        try (Connection conn = getConnection()) {
-            conn.setAutoCommit(false); // Start transaction
-
-            // Check for existing enrollment
-            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
-                checkStmt.setInt(1, userId);
-                checkStmt.setInt(2, eventId);
-
-                ResultSet rs = checkStmt.executeQuery();
-                if (rs.next()) {
-                    // User is already enrolled
-                    conn.rollback();
-                    logger.info("User " + userId + " is already enrolled in event " + eventId);
-                    return false;
-                }
-
-                // Insert new enrollment
-                String insertSql = "INSERT INTO " + SCHEMA +
-                        ".eventregistration (user_id, event_id, status) VALUES (?, ?, ?)";
-
-                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
-                    insertStmt.setInt(1, userId);
-                    insertStmt.setInt(2, eventId);
-                    insertStmt.setString(3, "confirmed");
-
-                    int rowsInserted = insertStmt.executeUpdate();
-
-                    if (rowsInserted > 0) {
-                        conn.commit();
-                        logger.info(
-                                "Successfully enrolled user " + userId + " in event " + eventId);
-                        return true;
-                    } else {
-                        conn.rollback();
-                        logger.warning("Failed to enroll user in event");
-                        return false;
-                    }
-                }
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database error while enrolling user in event", e);
-            return false;
-        }
-    }
-
     /**
-     * Get all events a user has enrolled in
+     * Get all events a user has enrolled in.
      *
      * @param userId The ID of the user
      * @return A list of events the user has enrolled in
@@ -585,7 +532,7 @@ public class EventDAO {
     }
 
     /**
-     * De-enroll a user from an event
+     * De-enroll a user from an event.
      *
      * @param userId  The ID of the user
      * @param eventId The ID of the event
@@ -648,6 +595,17 @@ public class EventDAO {
         }
     }
 
+    /**
+     * Enroll a user in an event with additional details.
+     *
+     * @param userId              The ID of the user
+     * @param eventId             The ID of the event
+     * @param dietaryRestrictions Dietary restrictions of the user
+     * @param status              Status of the enrollment (e.g., "confirmed")
+     * @param specialNotes        Special notes or requests
+     * @param wantsFoodOption     Whether the user wants a food option
+     * @return true if enrollment was successful, false otherwise
+     */
     public boolean enrollUserInEventWithDetails(int userId, int eventId, String dietaryRestrictions,
                                                 String status, String specialNotes,
                                                 boolean wantsFoodOption) {

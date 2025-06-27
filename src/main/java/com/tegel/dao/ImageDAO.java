@@ -5,10 +5,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-// handles database action related to images
+/**
+ * ImageDAO is responsible for interacting with the database to perform CRUD operations on images.
+ * It provides methods to save an image, retrieve an image by its ID, and get metadata of all images
+ */
 public class ImageDAO {
 
     /**
@@ -45,8 +46,8 @@ public class ImageDAO {
     public Image getImageById(int id) {
         String sql = "SELECT * FROM images WHERE id = ?";
 
-        try (Connection conncetion = DatabaseManager.getConnection();
-             PreparedStatement statement = conncetion.prepareStatement(sql)) {
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -65,31 +66,5 @@ public class ImageDAO {
         }
 
         return null; // Return null if no image found with the given ID
-    }
-
-    // retrieves a list of all the images metadata from the database (everything except the image)
-    public List<Image> getImageMetadata() {
-        String sql = "SELECT id, name, content_type, upload_date FROM images";
-        List<Image> images = new ArrayList<>();
-
-        try (Connection connection = DatabaseManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Image image = new Image();
-                image.setId(resultSet.getInt("id"));
-                image.setName(resultSet.getString("name"));
-                image.setContentType(resultSet.getString("content_type"));
-                image.setTimestamp(resultSet.getTimestamp("upload_date"));
-
-
-                images.add(image);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return images;
     }
 }

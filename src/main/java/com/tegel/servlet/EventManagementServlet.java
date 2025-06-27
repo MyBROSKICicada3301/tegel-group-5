@@ -280,6 +280,7 @@ public class EventManagementServlet extends HttpServlet {
             String isActiveStr = request.getParameter("isActive");
             String priceStr = request.getParameter("price");
             String hasFoodOptionStr = request.getParameter("hasFoodOption");
+            String isPublicStr = request.getParameter("isPublic");
 
             // parse the price
             double price = 0.0;
@@ -299,6 +300,12 @@ public class EventManagementServlet extends HttpServlet {
             boolean hasFoodOption = false; // Default to false
             if (hasFoodOptionStr != null) {
                 hasFoodOption = Boolean.parseBoolean(hasFoodOptionStr);
+            }
+
+            // parse the isPublic
+            boolean isPublic = false; // Default to false
+            if (isPublicStr != null) {
+                isPublic = Boolean.parseBoolean(isPublicStr);
             }
 
             

@@ -171,15 +171,17 @@
         const hasFoodOption = document.getElementById('hasFoodOption').checked;
         const isActive = document.getElementById('isActive').checked;
         const isPublic = document.getElementById('isPublic').checked;
-        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
-        formData.set('isActive', isActive ? 'on' : 'off');
-        formData.set('isPublic', isPublic ? 'on' : 'off');
+        formData.set('hasFoodOption', hasFoodOption ? 'true' : 'false');
+        formData.set('isActive', isActive ? 'true' : 'false');
+        formData.set('isPublic', isPublic ? 'true' : 'false');
 
         // Debug logs
         console.log('Food option checked:', hasFoodOption);
         console.log('Food option value in form:', formData.get('hasFoodOption'));
         console.log('Is public:', isPublic);
         console.log('Is public value in form:', formData.get('isPublic'));
+        console.log('Is active:', isActive);
+        console.log('Is active value in form:', formData.get('isActive'));
 
 
         // Validate required fields
@@ -203,7 +205,7 @@
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating...';
-
+        console.log(formData);
 
         fetch('/tegel_webapp/admin/events', {
             method: 'POST',

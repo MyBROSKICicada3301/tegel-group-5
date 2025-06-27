@@ -29,6 +29,8 @@ public class EventDAO {
             return false;
         }
         System.out.println("event food: " + event.isHasFoodOption());
+        System.out.println("event publicity: " + event.isPublic());
+        System.out.println("event active: " + event.isActive());
 
         // Validate required fields and format
         if (!isValidEventData(event)) {
@@ -238,7 +240,7 @@ public class EventDAO {
                 stmt.setDouble(8, event.getPrice());
                 stmt.setBoolean(9, event.isHasFoodOption());
                 stmt.setBoolean(10, event.isPublic());
-                stmt.setInt(10, event.getEventId());
+                stmt.setInt(11, event.getEventId());
 
                 int rowsAffected = stmt.executeUpdate();
 

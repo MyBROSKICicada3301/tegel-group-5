@@ -1,8 +1,10 @@
 package com.tegel.servlet;
 
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.tegel.dao.UserDAO;
@@ -14,7 +16,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/admin/*")
 public class AdminServlet extends HttpServlet {
+
+
     private UserDAO userDAO = new UserDAO();
     private Gson gson = new Gson();
     private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
@@ -44,12 +50,13 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
+        System.out.println("doPost called in /admin");
         String pathInfo = request.getPathInfo();
-        
+
         if (pathInfo != null && pathInfo.equals("/events")) {
             handleEventCreation(request, response);
         } else if (pathInfo != null && pathInfo.equals("/updateRole")) {
@@ -59,7 +66,7 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-    private void handleEventCreation(HttpServletRequest request, HttpServletResponse response) 
+    private void handleEventCreation(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
             // Check if user is admin
@@ -69,7 +76,7 @@ public class AdminServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Admin access required\"}");
                 return;
             }
-            
+
             String title = request.getParameter("title");
             String description = request.getParameter("description");
             String dateStr = request.getParameter("date");
@@ -80,33 +87,34 @@ public class AdminServlet extends HttpServlet {
             String priceStr = request.getParameter("price");
             String hasFoodOptionStr = request.getParameter("hasFoodOption");
             String isPublicStr = request.getParameter("isPublic");
-            
+
+            logger.info("Received parameters: isActive=" + isActiveStr + ", price=" + priceStr +
+                                ", hasFoodOption=" + hasFoodOptionStr + ", isPublic=" +
+                                isPublicStr);
             // Validate required fields
             if (title == null || title.trim().isEmpty() || dateStr == null) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Missing required fields\"}");
                 return;
             }
-            
+
             Event event = new Event();
             event.setTitle(title.trim());
             event.setDescription(description != null ? description.trim() : "");
             event.setDate(java.time.LocalDate.parse(dateStr));
             event.setLocation(location != null ? location.trim() : "");
-            
+
             if (maxParticipantsStr != null && !maxParticipantsStr.trim().isEmpty()) {
                 event.setMaxParticipants(Integer.parseInt(maxParticipantsStr));
             } else {
                 event.setMaxParticipants(0); // 0 = unlimited
             }
-            
+
             event.setImage(image != null ? image.trim() : "");
-            event.setActive("on".equals(isActiveStr));
+            event.setActive("true".equalsIgnoreCase(isActiveStr)|| "on".equals(isActiveStr));
 
             // set public visibility
-            event.setPublic("on".equals(isPublicStr));
-            logger.info("isPublicStr received: " + isPublicStr);
-            logger.info("isPublic value set: " + event.isPublic());
+            event.setPublic("true".equalsIgnoreCase(isPublicStr)|| "on".equals(isPublicStr));
 
             // set price, default to 0
             if (priceStr != null && !priceStr.trim().isEmpty()) {
@@ -121,20 +129,21 @@ public class AdminServlet extends HttpServlet {
             }
             logger.info("hasFoodOptionStr received: " + hasFoodOptionStr);
             logger.info("hasFoodOption value calculated: " + "on".equals(hasFoodOptionStr));
-            event.setHasFoodOption("on".equals(hasFoodOptionStr));
+            event.setHasFoodOption("true".equalsIgnoreCase(hasFoodOptionStr) || "on".equals(hasFoodOptionStr));
             logger.info("Event hasFoodOption after setting: " + event.isHasFoodOption());
 
             event.setCreatedBy((Integer) session.getAttribute("userId"));
-            
+
             com.tegel.dao.EventDAO eventDAO = new com.tegel.dao.EventDAO();
             boolean success = eventDAO.createEvent(event);
-            
+
             if (success) {
-                response.getWriter().write("{\"eventId\":" + event.getEventId() + ",\"success\":true}");
+                response.getWriter()
+                        .write("{\"eventId\":" + event.getEventId() + ",\"success\":true}");
             } else {
                 response.getWriter().write("{\"error\":\"Failed to create event\"}");
             }
-            
+
         } catch (Exception e) {
             logger.severe("Error creating event: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -152,7 +161,7 @@ public class AdminServlet extends HttpServlet {
         response.getWriter().write("{\"success\":" + success + "}");
     }
 
-    private void handleGetAllUsers(HttpServletRequest request, HttpServletResponse response) 
+    private void handleGetAllUsers(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
             List<User> users = userDAO.getAllUsers();

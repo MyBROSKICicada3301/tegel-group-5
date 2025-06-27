@@ -280,7 +280,10 @@
         document.getElementById('eventSearchInput').value = '';
         displayEvents(dummyEvents);
     }
-    function createEvent() {
+
+    function createEvent(event) {
+        event.preventDefault(); // Prevent default form submission
+
         const form = document.getElementById('adminEventCreateForm');
         const formData = new FormData(form);
 
@@ -289,9 +292,9 @@
         const isActive = document.getElementById('isActive').checked;
         const isPublic = document.getElementById('isPublic').checked;
 
-        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
-        formData.set('isActive', isActive ? 'on' : 'off');
-        formData.set('isPublic', isPublic ? 'on' : 'off');
+        formData.set('hasFoodOption', hasFoodOption ? 'true' : 'false');
+        formData.set('isActive', isActive ? 'true' : 'false');
+        formData.set('isPublic', isPublic ? 'true' : 'false');
 
         // Validate required fields
         if (!formData.get('title') || !formData.get('date')) {
@@ -352,7 +355,7 @@
         // Handle event creation form submission via the submit button in modal
         document.getElementById('submitEventBtn').addEventListener('click', function(e) {
            e.preventDefault()
-            createEvent();
+            createEvent(e);
         });
 
             // Insert at the top of the main content

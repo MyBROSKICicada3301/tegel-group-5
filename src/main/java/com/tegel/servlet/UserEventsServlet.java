@@ -23,18 +23,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Servlet to provide a list of events the user has enrolled in
+ * Servlet to provide a list of events the user has enrolled in.
  */
 @WebServlet("/user-events")
 public class UserEventsServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(UserEventsServlet.class.getName());
-    private EventDAO eventDAO = new EventDAO();
+    private final EventDAO eventDAO = new EventDAO();
 
     // Configure Gson with adapters for proper date/time serialization
-    private Gson gson = new GsonBuilder()
-        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-        .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -54,13 +53,14 @@ public class UserEventsServlet extends HttpServlet {
 
                 // Send response with events
                 out.print("{\"events\":" + gson.toJson(enrolledEvents) + "}");
-                logger.info("Sent " + enrolledEvents.size() + " enrolled events for user ID: " + userId);
+                logger.info("Sent " + enrolledEvents.size() + " enrolled events for user ID: " +
+                                    userId);
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 out.print("{\"error\": \"Not authenticated\"}");
                 logger.info("Unauthenticated user events request");
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error retrieving user events", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\": \"Server error occurred\"}");

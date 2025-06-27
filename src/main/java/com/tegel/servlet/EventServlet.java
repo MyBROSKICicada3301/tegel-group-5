@@ -1,7 +1,6 @@
 package com.tegel.servlet;
 
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -10,9 +9,7 @@ import java.util.logging.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tegel.dao.EventDAO;
-import com.tegel.dao.ImageDAO;
 import com.tegel.model.Event;
-import com.tegel.model.Image;
 import com.tegel.util.LocalDateAdapter;
 import com.tegel.util.LocalDateTimeAdapter;
 
@@ -24,29 +21,30 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Servlet to handle event-related operations such as fetching events and their details.
+ */
 @MultipartConfig
 @WebServlet("/events/*")
 public class EventServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventServlet.class.getName());
-    private EventDAO eventDAO = new EventDAO();
-    private ImageDAO imageDAO = new ImageDAO();  // Added ImageDAO
+    private final EventDAO eventDAO = new EventDAO();
 
     // Configure Gson with adapters for proper date/time serialization
-    private Gson gson = new GsonBuilder()
-        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-        .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+        request.getSession(false);
 
         logger.info("EventServlet: Request received for path: " + request.getRequestURI());
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         String pathInfo = request.getPathInfo();
         logger.info("EventServlet: Path info: " + pathInfo);
 
@@ -71,14 +69,19 @@ public class EventServlet extends HttpServlet {
                             try {
                                 int imageId = Integer.parseInt(event.getImage());
                                 event.setImageId(imageId);
-                                logger.info("Converted image string to ID: " + imageId + " for event " + event.getEventId());
+                                logger.info(
+                                        "Converted image string to ID: " + imageId + " for event " +
+                                                event.getEventId());
                             } catch (NumberFormatException e) {
                                 // Not a number, leave as is (probably a legacy URL)
-                                logger.fine("Unable to parse image as ID for event " + event.getEventId() + ": " + event.getImage());
+                                logger.fine("Unable to parse image as ID for event " +
+                                                    event.getEventId() + ": " + event.getImage());
                             }
                         }
-                    } catch (Exception e) {
-                        logger.warning("EventServlet: Error processing event " + event.getEventId() + ": " + e.getMessage());
+                    } catch (RuntimeException e) {
+                        logger.warning(
+                                "EventServlet: Error processing event " + event.getEventId() +
+                                        ": " + e.getMessage());
                     }
                 }
 
@@ -107,17 +110,21 @@ public class EventServlet extends HttpServlet {
                             try {
                                 int imageId = Integer.parseInt(event.getImage());
                                 event.setImageId(imageId);
-                                logger.info("Converted image string to ID: " + imageId + " for event " + event.getEventId());
+                                logger.info(
+                                        "Converted image string to ID: " + imageId + " for event " +
+                                                event.getEventId());
                             } catch (NumberFormatException e) {
                                 // Not a number, leave as is (probably a legacy URL)
-                                logger.fine("Unable to parse image as ID for event " + event.getEventId() + ": " + event.getImage());
+                                logger.fine("Unable to parse image as ID for event " +
+                                                    event.getEventId() + ": " + event.getImage());
                             }
                         }
 
                         String jsonEvent = gson.toJson(event);
                         logger.info("EventServlet: JSON response for single event: " + jsonEvent);
                         response.getWriter().write(jsonEvent);
-                        logger.info("EventServlet: Response sent successfully for event ID: " + eventId);
+                        logger.info("EventServlet: Response sent successfully for event ID: " +
+                                            eventId);
                     } else {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         response.getWriter().write("{\"error\":\"Event not found\"}");
@@ -129,7 +136,9 @@ public class EventServlet extends HttpServlet {
                     logger.warning("EventServlet: Invalid event ID format: " + eventIdStr);
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "EventServlet: Error processing request", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Internal server error\"}");

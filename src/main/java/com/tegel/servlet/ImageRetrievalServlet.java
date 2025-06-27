@@ -14,18 +14,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Servlet for retrieving images from the database
+ * Servlet for retrieving images from the database.
  * This servlet retrieves an image by its ID or by an event ID and sends it to the client
  * Usage: /tegel_webapp/get-image?id=x (for direct image ID)
- *        /tegel_webapp/get-image?eventId=x (for image associated with an event)
+ * /tegel_webapp/get-image?eventId=x (for image associated with an event)
  */
 @WebServlet("/get-image")
 public class ImageRetrievalServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(ImageRetrievalServlet.class.getName());
-    private ImageDAO imageDAO = new ImageDAO();
+    private final ImageDAO imageDAO = new ImageDAO();
 
     /**
-     * Handles GET requests to retrieve images
+     * Handles GET requests to retrieve images.
      * The image can be retrieved by:
      * - image ID (?id=x)
      * - event ID (?eventId=x)
@@ -35,17 +35,20 @@ public class ImageRetrievalServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // For debugging - just to confirm the servlet is getting called
-        logger.info("ImageRetrievalServlet doGet called with request URI: " + request.getRequestURI());
+        logger.info(
+                "ImageRetrievalServlet doGet called with request URI: " + request.getRequestURI());
 
         // Get the image ID from the request
         String imageIdStr = request.getParameter("id");
         String eventIdStr = request.getParameter("eventId");
 
-        logger.info("Image retrieval request received - imageId: " + imageIdStr + ", eventId: " + eventIdStr);
+        logger.info("Image retrieval request received - imageId: " + imageIdStr + ", eventId: " +
+                            eventIdStr);
 
         if (imageIdStr == null && eventIdStr == null) {
             logger.warning("Image retrieval request with no ID or eventId parameter");
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Either image ID or event ID is required");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Either image ID or event ID is required");
             return;
         }
 
@@ -80,13 +83,16 @@ public class ImageRetrievalServlet extends HttpServlet {
 
             // Check if we have a valid image with data
             if (image == null) {
-                logger.warning("No image found for request (imageId: " + imageIdStr + ", eventId: " + eventIdStr + ")");
+                logger.warning(
+                        "No image found for request (imageId: " + imageIdStr + ", eventId: " +
+                                eventIdStr + ")");
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
                 return;
             }
 
             if (image.getData() == null || image.getData().length == 0) {
-                logger.warning("Image found but has no data (imageId: " + (image.getId() == 0 ? requestedId : image.getId()) + ")");
+                logger.warning("Image found but has no data (imageId: " +
+                                       (image.getId() == 0 ? requestedId : image.getId()) + ")");
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image has no data");
                 return;
             }
@@ -104,16 +110,21 @@ public class ImageRetrievalServlet extends HttpServlet {
             response.getOutputStream().write(image.getData());
             response.getOutputStream().flush();
 
-            logger.info("Image successfully retrieved and sent: ID=" + image.getId() +
-                      ", Type=" + image.getContentType() +
-                      ", Size=" + image.getData().length + " bytes");
+            logger.info("Image successfully retrieved and sent: ID=" + image.getId() + ", Type=" +
+                                image.getContentType() + ", Size=" + image.getData().length +
+                                " bytes");
 
         } catch (NumberFormatException e) {
-            logger.warning("Invalid ID format: " + (imageIdStr != null ? imageIdStr : eventIdStr) + " - " + e.getMessage());
+            logger.warning(
+                    "Invalid ID format: " + (imageIdStr != null ? imageIdStr : eventIdStr) + " - " +
+                            e.getMessage());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error retrieving image: " + e.getMessage(), e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving image: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                               "Error retrieving image: " + e.getMessage());
         }
     }
 }

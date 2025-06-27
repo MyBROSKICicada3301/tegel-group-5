@@ -25,18 +25,17 @@ import java.time.LocalDateTime;
 
 /**
  * Servlet to provide basic user information for announcements and other public displays
- * This servlet will return only limited information about any user if the requester is authenticated
+ * This servlet will return only limited information about any user if the requester is authenticated.
  */
 @WebServlet("/userdetails")
 public class UserInfoServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(UserInfoServlet.class.getName());
-    private UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     // Configure Gson with adapters for proper date/time serialization
-    private Gson gson = new GsonBuilder()
-        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-        .create();
+    private final Gson gson =
+            new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -84,7 +83,7 @@ public class UserInfoServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("{\"error\": \"Invalid user ID format\"}");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error retrieving user details", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print("{\"error\": \"Server error occurred\"}");

@@ -26,70 +26,86 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024,    // 1 MB
-    maxFileSize = 10 * 1024 * 1024,     // 10 MB
-    maxRequestSize = 50 * 1024 * 1024   // 50 MB
+@MultipartConfig(fileSizeThreshold = 1024 * 1024,    // 1 MB
+        maxFileSize = 10 * 1024 * 1024,     // 10 MB
+        maxRequestSize = 50 * 1024 * 1024   // 50 MB
 )
+
 @WebServlet("/admin/events/*")
 public class EventManagementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());
-    private EventDAO eventDAO = new EventDAO();
-    private ImageDAO imageDAO = new ImageDAO();
-    private Gson gson;
-    
+    private final EventDAO eventDAO = new EventDAO();
+    private final ImageDAO imageDAO = new ImageDAO();
+    private final Gson gson;
+
+    /**
+     * Default constructor initializes Gson with custom serializers for LocalDate and LocalDateTime.
+     */
     public EventManagementServlet() {
 
         // Configure Gson with custom serializers for LocalDate and LocalDateTime
-        this.gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> 
-                context.serialize(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
-            .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> 
-                context.serialize(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
-            .create();
+        this.gson = new GsonBuilder().registerTypeAdapter(LocalDate.class,
+                                                          (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> context.serialize(
+                                                                  src.format(
+                                                                          DateTimeFormatter.ISO_LOCAL_DATE)))
+                .registerTypeAdapter(LocalDateTime.class,
+                                     (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> context.serialize(
+                                             src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+                .create();
     }
 
+    /**
+     * Handles GET requests to retrieve events.
+     * Supports fetching all events, active events, upcoming events, or a specific event by ID.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        if (!isAuthorized(request, response)) return;
-        
+
+        if (!isAuthorized(request, response)) {
+            return;
+        }
+
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
             if (pathInfo == null || "/".equals(pathInfo) || "/all".equals(pathInfo)) {
                 // Get all events
                 List<Event> events = eventDAO.getAllEvents();
                 response.getWriter().write(gson.toJson(events));
                 logger.info("Retrieved all events for admin view");
-                
+
             } else if ("/active".equals(pathInfo)) {
                 // Get only active events
                 List<Event> events = eventDAO.getAllActiveEvents();
                 response.getWriter().write(gson.toJson(events));
                 logger.info("Retrieved active events for admin view");
-                
+
             } else if ("/upcoming".equals(pathInfo)) {
                 // Get upcoming events
                 List<Event> events = eventDAO.getUpcomingEvents();
                 response.getWriter().write(gson.toJson(events));
                 logger.info("Retrieved upcoming events for admin view");
-                
+
             } else if (pathInfo.startsWith("/") && pathInfo.length() > 1) {
                 // Get specific event by ID
                 try {
                     String eventIdStr = pathInfo.substring(1);
                     int eventId = Integer.parseInt(eventIdStr);
-                    
+
                     if (!SecurityUtils.isValidUserId(eventId)) {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         response.getWriter().write("{\"error\":\"Invalid event ID\"}");
                         return;
                     }
-                    
+
                     Event event = eventDAO.getEventById(eventId);
                     if (event != null) {
                         response.getWriter().write(gson.toJson(event));
@@ -106,23 +122,36 @@ public class EventManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid request path\"}");
             }
-            
-        } catch (Exception e) {
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error retrieving events", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
     }
-    
+
+    /**
+     * Handles POST requests to create a new event.
+     * Supports image uploads and associates the image with the event.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        if (!isAuthorized(request, response)) return;
-        
+        if (!isAuthorized(request, response)) {
+            return;
+        }
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
             // Process the image upload first to get the image ID for the event
             Part imagePart = request.getPart("eventImage");
@@ -161,7 +190,7 @@ public class EventManagementServlet extends HttpServlet {
                     }
 
                     // Store the image ID as an Integer object
-                    imageId = Integer.valueOf(imgId);
+                    imageId = imgId;
                     logger.info("Successfully saved event image with ID: " + imageId);
                 }
             }
@@ -173,7 +202,7 @@ public class EventManagementServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Invalid event data provided\"}");
                 return;
             }
-            
+
             // Set the image ID if we have one
             if (imageId != null) {
                 event.setImageId(imageId);
@@ -188,17 +217,18 @@ public class EventManagementServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"User session invalid\"}");
                 return;
             }
-            
+
             event.setCreatedBy(userId);
             event.setActive(true);
-            
+
             if (eventDAO.createEvent(event)) {
                 logger.info("Event created successfully by user: " + userId);
 
                 // If we have an image ID, update the image record to associate it with the event
                 if (imageId != null) {
                     imageDAO.updateEventIdForImage(imageId, event.getEventId());
-                    logger.info("Updated image " + imageId + " with event ID " + event.getEventId());
+                    logger.info(
+                            "Updated image " + imageId + " with event ID " + event.getEventId());
                 }
 
                 response.setStatus(HttpServletResponse.SC_CREATED);
@@ -207,45 +237,57 @@ public class EventManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to create event\"}");
             }
-            
+
         } catch (SecurityException e) {
             logger.warning("Security violation in event creation: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\":\"Invalid input data detected\"}");
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error creating event", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
     }
-    
+
+    /**
+     * Handles PUT requests to update an existing event.
+     * Supports image uploads and updates the associated image if provided.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        if (!isAuthorized(request, response)) return;
-        
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        if (!isAuthorized(request, response)) {
+            return;
+        }
+
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
-            if (pathInfo == null || !pathInfo.startsWith("/") || pathInfo.length() <= 1) {
+            if (pathInfo == null || !pathInfo.startsWith("/") || pathInfo.length() == 1) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Event ID required for update\"}");
                 return;
             }
-            
+
             // Extract event ID from path
             String eventIdStr = pathInfo.substring(1);
             int eventId = Integer.parseInt(eventIdStr);
-            
+
             if (!SecurityUtils.isValidUserId(eventId)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid event ID\"}");
                 return;
             }
-            
+
             // Check if event exists
             Event existingEvent = eventDAO.getEventById(eventId);
             if (existingEvent == null) {
@@ -253,7 +295,7 @@ public class EventManagementServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Event not found\"}");
                 return;
             }
-            
+
             // Process the image upload first to get the image ID for the event update
             Part imagePart = request.getPart("eventImage");
             Integer newImageId = null;
@@ -290,7 +332,7 @@ public class EventManagementServlet extends HttpServlet {
                     }
 
                     // Store the image ID as an Integer object
-                    newImageId = Integer.valueOf(imgId);
+                    newImageId = imgId;
                     logger.info("Successfully saved new event image with ID: " + newImageId);
                 }
             }
@@ -302,7 +344,7 @@ public class EventManagementServlet extends HttpServlet {
                 response.getWriter().write("{\"error\":\"Invalid event data provided\"}");
                 return;
             }
-            
+
             // Set the new image ID if we have one, otherwise preserve the existing one
             if (newImageId != null) {
                 updatedEvent.setImageId(newImageId);
@@ -316,7 +358,7 @@ public class EventManagementServlet extends HttpServlet {
             updatedEvent.setEventId(eventId);
             updatedEvent.setCreatedBy(existingEvent.getCreatedBy());
             updatedEvent.setCreatedAt(existingEvent.getCreatedAt());
-            
+
             if (eventDAO.updateEvent(updatedEvent)) {
                 logger.info("Event updated successfully: " + eventId);
 
@@ -331,7 +373,7 @@ public class EventManagementServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"Failed to update event\"}");
             }
-            
+
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\":\"Invalid event ID format\"}");
@@ -339,57 +381,80 @@ public class EventManagementServlet extends HttpServlet {
             logger.warning("Security violation in event update: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\":\"Invalid input data detected\"}");
-        } catch (Exception e) {
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error updating event", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
     }
-    
+
+    /**
+     * Handles DELETE requests to remove an existing event.
+     * Deletes the event by ID and removes associated image if applicable.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        if (!isAuthorized(request, response)) return;
-        
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        if (!isAuthorized(request, response)) {
+            return;
+        }
+
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
-            if (pathInfo == null || !pathInfo.startsWith("/") || pathInfo.length() <= 1) {
+            if (pathInfo == null || !pathInfo.startsWith("/") || pathInfo.length() == 1) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Event ID required for deletion\"}");
                 return;
             }
-            
+
             String eventIdStr = pathInfo.substring(1);
             int eventId = Integer.parseInt(eventIdStr);
-            
+
             if (!SecurityUtils.isValidUserId(eventId)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"error\":\"Invalid event ID\"}");
                 return;
             }
-            
+
             if (eventDAO.deleteEvent(eventId)) {
                 logger.info("Event deleted successfully: " + eventId);
-                response.getWriter().write("{\"success\":true,\"message\":\"Event deleted successfully\"}");
+                response.getWriter()
+                        .write("{\"success\":true,\"message\":\"Event deleted successfully\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("{\"error\":\"Event not found or could not be deleted\"}");
+                response.getWriter()
+                        .write("{\"error\":\"Event not found or could not be deleted\"}");
             }
-            
+
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"error\":\"Invalid event ID format\"}");
-        } catch (Exception e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Error deleting event", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"Server error occurred\"}");
         }
     }
-    
+
+    /**
+     * Creates an Event object from the request parameters.
+     * Validates and sanitizes input data, handles image uploads, and parses date formats.
+     *
+     * @param request the HttpServletRequest object
+     * @return a populated Event object or null if validation fails
+     */
     private Event createEventFromRequest(HttpServletRequest request) {
         try {
             // Extract parameters
@@ -397,7 +462,8 @@ public class EventManagementServlet extends HttpServlet {
             String description = request.getParameter("description");
             String dateStr = request.getParameter("date");
             String location = request.getParameter("location");
-            String image = request.getParameter("image"); // May be null if file upload is used instead
+            String image =
+                    request.getParameter("image"); // May be null if file upload is used instead
             String maxParticipantsStr = request.getParameter("maxParticipants");
             String isActiveStr = request.getParameter("isActive");
             String priceStr = request.getParameter("price");
@@ -456,22 +522,23 @@ public class EventManagementServlet extends HttpServlet {
                 isPublic = Boolean.parseBoolean(isPublicStr);
             }
 
-            
+
             // Validate required fields
             if (title == null || title.trim().isEmpty()) {
                 logger.warning("Event title is required");
                 return null;
             }
-            
+
             if (dateStr == null || dateStr.trim().isEmpty()) {
                 logger.warning("Event date is required");
                 return null;
             }
-            
+
             // Sanitize inputs
             try {
                 title = SecurityUtils.sanitizeInput(title);
-                description = description != null ? SecurityUtils.sanitizeTextArea(description) : null;
+                description =
+                        description != null ? SecurityUtils.sanitizeTextArea(description) : null;
                 location = location != null ? SecurityUtils.sanitizeInput(location) : null;
                 // Only sanitize image if it's a path/URL, not if it's an image ID
                 image = image != null ? SecurityUtils.sanitizeInput(image) : null;
@@ -479,20 +546,20 @@ public class EventManagementServlet extends HttpServlet {
                 logger.warning("Input sanitization failed: " + e.getMessage());
                 throw e;
             }
-            
+
             // Validate formats
             if (title.length() > 100) {
                 throw new SecurityException("Title too long (max 100 characters)");
             }
-            
+
             if (location != null && location.length() > 100) {
                 throw new SecurityException("Location too long (max 100 characters)");
             }
-            
+
             if (description != null && description.length() > 2000) {
                 throw new SecurityException("Description too long (max 2000 characters)");
             }
-            
+
             // Parse and validate date
             LocalDate eventDate;
             try {
@@ -501,17 +568,17 @@ public class EventManagementServlet extends HttpServlet {
                 logger.warning("Invalid date format: " + dateStr);
                 return null;
             }
-            
+
             // Validate date is not too far in the past or future
             LocalDate now = LocalDate.now();
             if (eventDate.isBefore(now.minusDays(1))) {
                 throw new SecurityException("Event date cannot be in the past");
             }
-            
+
             if (eventDate.isAfter(now.plusYears(2))) {
                 throw new SecurityException("Event date cannot be more than 2 years in the future");
             }
-            
+
             // Parse and validate max participants
             int maxParticipants = 0;
             if (maxParticipantsStr != null && !maxParticipantsStr.trim().isEmpty()) {
@@ -525,13 +592,13 @@ public class EventManagementServlet extends HttpServlet {
                     return null;
                 }
             }
-            
+
             // Parse active status
             boolean isActive = true; // Default to active
             if (isActiveStr != null) {
                 isActive = Boolean.parseBoolean(isActiveStr);
             }
-            
+
             // Create and populate event object
             Event event = new Event();
             event.setTitle(title);
@@ -546,16 +613,25 @@ public class EventManagementServlet extends HttpServlet {
             event.setPublic(isPublic);
 
             return event;
-            
+
         } catch (SecurityException e) {
             // Re-throw security exceptions
             throw e;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.log(Level.WARNING, "Error parsing event data from request", e);
             return null;
         }
     }
 
+    /**
+     * Checks if the user is authorized to access event management features.
+     * Validates session and user role.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @return true if authorized, false otherwise
+     * @throws IOException if an I/O error occurs
+     */
     private boolean isAuthorized(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
@@ -566,7 +642,8 @@ public class EventManagementServlet extends HttpServlet {
             return false;
         }
 
-        String userRole = (String) session.getAttribute("role"); // Changed from "userRole" to "role"
+        String userRole =
+                (String) session.getAttribute("role"); // Changed from "userRole" to "role"
         Integer userId = (Integer) session.getAttribute("userId");
 
         if (!"admin".equals(userRole) || userId == null) {

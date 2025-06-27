@@ -342,4 +342,46 @@ public class UserDAO {
 
         return user;
     }
+
+    /**
+     * Updates a user's password.
+     *
+     * @param userId The ID of the user whose password is to be updated.
+     * @param newPasswordHash The new password hash to set.
+     * @return true if the password was updated successfully, false otherwise.
+     */
+    public boolean updateUserPassword(int userId, String newPasswordHash) {
+        // Validate inputs
+        if (!SecurityUtils.isValidUserId(userId) || newPasswordHash == null || newPasswordHash.isEmpty()) {
+            logger.warning("Invalid userId or password provided for update");
+            return false;
+        }
+
+        String sql = "UPDATE mod4db.users SET passwordhash = ? WHERE user_id = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false); // Start transaction
+
+            stmt.setString(1, newPasswordHash);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                conn.commit();
+                logger.info("Password updated successfully for userId: " + userId);
+                return true;
+            } else {
+                conn.rollback();
+                logger.warning("No user found with userId: " + userId);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error updating user password", e);
+            return false;
+        }
+    }
 }

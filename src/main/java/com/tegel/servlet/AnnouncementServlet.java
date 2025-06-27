@@ -195,6 +195,14 @@ public class AnnouncementServlet extends HttpServlet {
             return;
         }
 
+        // Allow both admin and member users to create announcements
+        String role = (String) session.getAttribute("role");
+        if (!"admin".equals(role) && !"member".equals(role)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            out.write(gson.toJson(createErrorResponse("Only administrators and members can create announcements.")));
+            return;
+        }
+
         int userId = (int) session.getAttribute("userId");
 
         try {
@@ -252,6 +260,9 @@ public class AnnouncementServlet extends HttpServlet {
             return;
         }
 
+        int userId = (int) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+
         try {
             // Parse request body into Announcement object
             Announcement announcement = parseRequestBody(request);
@@ -265,6 +276,31 @@ public class AnnouncementServlet extends HttpServlet {
                 return;
             }
 
+            // Check if the announcement exists and get its details
+            Announcement existingAnnouncement = announcementDAO.getAnnouncementById(announcement.getAnnouncementId());
+
+            if (existingAnnouncement == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write(gson.toJson(createErrorResponse("Announcement not found.")));
+                return;
+            }
+
+            // Check permissions: admins can update any announcement, members can only update their own
+            if (!"admin".equals(role)) {
+                if (!"member".equals(role)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.write(gson.toJson(createErrorResponse("Only administrators and members can update announcements.")));
+                    return;
+                }
+
+                // Check if the member is the author of the announcement
+                if (existingAnnouncement.getPostedBy() != userId) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.write(gson.toJson(createErrorResponse("You can only update your own announcements.")));
+                    return;
+                }
+            }
+
             // Update the announcement
             boolean success = announcementDAO.updateAnnouncement(announcement);
 
@@ -274,8 +310,8 @@ public class AnnouncementServlet extends HttpServlet {
                 responseData.put("message", "Announcement updated successfully.");
                 out.write(gson.toJson(responseData));
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.write(gson.toJson(createErrorResponse("Announcement not found or could not be updated.")));
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(gson.toJson(createErrorResponse("Failed to update announcement.")));
             }
 
         } catch (Exception e) {
@@ -304,6 +340,9 @@ public class AnnouncementServlet extends HttpServlet {
             return;
         }
 
+        int userId = (int) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+
         try {
             // Get announcement ID from request parameter
             String idParam = request.getParameter("id");
@@ -315,6 +354,31 @@ public class AnnouncementServlet extends HttpServlet {
 
             int announcementId = Integer.parseInt(idParam);
 
+            // Check if the announcement exists and get its details
+            Announcement existingAnnouncement = announcementDAO.getAnnouncementById(announcementId);
+
+            if (existingAnnouncement == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write(gson.toJson(createErrorResponse("Announcement not found.")));
+                return;
+            }
+
+            // Check permissions: admins can delete any announcement, members can only delete their own
+            if (!"admin".equals(role)) {
+                if (!"member".equals(role)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.write(gson.toJson(createErrorResponse("Only administrators and members can delete announcements.")));
+                    return;
+                }
+
+                // Check if the member is the author of the announcement
+                if (existingAnnouncement.getPostedBy() != userId) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    out.write(gson.toJson(createErrorResponse("You can only delete your own announcements.")));
+                    return;
+                }
+            }
+
             // Delete the announcement
             boolean success = announcementDAO.deleteAnnouncement(announcementId);
 
@@ -324,8 +388,8 @@ public class AnnouncementServlet extends HttpServlet {
                 responseData.put("message", "Announcement deleted successfully.");
                 out.write(gson.toJson(responseData));
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.write(gson.toJson(createErrorResponse("Announcement not found or could not be deleted.")));
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                out.write(gson.toJson(createErrorResponse("Failed to delete announcement.")));
             }
 
         } catch (NumberFormatException e) {

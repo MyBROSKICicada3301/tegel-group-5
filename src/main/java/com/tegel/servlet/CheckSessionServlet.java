@@ -23,9 +23,9 @@ public class CheckSessionServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         if (session != null && session.getAttribute("userId") != null) {
-            // User is logged in
+            // User is logged in - include userId in response
             out.print(
-                    "{\"loggedIn\": true, \"role\": \"" + session.getAttribute("role") + "\"}");
+                    "{\"loggedIn\": true, \"userId\": " + session.getAttribute("userId") + ", \"role\": \"" + session.getAttribute("role") + "\"}");
         } else {
             // User is not logged in
             out.print("{\"loggedIn\": false}");

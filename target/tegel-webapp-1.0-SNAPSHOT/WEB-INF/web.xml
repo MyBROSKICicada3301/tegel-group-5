@@ -25,16 +25,6 @@
         <url-pattern>/newsletter</url-pattern>
     </servlet-mapping>
 
-    <!-- Announcement servlet mapping -->
-    <servlet>
-        <servlet-name>AnnouncementServlet</servlet-name>
-        <servlet-class>com.tegel.servlet.AnnouncementServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AnnouncementServlet</servlet-name>
-        <url-pattern>/announcement</url-pattern>
-    </servlet-mapping>
-
     <!-- Admin User Management servlet mapping -->
     <servlet>
         <servlet-name>AdminUserManagementServlet</servlet-name>
@@ -44,5 +34,7 @@
         <servlet-name>AdminUserManagementServlet</servlet-name>
         <url-pattern>/admin/users/*</url-pattern>
     </servlet-mapping>
+
+    <!-- Note: CheckSessionServlet is already mapped with @WebServlet annotation in the Java file -->
 
 </web-app>

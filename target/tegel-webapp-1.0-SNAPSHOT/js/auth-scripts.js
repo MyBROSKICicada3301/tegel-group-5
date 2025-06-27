@@ -5,16 +5,13 @@
 if (typeof debug === 'undefined') {
     // Create minimal debug utility that won't cause errors even if the main debug-utils.js fails to load
     const debug = {
-        log: function(source, message, data) {
+        log: function (source, message, data) {
             console.log(`[${source}] ${message}`, data || '');
         },
-        error: function(source, message, error) {
+        error: function (source, message, error) {
             console.error(`[${source}] ERROR: ${message}`, error || '');
         },
-        warn: function(source, message, data) {
-            console.warn(`[${source}] WARNING: ${message}`, data || '');
-        },
-        info: function(source, message, data) {
+        info: function (source, message, data) {
             console.info(`[${source}] INFO: ${message}`, data || '');
         }
     };
@@ -22,7 +19,7 @@ if (typeof debug === 'undefined') {
 }
 
 // Check if user is logged in and update the auth buttons accordingly
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Auth-scripts loaded, checking login status');
 
     // Function to update auth buttons
@@ -45,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
 
             // Add click event for sign out button
-            document.getElementById('signoutBtn').addEventListener('click', function(e) {
+            document.getElementById('signoutBtn').addEventListener('click', function (e) {
                 e.preventDefault();
                 console.log('Sign out button clicked');
                 signOut();
@@ -65,35 +62,35 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'GET',
             credentials: 'include'
         })
-        .then(response => {
-            if (!response.ok) {
-                console.error(`Session check failed with status: ${response.status}`);
-                throw new Error(`Session check failed with status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Login status response:', data);
-            // Store user role for future reference
-            if (data.loggedIn) {
-                localStorage.setItem('userRole', data.role || 'user');
-                localStorage.setItem('userLoggedIn', 'true');
-                if (data.userId) {
-                    localStorage.setItem('userId', data.userId);
+            .then(response => {
+                if (!response.ok) {
+                    console.error(`Session check failed with status: ${response.status}`);
+                    throw new Error(`Session check failed with status: ${response.status}`);
                 }
-            }
-            // Update UI based on login status and admin role
-            updateAuthButtons(data.loggedIn, data.role === 'admin');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Login status response:', data);
+                // Store user role for future reference
+                if (data.loggedIn) {
+                    localStorage.setItem('userRole', data.role || 'user');
+                    localStorage.setItem('userLoggedIn', 'true');
+                    if (data.userId) {
+                        localStorage.setItem('userId', data.userId);
+                    }
+                }
+                // Update UI based on login status and admin role
+                updateAuthButtons(data.loggedIn, data.role === 'admin');
 
-            // Check if current page requires admin privileges
-            checkAdminPageAccess(data.loggedIn, data.role === 'admin');
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-            // Assume not logged in if there's an error
-            updateAuthButtons(false, false);
-            checkAdminPageAccess(false, false);
-        });
+                // Check if current page requires admin privileges
+                checkAdminPageAccess(data.loggedIn, data.role === 'admin');
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+                // Assume not logged in if there's an error
+                updateAuthButtons(false, false);
+                checkAdminPageAccess(false, false);
+            });
     }
 
     // Function to check and restrict access to admin pages
@@ -101,11 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get current page path
         const currentPath = window.location.pathname;
         const isAdminPage = currentPath.includes('admin') &&
-                           !currentPath.endsWith('login.html') &&
-                           !currentPath.endsWith('signup.html');
+            !currentPath.endsWith('login.html') &&
+            !currentPath.endsWith('signup.html');
 
         if (isAdminPage) {
-            debug.log('Auth', 'Admin page access check', { isLoggedIn, isAdmin });
+            debug.log('Auth', 'Admin page access check', {isLoggedIn, isAdmin});
 
             if (!isLoggedIn) {
                 debug.warn('Auth', 'Unauthorized access attempt: Not logged in', currentPath);
@@ -133,31 +130,31 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             credentials: 'include'
         })
-        .then(response => {
-            if (response.ok) {
-                console.log('Signed out successfully');
-                // Clear any stored user data
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userLoggedIn');
-                localStorage.removeItem('userRole');
-                // Redirect to home page
-                window.location.href = 'index.html';
-            } else {
-                console.error('Sign out failed:', response.status);
-                alert('Failed to sign out. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error during sign out:', error);
-            alert('An error occurred while signing out.');
-        });
+            .then(response => {
+                if (response.ok) {
+                    console.log('Signed out successfully');
+                    // Clear any stored user data
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userRole');
+                    // Redirect to home page
+                    window.location.href = 'index.html';
+                } else {
+                    console.error('Sign out failed:', response.status);
+                    alert('Failed to sign out. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during sign out:', error);
+                alert('An error occurred while signing out.');
+            });
     }
 
     // Expose sign out function to global scope
     window.signOut = signOut;
 
     // Expose function to check if current user is admin
-    window.isUserAdmin = function() {
+    window.isUserAdmin = function () {
         return localStorage.getItem('userRole') === 'admin';
     };
 

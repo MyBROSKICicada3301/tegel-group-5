@@ -551,11 +551,17 @@
 
         // Show the modal for editing an existing announcement
         function showEditAnnouncementModal(announcement) {
+            console.log("Editing announcement:", announcement); // Add debug info
+
             // Set form fields
             document.getElementById('announcementId').value = announcement.announcementId;
             document.getElementById('announcementTitle').value = announcement.title;
             document.getElementById('announcementContent').value = announcement.content;
-            document.getElementById('announcementIsPublic').checked = announcement.public;
+
+            // Use the correct property - could be public or isPublic depending on how backend serializes it
+            document.getElementById('announcementIsPublic').checked = announcement.isPublic !== undefined ?
+                announcement.isPublic : announcement.public;
+
             document.getElementById('modalErrorMsg').textContent = '';
 
             // Update modal title
@@ -583,10 +589,11 @@
                 return;
             }
 
+            // Make sure we send isPublic as a property (backend expects this)
             const announcement = {
                 title: title,
                 content: content,
-                public: isPublic
+                isPublic: isPublic // Changed from 'public' to 'isPublic' to match the Java model
             };
 
             let url = `${contextPath}/announcement`;
@@ -597,6 +604,8 @@
                 announcement.announcementId = parseInt(id);
                 method = 'PUT';
             }
+
+            console.log("Saving announcement with data:", announcement); // Debug info
 
             fetch(url, {
                 method: method,

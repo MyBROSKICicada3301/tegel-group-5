@@ -782,11 +782,12 @@
         document.getElementById('editEventLocation').value = event.location || '';
         document.getElementById('editMaxParticipants').value = event.maxParticipants || '';
         document.getElementById('editEventDescription').value = event.description || '';
-        document.getElementById('editEventImage').value = event.image || '';
-        document.getElementById('editIsActive').checked = event.isActive;
-        document.getElementById('editIsPublic').checked = event.isPublic; // Add this line
 
-        // Fix these ID references to match your HTML
+        // Handle image field as integer ID
+        document.getElementById('editEventImage').value = event.image || '';
+
+        document.getElementById('editIsActive').checked = event.isActive;
+        document.getElementById('editIsPublic').checked = event.isPublic;
         document.getElementById('eventPrice').value = event.price || 0;
         document.getElementById('hasFoodOption').checked = event.hasFoodOption || false;
 
@@ -801,24 +802,38 @@
         const formData = new FormData(form);
         const eventId = formData.get('eventId');
 
-        fetch(`/tegel_webapp/admin/events/${eventId}`, {
-            method: 'PUT',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.eventId || data.success) {
-                alert('Event updated successfully!');
-                bootstrap.Modal.getInstance(document.getElementById('editEventModal')).hide();
-                loadEvents(); // Reload events
+        // Make sure image is sent as an integer if it's numeric
+        const imageValue = formData.get('image');
+        if (imageValue !== null && imageValue !== '') {
+            formData.delete('image');
+            // Try to convert to int if possible
+            const imageId = parseInt(imageValue);
+            if (!isNaN(imageId)) {
+                formData.append('image', imageId);
             } else {
-                alert(data.error || 'Failed to update event.');
+                formData.append('image', imageValue);
             }
+        }
+
+        fetch(`${contextPath}/admin/events/${eventId}`, {
+            method: 'PUT',
+            body: formData,
+            credentials: 'include'
         })
-        .catch(error => {
-            console.error('Error updating event:', error);
-            alert('Error updating event. Please try again.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.eventId || data.success) {
+                    notificationSystem.success('Event updated successfully!');
+                    bootstrap.Modal.getInstance(document.getElementById('editEventModal')).hide();
+                    loadEvents(); // Reload events
+                } else {
+                    notificationSystem.error(data.error || 'Failed to update event.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating event:', error);
+                notificationSystem.error('Error updating event. Please try again.');
+            });
     }
 
     function deleteEvent(eventId) {
@@ -860,79 +875,30 @@
             `${action.charAt(0).toUpperCase() + action.slice(1)} Event`,
             `Are you sure you want to ${action} this event?`,
             function() {
-                // Get the current event to retain all its properties
                 const event = events.find(e => e.eventId === eventId);
                 if (!event) {
                     notificationSystem.error("Event not found");
                     return;
                 }
 
-                // Create a form data with all event properties
                 const formData = new FormData();
                 formData.append('title', event.title);
                 formData.append('date', event.date);
                 formData.append('location', event.location || '');
                 formData.append('description', event.description || '');
                 formData.append('maxParticipants', event.maxParticipants || '');
-                formData.append('image', event.image || '');
-                formData.append('price', event.price || 0);
-                formData.append('hasFoodOption', event.hasFoodOption || false);
-                formData.append('isPublic', event.isPublic || false);
-                formData.append('isActive', newStatus); // Update status
 
-                // Use the standard event update endpoint
-                fetch(`${contextPath}/admin/events/${eventId}`, {
-                    method: 'PUT',
-                    body: formData,
-                    credentials: 'include'
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                throw new Error(text || `Server error: ${response.status}`);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        notificationSystem.success(`Event ${action}d successfully!`);
-                        event.isActive = newStatus;
-                        renderEvents();
-                    })
-                    .catch(error => {
-                        console.error('Error updating event status:', error);
-                        notificationSystem.error(`Error updating event status: ${error.message}`);
-                    });
-            }
-        );
-    }function toggleEventStatus(eventId, newStatus) {
-        const action = newStatus ? 'activate' : 'deactivate';
-
-        notificationSystem.confirm(
-            `${action.charAt(0).toUpperCase() + action.slice(1)} Event`,
-            `Are you sure you want to ${action} this event?`,
-            function() {
-                // Get the current event to retain all its properties
-                const event = events.find(e => e.eventId === eventId);
-                if (!event) {
-                    notificationSystem.error("Event not found");
-                    return;
+                // Handle image field as integer
+                if (event.image) {
+                    const imageId = parseInt(event.image);
+                    formData.append('image', !isNaN(imageId) ? imageId : event.image);
                 }
 
-                // Create a form data with all event properties
-                const formData = new FormData();
-                formData.append('title', event.title);
-                formData.append('date', event.date);
-                formData.append('location', event.location || '');
-                formData.append('description', event.description || '');
-                formData.append('maxParticipants', event.maxParticipants || '');
-                formData.append('image', event.image || '');
                 formData.append('price', event.price || 0);
                 formData.append('hasFoodOption', event.hasFoodOption || false);
                 formData.append('isPublic', event.isPublic || false);
-                formData.append('isActive', newStatus); // Update status
+                formData.append('isActive', newStatus);
 
-                // Use the standard event update endpoint
                 fetch(`${contextPath}/admin/events/${eventId}`, {
                     method: 'PUT',
                     body: formData,

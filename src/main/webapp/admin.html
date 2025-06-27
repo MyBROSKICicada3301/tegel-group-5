@@ -191,6 +191,37 @@
     </div>
 </main>
 
+<!-- Password Reset Modal -->
+<div class="modal fade" id="passwordResetModal" tabindex="-1" aria-labelledby="passwordResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordResetModalLabel">Reset User Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="resetPasswordUserId">
+                <p>You are about to reset the password for <strong id="resetPasswordUserEmail"></strong></p>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" required>
+                    <div id="passwordMismatch" class="text-danger mt-2" style="display: none;">
+                        Passwords do not match!
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmResetBtn">Reset Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Event Modal -->
 <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -455,20 +486,21 @@
         users.forEach(user => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${user.fullName || user.email}</td>
-                <td>${user.email}</td>
-                <td>
-                    <select class="form-select btn-role" data-id="${user.userId}">
-                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
-                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="btn btn-info btn-sm me-2" onclick="viewUser(${user.userId})">View</button>
-                    <button class="btn btn-delete btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
-                </td>
-            `;
+            <td>${user.fullName || user.email}</td>
+            <td>${user.email}</td>
+            <td>
+                <select class="form-select btn-role" data-id="${user.userId}">
+                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
+                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn btn-info btn-sm me-1" onclick="viewUser(${user.userId})">View</button>
+                <button class="btn btn-warning btn-sm me-1" onclick="resetPassword(${user.userId})">Reset Password</button>
+                <button class="btn btn-delete btn-sm" onclick="deleteUser(${user.userId})">Delete</button>
+            </td>
+        `;
             tbody.appendChild(tr);
         });
 
@@ -1160,6 +1192,76 @@
             modal.show();
         }
     };
+    // Password reset functionality
+    function resetPassword(userId) {
+        const user = users.find(u => u.userId === userId);
+        if (!user) return;
+
+        // Populate the modal with user info
+        document.getElementById('resetPasswordUserId').value = userId;
+        document.getElementById('resetPasswordUserEmail').textContent = user.email;
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        document.getElementById('passwordMismatch').style.display = 'none';
+
+        // Show the modal
+        const passwordResetModal = new bootstrap.Modal(document.getElementById('passwordResetModal'));
+        passwordResetModal.show();
+
+        // Add event listener to the confirm button
+        document.getElementById('confirmResetBtn').onclick = function() {
+            submitPasswordReset();
+        };
+    }
+
+    function submitPasswordReset() {
+        const userId = document.getElementById('resetPasswordUserId').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // Validate passwords
+        if (newPassword !== confirmPassword) {
+            document.getElementById('passwordMismatch').style.display = 'block';
+            return;
+        }
+
+        // Validate password strength
+        if (newPassword.length < 8) {
+            notificationSystem.error('Password must be at least 8 characters long');
+            return;
+        }
+
+        // Submit password reset request
+        fetch(`${contextPath}/admin/users/password/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password: newPassword }),
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Hide modal
+                    bootstrap.Modal.getInstance(document.getElementById('passwordResetModal')).hide();
+
+                    // Show success message
+                    notificationSystem.success('Password reset successfully');
+                } else {
+                    notificationSystem.error(data.error || 'Failed to reset password');
+                }
+            })
+            .catch(error => {
+                console.error('Error resetting password:', error);
+                notificationSystem.error('Error resetting password. Please try again.');
+            });
+    }
 </script>
 <script src="js/session-manager.js"></script>
 </body>

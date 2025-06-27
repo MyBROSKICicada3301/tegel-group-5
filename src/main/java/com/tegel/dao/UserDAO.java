@@ -280,38 +280,27 @@ public class UserDAO {
             return false;
         }
 
-        String sql = "CALL mod4d.update_user(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "SELECT mod4db.update_user(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Set input parameters
+            // Set parameters
             stmt.setInt(1, user.getUserId());
-            stmt.setString(2, SecurityUtils.sanitizeInput(user.getEmail().toLowerCase().trim()));
-            stmt.setString(3, user.getPasswordHash()); // Already hashed, don't sanitize
-            stmt.setString(4, user.getPhoneNumber() != null ?
-                    SecurityUtils.sanitizeInput(user.getPhoneNumber()) : null);
-            stmt.setDate(5, user.getDateOfBirth() != null ? Date.valueOf(user.getDateOfBirth()) :
-                    null);
-            stmt.setString(6, user.getDietRes() != null ?
-                    SecurityUtils.sanitizeTextArea(user.getDietRes()) : null);
-            stmt.setString(7, SecurityUtils.sanitizeInput(user.getFullName()));
-            stmt.setString(8, user.getNickName() != null ?
-                    SecurityUtils.sanitizeInput(user.getNickName()) : null);
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setDate(5, user.getDateOfBirth() != null ?
+                    Date.valueOf(user.getDateOfBirth()) : null);
+            stmt.setString(6, user.getDietRes());
+            stmt.setString(7, user.getFullName());
+            stmt.setString(8, user.getNickName());
 
-            // Register the OUT parameter for success
-            stmt.registerOutParameter(9, java.sql.Types.BOOLEAN);
-
-            // Execute the stored procedure
-            stmt.execute();
-
-            // Get the success value
-            boolean success = stmt.getBoolean(9);
-
-            if (success) {
-                logger.info("User updated successfully: " + user.getUserId());
-            } else {
-                logger.warning("No user updated with ID: " + user.getUserId());
+            // Execute and get result
+            ResultSet rs = stmt.executeQuery();
+            boolean success = false;
+            if (rs.next()) {
+                success = rs.getBoolean(1);
             }
 
             return success;

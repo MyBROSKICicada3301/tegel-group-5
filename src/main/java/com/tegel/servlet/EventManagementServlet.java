@@ -1,7 +1,9 @@
 package com.tegel.servlet;
 
 import com.tegel.dao.EventDAO;
+import com.tegel.dao.ImageDAO;
 import com.tegel.model.Event;
+import com.tegel.model.Image;
 import com.tegel.util.SecurityUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,7 +15,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,11 +26,16 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-@MultipartConfig
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,    // 1 MB
+    maxFileSize = 10 * 1024 * 1024,     // 10 MB
+    maxRequestSize = 50 * 1024 * 1024   // 50 MB
+)
 @WebServlet("/admin/events/*")
 public class EventManagementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());
     private EventDAO eventDAO = new EventDAO();
+    private ImageDAO imageDAO = new ImageDAO();
     private Gson gson;
     
     public EventManagementServlet() {
@@ -115,6 +124,49 @@ public class EventManagementServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         try {
+            // Process the image upload first to get the image ID for the event
+            Part imagePart = request.getPart("eventImage");
+            Integer imageId = null;
+
+            // If an image was uploaded, save it first
+            if (imagePart != null && imagePart.getSize() > 0) {
+                try (InputStream fileContent = imagePart.getInputStream()) {
+                    String fileName = imagePart.getSubmittedFileName();
+                    String contentType = imagePart.getContentType();
+
+                    // Validate file is an image
+                    if (contentType == null || !contentType.startsWith("image/")) {
+                        logger.warning("Uploaded file is not an image: " + contentType);
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("{\"error\":\"Only image files are allowed\"}");
+                        return;
+                    }
+
+                    byte[] imageData = fileContent.readAllBytes();
+
+                    Image imageObj = new Image();
+                    imageObj.setName(fileName);
+                    imageObj.setContentType(contentType);
+                    imageObj.setData(imageData);
+
+                    // Save the image first to get its ID
+                    // We'll associate it with the event after the event is created
+                    int imgId = imageDAO.saveImage(imageObj);
+
+                    if (imgId <= 0) {
+                        logger.warning("Failed to save image for event");
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\":\"Failed to save event image\"}");
+                        return;
+                    }
+
+                    // Store the image ID as an Integer object
+                    imageId = Integer.valueOf(imgId);
+                    logger.info("Successfully saved event image with ID: " + imageId);
+                }
+            }
+
+            // Now create the event with the image ID if we have one
             Event event = createEventFromRequest(request);
             if (event == null) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -122,6 +174,12 @@ public class EventManagementServlet extends HttpServlet {
                 return;
             }
             
+            // Set the image ID if we have one
+            if (imageId != null) {
+                event.setImageId(imageId);
+                logger.info("Setting event image ID to: " + imageId);
+            }
+
             // Set creator from session
             HttpSession session = request.getSession();
             Integer userId = (Integer) session.getAttribute("userId");
@@ -136,6 +194,13 @@ public class EventManagementServlet extends HttpServlet {
             
             if (eventDAO.createEvent(event)) {
                 logger.info("Event created successfully by user: " + userId);
+
+                // If we have an image ID, update the image record to associate it with the event
+                if (imageId != null) {
+                    imageDAO.updateEventIdForImage(imageId, event.getEventId());
+                    logger.info("Updated image " + imageId + " with event ID " + event.getEventId());
+                }
+
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 response.getWriter().write(gson.toJson(event));
             } else {
@@ -275,12 +340,38 @@ public class EventManagementServlet extends HttpServlet {
             String description = request.getParameter("description");
             String dateStr = request.getParameter("date");
             String location = request.getParameter("location");
-            String image = request.getParameter("image");
+            String image = request.getParameter("image"); // May be null if file upload is used instead
             String maxParticipantsStr = request.getParameter("maxParticipants");
             String isActiveStr = request.getParameter("isActive");
             String priceStr = request.getParameter("price");
             String hasFoodOptionStr = request.getParameter("hasFoodOption");
             String isPublicStr = request.getParameter("isPublic");
+
+            // Handle image upload if present
+            try {
+                Part imagePart = request.getPart("eventImage");
+                if (imagePart != null && imagePart.getSize() > 0) {
+                    String fileName = imagePart.getSubmittedFileName();
+                    String contentType = imagePart.getContentType();
+
+                    // Validate file is an image
+                    if (contentType != null && !contentType.startsWith("image/")) {
+                        logger.warning("Uploaded file is not an image: " + contentType);
+                        throw new SecurityException("Only image files are allowed");
+                    }
+
+                    // Store the image part for later processing after event creation
+                    // This way we can associate it with the event_id
+                    request.setAttribute("pendingImageUpload", true);
+                    request.setAttribute("pendingImagePart", imagePart);
+                    logger.info("Image prepared for upload with event");
+                }
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error handling image upload", e);
+            } catch (ServletException e) {
+                // Part may not be available if not multipart request
+                logger.log(Level.FINE, "No image part found in request", e);
+            }
 
             // parse the price
             double price = 0.0;
@@ -325,6 +416,7 @@ public class EventManagementServlet extends HttpServlet {
                 title = SecurityUtils.sanitizeInput(title);
                 description = description != null ? SecurityUtils.sanitizeTextArea(description) : null;
                 location = location != null ? SecurityUtils.sanitizeInput(location) : null;
+                // Only sanitize image if it's a path/URL, not if it's an image ID
                 image = image != null ? SecurityUtils.sanitizeInput(image) : null;
             } catch (SecurityException e) {
                 logger.warning("Input sanitization failed: " + e.getMessage());
@@ -394,7 +486,8 @@ public class EventManagementServlet extends HttpServlet {
             event.setActive(isActive);
             event.setHasFoodOption(hasFoodOption);
             event.setPrice(price);
-            
+            event.setPublic(isPublic);
+
             return event;
             
         } catch (SecurityException e) {

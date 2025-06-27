@@ -6,8 +6,20 @@
     <title>Announcements | Tegel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="styles.css" rel="stylesheet">
     <style>
+        /* Main body styling */
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            line-height: 1.6;
+        }
+
+        main {
+            min-height: 70vh;
+        }
+
+        /* Announcement specific styles */
         .announcement-card {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -30,68 +42,148 @@
         }
 
         .announcement-title {
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #333;
-            margin-right: 10px;
-        }
-
-        .announcement-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            margin-bottom: 0;
         }
 
         .announcement-date {
-            font-style: italic;
-        }
-
-        .announcement-author {
-            font-weight: 500;
+            font-size: 0.875rem;
+            color: #666;
         }
 
         .announcement-content {
-            line-height: 1.6;
-            color: #333;
-            white-space: pre-line;
+            color: #444;
         }
 
-        .private-announcement {
-            background-color: #fff8e1;
-            border-color: #ffecb3;
-        }
-
-        .loading-spinner {
+        .announcement-footer {
             display: flex;
-            justify-content: center;
-            margin: 50px 0;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
         }
 
-        .no-announcements {
-            text-align: center;
-            padding: 50px 0;
+        .announcement-author {
+            font-size: 0.875rem;
             color: #666;
-            font-style: italic;
         }
 
-        .admin-controls {
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-end;
+        /* Navbar Styles */
+        .navbar {
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(252, 125, 4, 1);
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+
+        .navbar .nav-link {
+            font-size: 18px;
+            padding: 12px 20px !important;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer styles */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px 0;
+            margin-top: 80px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .address-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            height: 40px;
+        }
+
+        /* Form styles */
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #ff8c1a;
+            box-shadow: 0 0 0 0.2rem rgba(255, 140, 26, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-text {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Error and success messages */
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+
+            .content-section {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(252,125,4,255);">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html" style="padding:0;">
-                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" style="height:40px; width:auto; display:inline-block; vertical-align:middle;">
+    <nav class="navbar navbar-expand-lg sticky-top" style="background: rgba(252,125,4,255);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/TEGEL LOGO.png" alt="Tegel Logo" height="40" class="d-inline-block align-middle">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
@@ -99,7 +191,7 @@
                     <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="events.html">Events</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link text-white active" href="announcements.html">Announcements</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="announcements.html" aria-current="page">Announcements</a></li>
                 </ul>
                 <div id="authButtons">
                     <a href="signup.html" class="btn btn-light me-2">Sign Up</a>

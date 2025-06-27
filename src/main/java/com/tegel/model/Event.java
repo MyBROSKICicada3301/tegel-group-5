@@ -9,7 +9,8 @@ public class Event {
     private String description;
     private LocalDate date;
     private String location;
-    private int image;
+    private String image;
+    private Integer imageId; // Added imageId field
     private int maxParticipants;
     private int currentParticipants;
     private int createdBy;
@@ -23,7 +24,7 @@ public class Event {
     public Event() {}
     
     public Event(String title, String description, LocalDate date, String location, 
-                 int image, int maxParticipants, int createdBy, boolean isActive,
+                 String image, int maxParticipants, int createdBy, boolean isActive,
                  boolean hasFoodOption, double price, boolean isPublic) {
         this.title = title;
         this.description = description;
@@ -55,9 +56,12 @@ public class Event {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
     
-    public int getImage() { return image; }
-    public void setImage(int image) { this.image = image; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
     
+    public Integer getImageId() { return imageId; } // Added getter for imageId
+    public void setImageId(int imageId) { this.imageId = imageId; } // Added setter for imageId
+
     public int getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
     

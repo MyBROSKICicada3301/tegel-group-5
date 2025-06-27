@@ -40,19 +40,18 @@ public class ImageUploadServlet extends HttpServlet {
             image.setContentType(contentType);
             image.setData(imageData);
 
-            boolean isSaved = imageDAO.saveImage(image);
+            // Now saveImage returns an image ID rather than a boolean
+            int imageId = imageDAO.saveImage(image);
 
-            if (isSaved) {
+            if (imageId > 0) {
                 response.setContentType("application/json");
                 response.getWriter()
-                        .write("{\success\": true, \"message\": \"Image uploaded successfully.\"}");
+                        .write("{\"success\": true, \"message\": \"Image uploaded successfully.\", \"imageId\": " + imageId + "}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter()
-                        .write("{\success\": false, \"message\": \"Image upload failed.\"}");
+                        .write("{\"success\": false, \"message\": \"Image upload failed.\"}");
             }
         }
-
     }
-
 }

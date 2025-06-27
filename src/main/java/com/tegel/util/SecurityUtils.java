@@ -110,9 +110,10 @@ public class SecurityUtils {
             throw new SecurityException("Invalid input detected");
         }
         
-        return input.trim()
-                   .replaceAll("[<>\"'&]", "") // Remove XSS characters
-                   .substring(0, Math.min(input.length(), 255)); // Limit length
+        // Store the intermediate result after trim and replaceAll
+        String sanitized = input.trim().replaceAll("[<>\"'&]", "");
+        // Now apply substring on the sanitized string's length
+        return sanitized.substring(0, Math.min(sanitized.length(), 255)); // Limit length
     }
     
     /**
@@ -127,9 +128,10 @@ public class SecurityUtils {
             throw new SecurityException("Invalid input detected");
         }
         
-        return input.trim()
-                   .replaceAll("[<>\"'&]", "")
-                   .substring(0, Math.min(input.length(), 2000));
+        // Store the intermediate result after trim and replaceAll
+        String sanitized = input.trim().replaceAll("[<>\"'&]", "");
+        // Now apply substring on the sanitized string's length
+        return sanitized.substring(0, Math.min(sanitized.length(), 2000)); // Limit length
     }
     
     /**

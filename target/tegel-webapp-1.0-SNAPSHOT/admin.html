@@ -167,7 +167,7 @@
                 <button class="btn btn-primary" type="button" onclick="searchEvents()">Search</button>
                 <button class="btn btn-secondary" type="button" onclick="resetEventSearch()">Reset</button>
             </div>
-            <button class="btn btn-success" onclick="showCreateEventModal()">
+            <button class="btn btn-success" onclick="window.location.href='admin-create.html'">
                 <i class="bi bi-plus-circle"></i> Create New Event
             </button>
         </div>
@@ -190,110 +190,6 @@
         </div>
     </div>
 </main>
-
-<!-- Create Event Modal -->
-<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createEventModalLabel">Create New Event</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createEventForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="eventTitle" class="form-label">Event Title *</label>
-                                <input type="text" class="form-control" id="eventTitle" name="title" required maxlength="100">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="eventDate" class="form-label">Event Date *</label>
-                                <input type="date" class="form-control" id="eventDate" name="date" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="eventLocation" class="form-label">Location</label>
-                                <input type="text" class="form-control" id="eventLocation" name="location" maxlength="100">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="maxParticipants" class="form-label">Max Participants</label>
-                                <input type="number" class="form-control" id="maxParticipants" name="maxParticipants" min="0" max="10000">
-                                <small class="form-text text-muted">Leave empty for unlimited</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="eventPrice" class="form-label">Event Price (€)</label>
-                                <input type="number" class="form-control" id="eventPrice" name="price"
-                                       min="0" step="0.01" value="0.00">
-                                <small class="form-text text-muted">Set to 0 for free events</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Food Options</label>
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="hasFoodOption" name="hasFoodOption">
-                                    <label class="form-check-label" for="hasFoodOption">
-                                        <strong>This event includes food options</strong>
-                                    </label>
-                                    <div class="form-text">Enables participants to select food options during enrollment</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="eventDescription" name="description" rows="4" maxlength="2000"></textarea>
-                        <small class="form-text text-muted">Max 2000 characters</small>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="eventImage" class="form-label">Image URL</label>
-                                <input type="url" class="form-control" id="eventImage" name="image">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="isPublic" name="isPublic" checked>
-                                    <label class="form-check-label" for="isPublic">
-                                        Make this event public
-                                    </label>
-                                </div>
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
-                                    <label class="form-check-label" for="isActive">
-                                        Active Event
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" onclick="createEvent()">Create Event</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Edit Event Modal -->
 <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
@@ -370,6 +266,17 @@
                             <div class="mb-3">
                                 <label for="editEventImage" class="form-label">Image URL</label>
                                 <input type="url" class="form-control" id="editEventImage" name="image">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="editIsPublic" name="isPublic">
+                                    <label class="form-check-label" for="editIsPublic">
+                                        Public Event
+                                    </label>
+                                    <div class="form-text">If checked, event will be visible to non-members</div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -805,53 +712,6 @@
         });
     }
 
-    // Event Management Functions
-    function showCreateEventModal() {
-        // Set minimum date to today
-        document.getElementById('eventDate').min = new Date().toISOString().split('T')[0];
-        new bootstrap.Modal(document.getElementById('createEventModal')).show();
-    }
-
-    function createEvent() {
-        const form = document.getElementById('createEventForm');
-        const formData = new FormData(form);
-
-        // Validate required fields
-        if (!formData.get('title') || !formData.get('date')) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        // Handle checkboxes properly
-        const hasFoodOption = document.getElementById('hasFoodOption').checked;
-        const isActive = document.getElementById('isActive').checked;
-        const isPublic = document.getElementById('isPublic').checked;
-
-        formData.set('hasFoodOption', hasFoodOption ? 'on' : 'off');
-        formData.set('isActive', isActive ? 'on' : 'off');
-        formData.set('isPublic', isPublic ? 'on' : 'off');
-
-        fetch('/tegel_webapp/admin/events', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.eventId) {
-                    alert('Event created successfully!');
-                    bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
-                    form.reset();
-                    loadEvents(); // Reload events
-                } else {
-                    alert(data.error || 'Failed to create event.');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating event:', error);
-                alert('Error creating event. Please try again.');
-            });
-    }
-
     function editEvent(eventId) {
         const event = events.find(e => e.eventId === eventId);
         if (!event) return;
@@ -865,12 +725,15 @@
         document.getElementById('editEventDescription').value = event.description || '';
         document.getElementById('editEventImage').value = event.image || '';
         document.getElementById('editIsActive').checked = event.isActive;
-        document.getElementById('editEventPrice').value = event.price || 0;
-        document.getElementById('editHasFoodOption').checked = event.hasFoodOption || false;
+        document.getElementById('editIsPublic').checked = event.isPublic; // Add this line
+
+        // Fix these ID references to match your HTML
+        document.getElementById('eventPrice').value = event.price || 0;
+        document.getElementById('hasFoodOption').checked = event.hasFoodOption || false;
 
         // Set minimum date to today for future events
         document.getElementById('editEventDate').min = new Date().toISOString().split('T')[0];
-        
+
         new bootstrap.Modal(document.getElementById('editEventModal')).show();
     }
 
@@ -922,34 +785,57 @@
     }
 
     function viewEventDetails(eventId) {
-        window.open(`event-details.html?eventId=${eventId}`, '_blank');
+        // Navigate to event details in the same window/tab
+        window.location.href = `event-details.html?eventId=${eventId}`;
     }
 
-    // Toggle event status (active/inactive)
     function toggleEventStatus(eventId, newStatus) {
         const action = newStatus ? 'activate' : 'deactivate';
         if (confirm(`Are you sure you want to ${action} this event?`)) {
-            fetch(`/tegel_webapp/admin/events/${eventId}/status`, {
+            // Get the current event to retain all its properties
+            const event = events.find(e => e.eventId === eventId);
+            if (!event) {
+                alert("Event not found");
+                return;
+            }
+
+            // Create a form data with all event properties
+            const formData = new FormData();
+            formData.append('title', event.title);
+            formData.append('date', event.date);
+            formData.append('location', event.location || '');
+            formData.append('description', event.description || '');
+            formData.append('maxParticipants', event.maxParticipants || '');
+            formData.append('image', event.image || '');
+            formData.append('price', event.price || 0);
+            formData.append('hasFoodOption', event.hasFoodOption || false);
+            formData.append('isPublic', event.isPublic || false);
+            formData.append('isActive', newStatus); // Update status
+
+            // Use the standard event update endpoint
+            fetch(`${contextPath}/admin/events/${eventId}`, {
                 method: 'PUT',
-                body: JSON.stringify({ isActive: newStatus }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                body: formData,
+                credentials: 'include'
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                .then(response => {
+                    if (!response.ok) {
+                        console.error(`Server responded with status: ${response.status}`);
+                        return response.text().then(text => {
+                            throw new Error(text || `Server error: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     alert(`Event ${action}d successfully!`);
-                    events.find(e => e.eventId === eventId).isActive = newStatus;
+                    event.isActive = newStatus;
                     renderEvents();
-                } else {
-                    alert('Failed to update event status.');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating event status:', error);
-                alert('Error updating event status. Please try again.');
-            });
+                })
+                .catch(error => {
+                    console.error('Error updating event status:', error);
+                    alert(`Error updating event status: ${error.message}`);
+                });
         }
     }
 

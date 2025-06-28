@@ -184,7 +184,7 @@
                        target="_blank" rel="noopener" class="me-3">
                         <i class="bi bi-instagram text-warning fs-4"></i>
                     </a>
-                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <a href="mailto:tegelmin@gmail.com" target="_blank" rel="noopener">
                         <i class="bi bi-envelope text-warning fs-4"></i>
                     </a>
                 </div>
@@ -408,7 +408,7 @@
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
-                .then(data => {
+                .then data => {
                     bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
                     loadNewsletters();
                     newsletterToDelete = null;

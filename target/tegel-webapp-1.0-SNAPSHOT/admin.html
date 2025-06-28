@@ -16,7 +16,7 @@
             display: flex;
             flex-direction: column;
             font-family: 'Segoe UI', sans-serif;
-            background-color: #ffffff !important;
+            background-color: #ffefe0 !important; /* Orange-tinted background */
             margin: 0;
             padding: 0;
         }
@@ -59,97 +59,67 @@
             width: 100%;
             margin-bottom: 40px;
         }
-        .admin-card h2 {
-            color: #333;
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
+        .admin-card h2, .admin-card h5, .modal-title, .table thead th {
+            text-align: center !important;
+        }
+        .admin-card {
+            margin-bottom: 48px;
+            padding: 48px 36px;
+        }
+        .admin-card .input-group, .admin-card .table-responsive, .admin-card .d-flex {
+            margin-bottom: 24px !important;
+        }
+        .admin-card .btn, .admin-card .form-control {
+            margin-right: 8px;
+        }
+        .admin-card .btn:last-child, .admin-card .form-control:last-child {
+            margin-right: 0;
+        }
+        .table {
+            margin-bottom: 0;
         }
         .table thead th {
-            background: #ff8c1a;
-            color: #fff;
-            border: none;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
         }
-        .table tbody tr {
-            background: rgba(255,255,255,0.85);
+        .table tbody td {
+            vertical-align: middle;
+            padding: 14px 10px;
         }
-        .btn-role {
-            min-width: 100px;
+        .modal-title {
+            width: 100%;
         }
-        .btn-delete {
-            background: #e74c3c;
-            color: #fff;
+        .modal-content {
+            padding: 12px 0;
         }
-        .btn-delete:hover {
-            background: #c0392b;
-            color: #fff;
+        .form-label, .form-check-label {
+            font-weight: 500;
         }
-        .footer {
-            background-color: black !important;
-            color: #ffffff;
-            padding: 30px 0;
-            margin-top: auto;
+        .form-control, .form-check-input {
+            margin-bottom: 12px;
         }
-
-        .footer .social-links a {
-            color: #ffc107;
-            text-decoration: none;
-            margin-right: 15px;
-            font-size: 1.5rem;
-            transition: color 0.3s ease, transform 0.3s ease;
+        .mb-3 {
+            margin-bottom: 1.5rem !important;
         }
-
-        .footer .social-links a:hover {
-            color: #ffeb3b;
-            transform: translateY(-2px);
+        .d-flex.justify-content-between.align-items-center.mb-3 {
+            margin-bottom: 2rem !important;
         }
-
-        .footer .address-text {
-            color: #adb5bd;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .footer .footer-brand {
-            max-width: 90px;
-            height: auto;
-        }
-
-        /* Footer responsive adjustments */
-        @media (max-width: 768px) {
-            .footer {
-                padding: 20px 0;
-                text-align: center;
-            }
-
-            .footer .social-links {
-                margin-bottom: 15px;
-            }
-
-            .footer .social-links a {
-                margin: 0 10px;
-            }
-
-            .footer .address-text {
-                margin-bottom: 15px;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .admin-card {
-                padding: 20px 5px;
-            }
-            .table-responsive {
-                font-size: 14px;
-            }
-        }
-
         .event-thumbnail {
             width: 50px;
             height: 50px;
             object-fit: cover;
             border-radius: 5px;
+        }
+        .btn-delete {
+            background: #e74c3c !important;
+            color: #fff !important;
+            border: none !important;
+        }
+        .btn-delete:hover, .btn-delete:focus {
+            background: #c0392b !important;
+            color: #fff !important;
+            border: none !important;
         }
     </style>
 </head>
@@ -1356,13 +1326,28 @@
         fetch(url, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
-                let html = `<h6>Participants for <strong>${eventTitle}</strong></h6>`;
+                let html = `<h6 style="text-align:center; margin-bottom: 20px;">Participants for <strong>${eventTitle}</strong></h6>`;
                 if (!Array.isArray(data) || data.length === 0) {
                     html += '<div class="alert alert-info mt-3">No participants enrolled for this event.</div>';
                 } else {
-                    html += `<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Dietary Restriction</th></tr></thead><tbody>`;
+                    html += `<div class="table-responsive" style="margin-top: 20px;">
+                        <table class="table table-bordered align-middle" style="background: #fff; border-radius: 10px; overflow: hidden;">
+                        <thead>
+                            <tr style="text-align:center; background:#f8f9fa;">
+                                <th style="text-align:center;">Name</th>
+                                <th style="text-align:center;">Email</th>
+                                <th style="text-align:center;">Phone</th>
+                                <th style="text-align:center;">Dietary Restriction</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
                     data.forEach(user => {
-                        html += `<tr><td>${user.fullName || user.email}</td><td>${user.email}</td><td>${user.phoneNumber || 'N/A'}</td><td>${user.dietRes || 'None'}</td></tr>`;
+                        html += `<tr>
+                            <td style="text-align:center; vertical-align:middle;">${user.fullName || user.email}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.email}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.phoneNumber || 'N/A'}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.dietRes || 'None'}</td>
+                        </tr>`;
                     });
                     html += '</tbody></table></div>';
                 }
@@ -1388,7 +1373,7 @@
             return response.blob();
         })
         .then(blob => {
-            // Create a link element to trigger the download
+            // This creates a link element to trigger the download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';

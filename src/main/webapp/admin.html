@@ -371,6 +371,26 @@
     </div>
 </div>
 
+<!-- Participants Modal -->
+<div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="participantsModalLabel">Event Participants</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="participantsListContainer">
+                    <!-- Participants table will be injected here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer class="footer mt-2 py-3 bg-dark text-white">
     <div class="container">
         <div class="row align-items-center">
@@ -860,6 +880,8 @@
                             ${event.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                         <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showParticipants(${event.eventId}, '${event.title.replace(/'/g, "&#39;")}')">View Participants</button>
+                        <button class="btn btn-outline-success btn-sm" onclick="downloadParticipants(${event.eventId})">Download Participants</button>
                     </div>
                 </td>
             `;
@@ -1099,6 +1121,8 @@
                             ${event.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                         <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showParticipants(${event.eventId}, '${event.title.replace(/'/g, "&#39;")}')">View Participants</button>
+                        <button class="btn btn-outline-success btn-sm" onclick="downloadParticipants(${event.eventId})">Download Participants</button>
                     </div>
                 </td>
             `;
@@ -1305,6 +1329,60 @@
                 console.error('Error resetting password:', error);
                 notificationSystem.error('Error resetting password. Please try again.');
             });
+    }
+
+    function showParticipants(eventId, eventTitle) {
+        const url = `${contextPath}/admin/events/${eventId}/participants`;
+        fetch(url, { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                let html = `<h6>Participants for <strong>${eventTitle}</strong></h6>`;
+                if (!Array.isArray(data) || data.length === 0) {
+                    html += '<div class="alert alert-info mt-3">No participants enrolled for this event.</div>';
+                } else {
+                    html += `<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Dietary Restriction</th></tr></thead><tbody>`;
+                    data.forEach(user => {
+                        html += `<tr><td>${user.fullName || user.email}</td><td>${user.email}</td><td>${user.phoneNumber || 'N/A'}</td><td>${user.dietRes || 'None'}</td></tr>`;
+                    });
+                    html += '</tbody></table></div>';
+                }
+                document.getElementById('participantsListContainer').innerHTML = html;
+                new bootstrap.Modal(document.getElementById('participantsModal')).show();
+            })
+            .catch(err => {
+                document.getElementById('participantsListContainer').innerHTML = '<div class="alert alert-danger">Failed to load participants.</div>';
+                new bootstrap.Modal(document.getElementById('participantsModal')).show();
+            });
+    }
+
+    function downloadParticipants(eventId) {
+        // Start the download of participants as CSV
+        fetch(`${contextPath}/admin/events/${eventId}/participants/download`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a link element to trigger the download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `participants_event_${eventId}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            notificationSystem.success('Participants downloaded successfully.');
+        })
+        .catch(error => {
+            console.error('Error downloading participants:', error);
+            notificationSystem.error('Error downloading participants. Please try again.');
+        });
     }
 </script>
 <script src="js/session-manager.js"></script>

@@ -75,30 +75,13 @@ public class EventServlet extends HttpServlet {
                 }
                 logger.info("EventServlet: Retrieved " + events.size() + " events");
 
-                // Only show event titles to unauthenticated users
-                boolean isAuthenticated = request.getSession(false) != null && request.getSession(false).getAttribute("user") != null;
-                if (!isAuthenticated) {
-                    // Return only event titles (and date for sorting)
-                    var simpleEvents = events.stream().map(e -> new Object() {
-                        String title = e.getTitle();
-                        LocalDate date = e.getDate();
-                    }).collect(Collectors.toList());
-                    String jsonEvents = gson.toJson(simpleEvents);
-                    response.getWriter().write(jsonEvents);
-                    logger.info("EventServlet: Sent only event titles for unauthenticated user");
-                    return;
-                }
-
-                // Update current participant count for each event
+                // Always return full event data for all users
                 for (Event event : events) {
                     try {
                         int count = eventDAO.getEventParticipantCount(event.getEventId());
                         if (count >= 0) {
                             event.setCurrentParticipants(count);
                         }
-
-                        // If imageId is null but the image column contains an integer value,
-                        // try to convert it and set as imageId
                         if (event.getImageId() == null && event.getImage() != null) {
                             try {
                                 int imageId = Integer.parseInt(event.getImage());
@@ -107,7 +90,6 @@ public class EventServlet extends HttpServlet {
                                         "Converted image string to ID: " + imageId + " for event " +
                                                 event.getEventId());
                             } catch (NumberFormatException e) {
-                                // Not a number, leave as is (probably a legacy URL)
                                 logger.fine("Unable to parse image as ID for event " +
                                                     event.getEventId() + ": " + event.getImage());
                             }

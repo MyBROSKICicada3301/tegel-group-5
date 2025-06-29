@@ -250,6 +250,9 @@
         <a href="events.html" class="btn btn-outline-orange">
             <i class="bi bi-arrow-left"></i> Back to Events
         </a>
+        <button id="editEventButton" class="btn btn-primary" style="display: none;">
+            <i class="bi bi-pencil-square me-2"></i>Edit Event
+        </button>
     </div>
 
     <div id="eventContent" class="mb-5">
@@ -333,6 +336,8 @@
                         <i class="bi bi-person-plus me-2"></i> Enroll Now
                     </button>
                 </div>
+
+
             </div>
         </div>
     </template>
@@ -454,6 +459,7 @@
             duration: "20:00 - 02:00"
         }
     ];
+    const contextPath = '/tegel_webapp';
 
     // Extract event ID from URL query parameters
     function getEventIdFromURL() {
@@ -507,6 +513,7 @@
                 } else {
                     throw new Error('Invalid event data received');
                 }
+                setupEditButton(event);
             })
             .catch(error => {
                 console.error(`Error loading event ${eventId}:`, error);
@@ -1249,6 +1256,150 @@
                 alert('An error occurred while enrolling. Please try again later.');
             });
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('updateEventBtn').addEventListener('click', updateEvent);
+    });
+
+    // check permissions below this
+    let currentEvent = null;
+    let currentUser = null;
+
+    // Check if user is logged in and has proper permissions
+    function checkEditPermissions(event) {
+        fetch('/tegel_webapp/check-session')
+            .then(response => response.json())
+            .then(data => {
+                currentUser = data;
+
+                // Show edit button only if user is logged in, is a member/admin, and created this event
+                const editButton = document.getElementById('editEventButton');
+                if (data.loggedIn &&
+                    (data.role === 'member' || data.role === 'admin') &&
+                    event.createdBy === data.userId) {
+                    editButton.style.display = 'inline-block';
+                } else {
+                    editButton.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking user permissions:', error);
+            });
+    }
+
+    // Setup edit button and permissions when event is loaded
+    function setupEditButton(event) {
+        currentEvent = event;
+        checkEditPermissions(event);
+
+        // Add click handler to the edit button
+        document.getElementById('editEventButton').addEventListener('click', function() {
+            openEditModal(event);
+        });
+    }
+    // Open the edit modal and populate with event data
+    function openEditModal(event) {
+        // Populate form fields
+        document.getElementById('editEventId').value = event.id || event.eventId;
+        document.getElementById('editEventTitle').value = event.title;
+
+        // Format date for the date input (YYYY-MM-DD)
+        if (event.date) {
+            const eventDate = new Date(event.date);
+            const formattedDate = eventDate.toISOString().split('T')[0];
+            document.getElementById('editEventDate').value = formattedDate;
+        }
+
+        document.getElementById('editEventLocation').value = event.location || '';
+        document.getElementById('editMaxParticipants').value = event.maxParticipants || '';
+        document.getElementById('editEventDescription').value = event.description || '';
+        document.getElementById('editEventPrice').value = event.price || 0;
+        document.getElementById('editHasFoodOption').checked = event.hasFoodOption || false;
+        document.getElementById('editIsPublic').checked = event.isPublic || false;
+
+        // Reset file input
+        document.getElementById('editEventImage').value = '';
+
+        // Handle image preview
+        const previewContainer = document.getElementById('currentImagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const currentImageIdField = document.getElementById('currentImageId');
+
+        if (event.imageId) {
+            currentImageIdField.value = event.imageId;
+            previewImg.src = `/tegel_webapp/get-image?id=${event.imageId}`;
+            previewContainer.style.display = 'block';
+        } else if (event.image && !isNaN(parseInt(event.image))) {
+            const imageId = parseInt(event.image);
+            currentImageIdField.value = imageId;
+            previewImg.src = `/tegel_webapp/get-image?id=${imageId}`;
+            previewContainer.style.display = 'block';
+        } else {
+            currentImageIdField.value = '';
+            previewContainer.style.display = 'none';
+        }
+
+        // Set minimum date to today for future events
+        document.getElementById('editEventDate').min = new Date().toISOString().split('T')[0];
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
+        modal.show();
+    }
+
+    // Update event when form is submitted
+    function updateEvent() {
+        const form = document.getElementById('editEventForm');
+        const formData = new FormData(form);
+        const eventId = formData.get('eventId');
+
+        // Check if a new image was uploaded
+        const fileInput = document.getElementById('editEventImage');
+        const currentImageId = document.getElementById('currentImageId').value;
+
+        // If no new file is selected but we have a current image ID, use that
+        if (fileInput.files.length === 0 && currentImageId) {
+            formData.delete('eventImage');
+            formData.append('image', currentImageId);
+        }
+
+        // Show loading message
+        const messageDiv = document.getElementById('editEventMessage');
+        messageDiv.innerHTML = '<div class="alert alert-info">Updating event...</div>';
+
+        fetch(`${contextPath}/admin/events/${eventId}`, {
+            method: 'PUT',
+            body: formData,
+            credentials: 'include'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            throw new Error(text || `Server error: ${response.status}`);
+                        }
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.eventId || data.success) {
+                    messageDiv.innerHTML = '<div class="alert alert-success">Event updated successfully!</div>';
+                    setTimeout(() => {
+                        // Close modal and reload page to see updated event
+                        bootstrap.Modal.getInstance(document.getElementById('editEventModal')).hide();
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-danger">${data.error || 'Failed to update event.'}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error updating event:', error);
+                messageDiv.innerHTML = `<div class="alert alert-danger">Error updating event: ${error.message}</div>`;
+            });
+    }
 
 </script>
 
@@ -1283,6 +1434,107 @@
                             width="100%" height="100%" style="border:0; min-height:300px;" allowfullscreen="" loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="editEventMessage"></div>
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId" name="eventId">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEventTitle" class="form-label">Event Title *</label>
+                                <input type="text" class="form-control" id="editEventTitle" name="title" required maxlength="100">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEventDate" class="form-label">Event Date *</label>
+                                <input type="date" class="form-control" id="editEventDate" name="date" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEventLocation" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="editEventLocation" name="location" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editMaxParticipants" class="form-label">Max Participants</label>
+                                <input type="number" class="form-control" id="editMaxParticipants" name="maxParticipants" min="0" max="10000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEventPrice" class="form-label">Event Price (€)</label>
+                                <input type="number" class="form-control" id="editEventPrice" name="price"
+                                       min="0" step="0.01" value="0.00">
+                                <small class="form-text text-muted">Set to 0 for free events</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Food Options</label>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="editHasFoodOption" name="hasFoodOption">
+                                    <label class="form-check-label" for="editHasFoodOption">
+                                        <strong>This event includes food options</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editEventDescription" name="description" rows="4" maxlength="2000"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editEventImage" class="form-label">Event Image</label>
+                                <input type="file" class="form-control" id="editEventImage" name="eventImage" accept="image/*">
+                                <small class="form-text text-muted">Upload a new image for this event</small>
+                                <input type="hidden" id="currentImageId" name="currentImageId">
+                                <div id="currentImagePreview" class="mt-2" style="display: none;">
+                                    <p>Current image:</p>
+                                    <img id="previewImg" src="" alt="Current event image" style="max-width: 100%; max-height: 150px;" class="img-thumbnail">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="editIsPublic" name="isPublic">
+                                    <label class="form-check-label" for="editIsPublic">
+                                        Public Event
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateEventBtn">Update Event</button>
             </div>
         </div>
     </div>

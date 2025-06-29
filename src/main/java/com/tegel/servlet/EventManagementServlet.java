@@ -35,7 +35,7 @@ import java.util.logging.Level;
         maxRequestSize = 50 * 1024 * 1024   // 50 MB
 )
 
-@WebServlet("/admin/events/*")
+@WebServlet({"/admin/events/*", "/members/events/*"})
 public class EventManagementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());
     private final EventDAO eventDAO = new EventDAO();
@@ -80,7 +80,20 @@ public class EventManagementServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        // check if its a member path
+        boolean isMemberPath = request.getServletPath().startsWith("/members/");
+        HttpSession session = request.getSession(false);
+        Integer userId = (Integer) session.getAttribute("userId");
+
         try {
+            if (isMemberPath &&
+                    (pathInfo == null || "/".equals(pathInfo) || "/all".equals(pathInfo))) {
+                // Get events created by the member
+                List<Event> events = eventDAO.getEventsByCreator(userId);
+                response.getWriter().write(gson.toJson(events));
+                return;
+            }
+
             if (pathInfo != null && pathInfo.matches("/\\d+/participants")) {
                 // /admin/events/{eventId}/participants
                 int eventId = Integer.parseInt(pathInfo.split("/")[1]);
@@ -105,17 +118,22 @@ public class EventManagementServlet extends HttpServlet {
                 var participants = userDAO.getUsersByEventId(eventId);
                 // Set headers for CSV download
                 response.setContentType("text/csv");
-                response.setHeader("Content-Disposition", "attachment; filename=participants_event_" + eventId + ".csv");
+                response.setHeader("Content-Disposition",
+                                   "attachment; filename=participants_event_" + eventId + ".csv");
                 response.setCharacterEncoding("UTF-8");
                 // Write CSV header
                 response.getWriter().println("Full Name,Email,Phone Number,Dietary Restrictions");
                 // Write participant data
                 for (var user : participants) {
                     String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\"",
-                        user.getFullName() != null ? user.getFullName().replace("\"", "''") : "",
-                        user.getEmail() != null ? user.getEmail().replace("\"", "''") : "",
-                        user.getPhoneNumber() != null ? user.getPhoneNumber().replace("\"", "''") : "",
-                        user.getDietRes() != null ? user.getDietRes().replace("\"", "''") : "");
+                                                user.getFullName() != null ?
+                                                        user.getFullName().replace("\"", "''") : "",
+                                                user.getEmail() != null ?
+                                                        user.getEmail().replace("\"", "''") : "",
+                                                user.getPhoneNumber() != null ?
+                                                        user.getPhoneNumber().replace("\"", "''") :
+                                                        "", user.getDietRes() != null ?
+                                                        user.getDietRes().replace("\"", "''") : "");
                     response.getWriter().println(line);
                 }
                 return;
@@ -302,15 +320,11 @@ public class EventManagementServlet extends HttpServlet {
      *
      * @param request  the HttpServletRequest object
      * @param response the HttpServletResponse object
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
-        if (!isAuthorized(request, response)) {
-            return;
-        }
 
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
@@ -441,7 +455,7 @@ public class EventManagementServlet extends HttpServlet {
      *
      * @param request  the HttpServletRequest object
      * @param response the HttpServletResponse object
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
@@ -687,17 +701,69 @@ public class EventManagementServlet extends HttpServlet {
             return false;
         }
 
-        String userRole =
-                (String) session.getAttribute("role"); // Changed from "userRole" to "role"
+        String userRole = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
 
-        if (!"admin".equals(userRole) || userId == null) {
-            logger.warning("Unauthorized access attempt to event management by user: " + userId);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("{\"error\":\"Admin access required\"}");
+        if (userId == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"User not authenticated\"}");
             return false;
         }
 
-        return true;
+        // Check if it's an admin path or member path
+        String servletPath = request.getServletPath();
+        boolean isAdminPath = servletPath.startsWith("/admin/");
+        boolean isMemberPath = servletPath.startsWith("/member/");
+
+        // Admin can access admin paths
+        if (isAdminPath && "admin".equals(userRole)) {
+            return true;
+        }
+
+        // For member paths, check if they're accessing their own event
+        if (isMemberPath) {
+            String pathInfo = request.getPathInfo();
+            if (pathInfo == null || !pathInfo.startsWith("/") || pathInfo.length() == 1) {
+                // For GET requests listing events, allow members to see their own
+                if (request.getMethod().equals("GET")) {
+                    return true;
+                }
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Event ID required\"}");
+                return false;
+            }
+
+            try {
+                // Extract event ID
+                String eventIdStr = pathInfo.split("/")[1];
+                int eventId = Integer.parseInt(eventIdStr);
+
+                // Get the event to check ownership
+                Event event = eventDAO.getEventById(eventId);
+                if (event == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("{\"error\":\"Event not found\"}");
+                    return false;
+                }
+
+                // Allow if user is the creator of the event
+                if (event.getCreatedBy() == userId) {
+                    return true;
+                }
+
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("{\"error\":\"You can only edit your own events\"}");
+                return false;
+            } catch (NumberFormatException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"Invalid event ID\"}");
+                return false;
+            }
+        }
+
+        // If we reach here, access is denied
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.getWriter().write("{\"error\":\"Access denied\"}");
+        return false;
     }
 }

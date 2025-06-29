@@ -1,8 +1,11 @@
 package com.tegel.servlet;
 
+import com.tegel.dao.ImageDAO;
+import com.tegel.model.Image;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,9 +20,6 @@ import com.tegel.util.LocalDateTimeAdapter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -205,6 +205,12 @@ public class EventServlet extends HttpServlet {
                 "ADMIN".equals(userRole) || "MEMBER".equals(userRole) ||
                 "ADMIN".equals(role) || "MEMBER".equals(role));
 
+        // Determine if user is specifically an admin (not just a member)
+        boolean isAdmin = ("admin".equalsIgnoreCase(userRole) ||
+                "admin".equalsIgnoreCase(role) ||
+                "ADMIN".equals(userRole) ||
+                "ADMIN".equals(role));
+
         if (!isAuthorized) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("{\"error\":\"Admin or member access required\"}");
@@ -246,13 +252,48 @@ public class EventServlet extends HttpServlet {
                 event.setMaxParticipants(0); // 0 = unlimited
             }
 
-            if (image != null && !image.trim().isEmpty()) {
-                event.setImage(String.valueOf(Integer.parseInt(image)));
-            } else {
-                // Set a default value or null
-                event.setImage("0"); // Default image ID
+            // Handle image upload
+            try {
+                // Get the uploaded file part
+                Part filePart = request.getPart("eventImage");
+
+                if (filePart != null && filePart.getSize() > 0) {
+                    String fileName = filePart.getSubmittedFileName();
+                    String contentType = filePart.getContentType();
+
+                    // Create image object
+                    Image img = new Image();
+                    img.setName(fileName);
+                    img.setContentType(contentType);
+
+                    // Save the image and get the ID
+                    try (InputStream inputStream = filePart.getInputStream()) {
+                        img.setData(inputStream.readAllBytes());
+                        ImageDAO imageDAO = new ImageDAO();
+                        int imageId = imageDAO.saveImage(img);
+
+                        if (imageId > 0) {
+                            // Set the image ID for the event
+                            event.setImageId(imageId);
+                            logger.info("Image saved with ID: " + imageId);
+                        } else {
+                            logger.warning("Failed to save image, imageId is " + imageId);
+                        }
+                    }
+                } else {
+                    logger.info("No image uploaded or empty image file");
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error processing image upload", e);
+                // Continue with event creation without image
             }
-            event.setActive("true".equalsIgnoreCase(isActiveStr) || "on".equals(isActiveStr));
+            if (isAdmin) {
+                // Admins can set active status as provided in the form
+                event.setActive("true".equalsIgnoreCase(isActiveStr) || "on".equals(isActiveStr));
+            } else {
+                // Members' events are always inactive by default
+                event.setActive(false);
+            }
             event.setPublic("true".equalsIgnoreCase(isPublicStr) || "on".equals(isPublicStr));
 
             // Set price, default to 0

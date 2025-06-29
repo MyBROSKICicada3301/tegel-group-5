@@ -38,10 +38,9 @@ public class EventDAO {
             return false;
         }
 
-        String sql =
-                "INSERT INTO " + SCHEMA + ".event (title, description, date, location, " +
-                        "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic, image) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + SCHEMA + ".event (title, description, date, location, " +
+                "maxparticipants, createdby, isactive, price, hasfoodoption, ispublic, image) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Debug the hasFoodOption value before SQL execution
         logger.info("Setting hasFoodOption to: " + event.isHasFoodOption());
@@ -228,9 +227,9 @@ public class EventDAO {
 
         if (event.getImageId() != null) {
             sql = "UPDATE " + SCHEMA +
-                ".event SET title = ?, description = ?, date = ?, location = ?, " +
-                "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
-                ", ispublic = ? WHERE event_id = ?";
+                    ".event SET title = ?, description = ?, date = ?, location = ?, " +
+                    "image = ?, maxparticipants = ?, isactive = ?, price = ?, hasfoodoption = ?" +
+                    ", ispublic = ? WHERE event_id = ?";
         }
 
         try (Connection conn = getConnection()) {
@@ -354,9 +353,9 @@ public class EventDAO {
 
     public List<Event> getUpcomingEvents() {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM " + SCHEMA + ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        String sql = "SELECT * FROM " + SCHEMA +
+                ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 events.add(mapResultSetToEvent(rs));
@@ -372,7 +371,8 @@ public class EventDAO {
      */
     public List<Event> getUpcomingEvents(int limit) {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM " + SCHEMA + ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date LIMIT ?";
+        String sql = "SELECT * FROM " + SCHEMA +
+                ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date LIMIT ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, limit);
@@ -723,6 +723,7 @@ public class EventDAO {
             return false;
         }
     }
+
     /**
      * Updates the approval status of an event to APPROVED.
      *
@@ -818,6 +819,7 @@ public class EventDAO {
 
     /**
      * Updates an event with the associated image ID
+     *
      * @param eventId The ID of the event to update
      * @param imageId The ID of the image to associate with the event
      * @return true if update was successful, false otherwise

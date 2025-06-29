@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
  * Servlet to handle event-related operations such as fetching events and their details.
  */
 @MultipartConfig
-@WebServlet("/events/*")
+@WebServlet({"/events/*", "/api/events/*"})
 public class EventServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventServlet.class.getName());
     private final EventDAO eventDAO = new EventDAO();
@@ -38,8 +39,6 @@ public class EventServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getSession(false);
-
         logger.info("EventServlet: Request received for path: " + request.getRequestURI());
 
         response.setContentType("application/json");
@@ -49,11 +48,46 @@ public class EventServlet extends HttpServlet {
         logger.info("EventServlet: Path info: " + pathInfo);
 
         try {
+            String upcomingParam = request.getParameter("upcoming");
+            String limitParam = request.getParameter("limit");
+            boolean upcoming = upcomingParam != null && upcomingParam.equalsIgnoreCase("true");
+            int limit = 0;
+            if (limitParam != null) {
+                try {
+                    limit = Integer.parseInt(limitParam);
+                } catch (NumberFormatException e) {
+                    limit = 0;
+                }
+            }
+
             if (pathInfo == null || pathInfo.equals("/")) {
-                // Get all active events for public view
-                logger.info("EventServlet: Fetching all active events");
-                List<Event> events = eventDAO.getAllActiveEvents();
+                List<Event> events;
+                if (upcoming) {
+                    // Fetch only upcoming events, with optional limit
+                    if (limit > 0) {
+                        events = eventDAO.getUpcomingEvents(limit);
+                    } else {
+                        events = eventDAO.getUpcomingEvents();
+                    }
+                } else {
+                    // Get all active events for public view
+                    events = eventDAO.getAllActiveEvents();
+                }
                 logger.info("EventServlet: Retrieved " + events.size() + " events");
+
+                // Only show event titles to unauthenticated users
+                boolean isAuthenticated = request.getSession(false) != null && request.getSession(false).getAttribute("user") != null;
+                if (!isAuthenticated) {
+                    // Return only event titles (and date for sorting)
+                    var simpleEvents = events.stream().map(e -> new Object() {
+                        String title = e.getTitle();
+                        LocalDate date = e.getDate();
+                    }).collect(Collectors.toList());
+                    String jsonEvents = gson.toJson(simpleEvents);
+                    response.getWriter().write(jsonEvents);
+                    logger.info("EventServlet: Sent only event titles for unauthenticated user");
+                    return;
+                }
 
                 // Update current participant count for each event
                 for (Event event : events) {

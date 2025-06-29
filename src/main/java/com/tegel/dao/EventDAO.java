@@ -377,6 +377,28 @@ public class EventDAO {
         return events;
     }
 
+    /**
+     * Returns a list of upcoming (future or today) active events, ordered by date ascending, limited to the specified number.
+     */
+    public List<Event> getUpcomingEvents(int limit) {
+        List<Event> events = new ArrayList<>();
+        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " +
+                "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
+                "WHERE e.isactive = true AND e.date >= ? GROUP BY e.event_id ORDER BY e.date ASC LIMIT ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(LocalDate.now()));
+            stmt.setInt(2, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                events.add(mapResultSetToEvent(rs));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database error retrieving upcoming events", e);
+        }
+        return events;
+    }
+
     public int getEventParticipantCount(int eventId) {
         // Validate event ID
         if (!SecurityUtils.isValidUserId(eventId)) {

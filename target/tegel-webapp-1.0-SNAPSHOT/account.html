@@ -498,11 +498,30 @@
         // Load enrolled events
         loadEnrolledEvents();
 
-        // Edit profile button functionality
-        document.getElementById('editProfileBtn').addEventListener('click', function() {
-            showEditProfileForm();
-        });
+        // Enhance navbar for admin if needed
+        checkAdminNavbar();
     });
+
+    function checkAdminNavbar() {
+        fetch('/tegel_webapp/check-session', {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn && data.role === 'admin') {
+                const navList = document.querySelector('.navbar-nav');
+                if (navList) {
+                    navList.innerHTML = `
+                        <li class="nav-item"><a class="nav-link text-white" id="adminNavLink" href="adminindex.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="admin.html">User Management</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="admin-newsletters.html">Newsletter</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="announcements.html">Announcement</a></li>
+                    `;
+                }
+            }
+        });
+    }
 
     // User data storage for edit form
     let currentUserData = {};

@@ -194,7 +194,6 @@
                         <th>Event Name</th>
                         <th>Date</th>
                         <th>Location</th>
-                        <th>Participants</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -851,7 +850,6 @@
                 </td>
                 <td>${eventDate}</td>
                 <td>${event.location || 'TBA'}</td>
-                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="btn-group" role="group">
@@ -1092,7 +1090,6 @@
                 <td>${event.title}</td>
                 <td>${eventDate}</td>
                 <td>${event.location || 'TBA'}</td>
-                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="btn-group" role="group">

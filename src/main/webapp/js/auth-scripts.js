@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (isLoggedIn) {
             // Show admin link if user is an admin
             const adminLink = isAdmin ?
-                `<a href="adminindex.html" class="btn btn-primary me-2">Admin Panel</a>` : '';
+                `<a href="adminindex.html" class="btn btn-primary me-2"></a>` : '';
 
             authButtons.innerHTML = `
                 ${adminLink}

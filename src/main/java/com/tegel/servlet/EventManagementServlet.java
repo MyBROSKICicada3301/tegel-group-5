@@ -1,7 +1,11 @@
 package com.tegel.servlet;
+/**
+ * Servelt for managing event-related operations in the admin panel.
+ */
 
 import com.tegel.dao.EventDAO;
 import com.tegel.dao.ImageDAO;
+import com.tegel.dao.UserDAO;
 import com.tegel.model.Event;
 import com.tegel.model.Image;
 import com.tegel.util.SecurityUtils;
@@ -36,6 +40,7 @@ public class EventManagementServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());
     private final EventDAO eventDAO = new EventDAO();
     private final ImageDAO imageDAO = new ImageDAO();
+    private final UserDAO userDAO = new UserDAO();
     private final Gson gson;
 
     /**
@@ -76,6 +81,46 @@ public class EventManagementServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
+            if (pathInfo != null && pathInfo.matches("/\\d+/participants")) {
+                // /admin/events/{eventId}/participants
+                int eventId = Integer.parseInt(pathInfo.split("/")[1]);
+                if (!SecurityUtils.isValidUserId(eventId)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Invalid event ID\"}");
+                    return;
+                }
+                var participants = userDAO.getUsersByEventId(eventId);
+                response.getWriter().write(gson.toJson(participants));
+                return;
+            }
+
+            if (pathInfo != null && pathInfo.matches("/\\d+/participants/download")) {
+                // /admin/events/{eventId}/participants/download
+                int eventId = Integer.parseInt(pathInfo.split("/")[1]);
+                if (!SecurityUtils.isValidUserId(eventId)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Invalid event ID\"}");
+                    return;
+                }
+                var participants = userDAO.getUsersByEventId(eventId);
+                // Set headers for CSV download
+                response.setContentType("text/csv");
+                response.setHeader("Content-Disposition", "attachment; filename=participants_event_" + eventId + ".csv");
+                response.setCharacterEncoding("UTF-8");
+                // Write CSV header
+                response.getWriter().println("Full Name,Email,Phone Number,Dietary Restrictions");
+                // Write participant data
+                for (var user : participants) {
+                    String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\"",
+                        user.getFullName() != null ? user.getFullName().replace("\"", "''") : "",
+                        user.getEmail() != null ? user.getEmail().replace("\"", "''") : "",
+                        user.getPhoneNumber() != null ? user.getPhoneNumber().replace("\"", "''") : "",
+                        user.getDietRes() != null ? user.getDietRes().replace("\"", "''") : "");
+                    response.getWriter().println(line);
+                }
+                return;
+            }
+
             if (pathInfo == null || "/".equals(pathInfo) || "/all".equals(pathInfo)) {
                 // Get all events
                 List<Event> events = eventDAO.getAllEvents();

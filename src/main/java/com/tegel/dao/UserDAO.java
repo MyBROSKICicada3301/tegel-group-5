@@ -384,4 +384,33 @@ public class UserDAO {
             return false;
         }
     }
+
+    /**
+     * Returns a list of users (name and dietary info) enrolled in a specific event.
+     * @param eventId The event ID
+     * @return List of users with fullName, email, and dietRes
+     */
+    public List<User> getUsersByEventId(int eventId) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.user_id, u.full_name, u.email, u.dietres, u.phonenumber FROM mod4db.users u " +
+                "JOIN mod4db.eventregistration er ON u.user_id = er.user_id " +
+                "WHERE er.event_id = ?"; // Removed status filter for broader match
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, eventId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setDietRes(rs.getString("dietres"));
+                user.setPhoneNumber(rs.getString("phonenumber"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error fetching users for eventId: " + eventId, e);
+        }
+        return users;
+    }
 }

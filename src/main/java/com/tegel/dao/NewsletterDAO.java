@@ -27,29 +27,26 @@ public class NewsletterDAO {
      * @return The created newsletter with ID, or null if creation failed
      */
     public Newsletter createNewsletter(Newsletter newsletter) {
-        String sql = "CALL mod4d.create_newsletter(?, ?, ?, ?)";
+        String sql = "INSERT INTO mod4db.newsletter (title, content, postedby, postedat) VALUES (?, ?, ?, ?) RETURNING letter_id";
 
         try (Connection conn = DatabaseManager.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Set input parameters
             stmt.setString(1, newsletter.getTitle());
-            // Strip HTML tags before storing
             stmt.setString(2, stripHtmlTags(newsletter.getContent()));
             stmt.setInt(3, newsletter.getCreatedBy());
+            stmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
 
-            // Register the OUT parameter for the generated ID
-            stmt.registerOutParameter(4, java.sql.Types.INTEGER);
-
-            // Execute the stored procedure
-            stmt.execute();
-
-            // Get the generated newsletter ID
-            int generatedId = stmt.getInt(4);
-            newsletter.setId(generatedId);
-            newsletter.setPublished(true); // Always published in this schema
-            logger.info("Created newsletter with ID: " + newsletter.getId());
-            return newsletter;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int generatedId = rs.getInt(1);
+                    newsletter.setId(generatedId);
+                    newsletter.setCreatedAt(LocalDateTime.now());
+                    newsletter.setPublished(true);
+                    logger.info("Created newsletter with ID: " + generatedId);
+                    return newsletter;
+                }
+            }
 
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error creating newsletter", e);
@@ -64,24 +61,17 @@ public class NewsletterDAO {
      * @return true if successful, false otherwise
      */
     public boolean updateNewsletter(Newsletter newsletter) {
-        String sql = "CALL mod4d.update_newsletter(?, ?, ?, ?)";
+        String sql = "UPDATE mod4db.newsletter SET title = ?, content = ? WHERE letter_id = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Set input parameters
-            stmt.setInt(1, newsletter.getId());
-            stmt.setString(2, newsletter.getTitle());
-            stmt.setString(3, newsletter.getContent());
+            stmt.setString(1, newsletter.getTitle());
+            stmt.setString(2, newsletter.getContent());
+            stmt.setInt(3, newsletter.getId());
 
-            // Register the OUT parameter for success
-            stmt.registerOutParameter(4, java.sql.Types.BOOLEAN);
-
-            // Execute the stored procedure
-            stmt.execute();
-
-            // Get the success value
-            boolean success = stmt.getBoolean(4);
+            int rowsAffected = stmt.executeUpdate();
+            boolean success = rowsAffected > 0;
 
             logger.info("Updated newsletter ID " + newsletter.getId() + ", success: " + success);
             return success;

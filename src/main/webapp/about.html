@@ -155,7 +155,7 @@
 
         /* Footer styles */
         .footer {
-            background-color: #f8f9fa;
+            background-color: black !important;
             padding: 30px 0;
             margin-top: auto;
         }
@@ -365,13 +365,15 @@
                        target="_blank" rel="noopener" class="me-3">
                         <i class="bi bi-instagram text-warning fs-4"></i>
                     </a>
-                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <a href="mailto:tegelmin@gmail.com" target="_blank" rel="noopener">
                         <i class="bi bi-envelope text-warning fs-4"></i>
                     </a>
                 </div>
             </div>
             <div class="col-md-4 text-center mb-3 mb-md-0">
-                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                <div class="address-text" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#mapModal">
+                    <i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede
+                </div>
             </div>
             <div class="col-md-4 text-center text-md-end">
                 <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
@@ -387,5 +389,23 @@
 <!-- Load scripts in the correct order -->
 <script src="js/debug-utils.js"></script>
 <script src="js/session-manager.js"></script>
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: none;">
+                <h5 class="modal-title fw-bold" id="mapModalLabel" style="color: orange;">Our Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0 1rem 1rem 1rem;">
+                <div style="width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                    <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2974.3260773299653!2d6.851301512542072!3d52.24187950666631!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47b813da253dae2f%3A0x304ac4c4dc858bd7!2sDrienerlolaan%205%2C%207522%20NB%20Enschede!5e1!3m2!1sen!2snl!4v1751111180286!5m2!1sen!2snl"
+                            width="100%" height="100%" style="border:0; min-height:300px;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

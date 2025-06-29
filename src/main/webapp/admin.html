@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Tegel</title>
@@ -15,7 +16,7 @@
             display: flex;
             flex-direction: column;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #ffb56b 0%, #ff8c1a 100%);
+            background-color: #ffefe0 !important; /* Orange-tinted background */
             margin: 0;
             padding: 0;
         }
@@ -27,10 +28,25 @@
             justify-content: flex-start;
             padding: 40px 20px;
         }
-        .navbar-brand {
-            font-family: 'Courier New', cursive;
-            font-size: 28px;
-            font-weight: bold;
+        .navbar {
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(252, 125, 4, 1);
+        }
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+        .navbar .nav-link {
+            font-size: 18px;
+            padding: 12px 20px !important;
+            margin: 0 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .navbar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
         .admin-card {
             background: rgba(255, 255, 255, 0.95);
@@ -43,97 +59,67 @@
             width: 100%;
             margin-bottom: 40px;
         }
-        .admin-card h2 {
-            color: #333;
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
+        .admin-card h2, .admin-card h5, .modal-title, .table thead th {
+            text-align: center !important;
+        }
+        .admin-card {
+            margin-bottom: 48px;
+            padding: 48px 36px;
+        }
+        .admin-card .input-group, .admin-card .table-responsive, .admin-card .d-flex {
+            margin-bottom: 24px !important;
+        }
+        .admin-card .btn, .admin-card .form-control {
+            margin-right: 8px;
+        }
+        .admin-card .btn:last-child, .admin-card .form-control:last-child {
+            margin-right: 0;
+        }
+        .table {
+            margin-bottom: 0;
         }
         .table thead th {
-            background: #ff8c1a;
-            color: #fff;
-            border: none;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
         }
-        .table tbody tr {
-            background: rgba(255,255,255,0.85);
+        .table tbody td {
+            vertical-align: middle;
+            padding: 14px 10px;
         }
-        .btn-role {
-            min-width: 100px;
+        .modal-title {
+            width: 100%;
         }
-        .btn-delete {
-            background: #e74c3c;
-            color: #fff;
+        .modal-content {
+            padding: 12px 0;
         }
-        .btn-delete:hover {
-            background: #c0392b;
-            color: #fff;
+        .form-label, .form-check-label {
+            font-weight: 500;
         }
-        .footer {
-            background-color: #343a40;
-            color: #ffffff;
-            padding: 30px 0;
-            margin-top: auto;
+        .form-control, .form-check-input {
+            margin-bottom: 12px;
         }
-
-        .footer .social-links a {
-            color: #ffc107;
-            text-decoration: none;
-            margin-right: 15px;
-            font-size: 1.5rem;
-            transition: color 0.3s ease, transform 0.3s ease;
+        .mb-3 {
+            margin-bottom: 1.5rem !important;
         }
-
-        .footer .social-links a:hover {
-            color: #ffeb3b;
-            transform: translateY(-2px);
+        .d-flex.justify-content-between.align-items-center.mb-3 {
+            margin-bottom: 2rem !important;
         }
-
-        .footer .address-text {
-            color: #adb5bd;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .footer .footer-brand {
-            max-width: 90px;
-            height: auto;
-        }
-
-        /* Footer responsive adjustments */
-        @media (max-width: 768px) {
-            .footer {
-                padding: 20px 0;
-                text-align: center;
-            }
-
-            .footer .social-links {
-                margin-bottom: 15px;
-            }
-
-            .footer .social-links a {
-                margin: 0 10px;
-            }
-
-            .footer .address-text {
-                margin-bottom: 15px;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .admin-card {
-                padding: 20px 5px;
-            }
-            .table-responsive {
-                font-size: 14px;
-            }
-        }
-
         .event-thumbnail {
             width: 50px;
             height: 50px;
             object-fit: cover;
             border-radius: 5px;
+        }
+        .btn-delete {
+            background: #e74c3c !important;
+            color: #fff !important;
+            border: none !important;
+        }
+        .btn-delete:hover, .btn-delete:focus {
+            background: #c0392b !important;
+            color: #fff !important;
+            border: none !important;
         }
     </style>
 </head>
@@ -278,7 +264,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -316,12 +302,12 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="editEventDescription" class="form-label">Description</label>
                         <textarea class="form-control" id="editEventDescription" name="description" rows="4" maxlength="2000"></textarea>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -371,6 +357,26 @@
     </div>
 </div>
 
+<!-- Participants Modal -->
+<div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="participantsModalLabel">Event Participants</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="participantsListContainer">
+                    <!-- Participants table will be injected here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer class="footer mt-2 py-3 bg-dark text-white">
     <div class="container">
         <div class="row align-items-center">
@@ -380,13 +386,15 @@
                        target="_blank" rel="noopener" class="me-3">
                         <i class="bi bi-instagram text-warning fs-4"></i>
                     </a>
-                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <a href="mailto:tegelmin@gmail.com" target="_blank" rel="noopener">
                         <i class="bi bi-envelope text-warning fs-4"></i>
                     </a>
                 </div>
             </div>
             <div class="col-md-4 text-center mb-3 mb-md-0">
-                <div class="address-text"><i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede</div>
+                <div class="address-text" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#mapModal">
+                    <i class="bi bi-geo-alt me-2"></i>Drienerlolaan 5, 7522 NB Enschede
+                </div>
             </div>
             <div class="col-md-4 text-center text-md-end">
                 <img class="footer-brand" src="images/TEGEL LOGO footer.png" alt="Tegel Logo"
@@ -395,6 +403,8 @@
         </div>
     </div>
 </footer>
+
+
 
 <script>
     let users = [];
@@ -832,15 +842,6 @@
                 '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
 
-            // Add approval status badge if exists
-            let approvalBadge = '';
-            if (event.approvalStatus) {
-                approvalBadge = event.approvalStatus === 'PENDING' ?
-                    '<span class="badge bg-warning me-1">Pending</span>' :
-                    '<span class="badge bg-info me-1">Approved</span>';
-            }
-
-
             // Determine image source and create image HTML if available
             let imageHtml = '';
             if (event.imageId) {
@@ -851,26 +852,6 @@
             }
 
             tr.innerHTML = `
-            <td>${event.title}</td>
-            <td>${eventDate}</td>
-            <td>${event.location || 'TBA'}</td>
-            <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
-            <td>${approvalBadge} ${statusBadge}</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
-                    <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
-                    <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
-                        ${event.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                    ${event.approvalStatus === 'PENDING' ?
-                `<button class="btn btn-success btn-sm me-1" onclick="approveEvent(${event.eventId})">
-                            <i class="bi bi-check-circle me-1"></i>Approve
-                        </button>` : ''}
-                    <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
-                </div>
-            </td>
-        `;
                 <td>
                     <div class="d-flex align-items-center">
                         ${imageHtml ? `<div class="me-2">${imageHtml}</div>` : ''}
@@ -889,6 +870,8 @@
                             ${event.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                         <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showParticipants(${event.eventId}, '${event.title.replace(/'/g, "&#39;")}')">View Participants</button>
+                        <button class="btn btn-outline-success btn-sm" onclick="downloadParticipants(${event.eventId})">Download Participants</button>
                     </div>
                 </td>
             `;
@@ -946,36 +929,6 @@
         document.getElementById('editEventDate').min = new Date().toISOString().split('T')[0];
 
         new bootstrap.Modal(document.getElementById('editEventModal')).show();
-    }
-
-    function approveEvent(eventId) {
-        notificationSystem.confirm(
-            "Approve Event",
-            "Are you sure you want to approve this event? It will become visible to members based on its public/private status.",
-            function() {
-                fetch(`/admin/events/approve/${eventId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(err => Promise.reject(err));
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        notificationSystem.success("Event approved successfully");
-                        // Refresh the events list to update UI
-                        fetchEvents();
-                    })
-                    .catch(error => {
-                        console.error('Error approving event:', error);
-                        notificationSystem.error(`Error approving event: ${error.message || 'Unknown error'}`);
-                    });
-            }
-        );
     }
 
     function updateEvent() {
@@ -1144,35 +1097,25 @@
                 '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
 
-            // Add approval status badge if exists
-            let approvalBadge = '';
-            if (event.approvalStatus) {
-                approvalBadge = event.approvalStatus === 'PENDING' ?
-                    '<span class="badge bg-warning me-1">Pending</span>' :
-                    '<span class="badge bg-info me-1">Approved</span>';
-            }
-
             tr.innerHTML = `
-            <td>${event.title}</td>
-            <td>${eventDate}</td>
-            <td>${event.location || 'TBA'}</td>
-            <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
-            <td>${approvalBadge} ${statusBadge}</td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
-                    <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
-                    <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
-                        ${event.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                    ${event.approvalStatus === 'PENDING' ?
-                `<button class="btn btn-success btn-sm me-1" onclick="approveEvent(${event.eventId})">
-                            <i class="bi bi-check-circle me-1"></i>Approve
-                        </button>` : ''}
-                    <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
-                </div>
-            </td>
-        `;
+                <td>${event.title}</td>
+                <td>${eventDate}</td>
+                <td>${event.location || 'TBA'}</td>
+                <td>${event.currentParticipants || 0}/${event.maxParticipants || '∞'}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-primary btn-sm me-1" onclick="editEvent(${event.eventId})">Edit</button>
+                        <button class="btn btn-danger btn-sm me-1" onclick="deleteEvent(${event.eventId})">Delete</button>
+                        <button class="btn ${event.isActive ? 'btn-warning' : 'btn-success'} btn-sm me-1" onclick="toggleEventStatus(${event.eventId}, ${!event.isActive})">
+                            ${event.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="viewEventDetails(${event.eventId})">View</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showParticipants(${event.eventId}, '${event.title.replace(/'/g, "&#39;")}')">View Participants</button>
+                        <button class="btn btn-outline-success btn-sm" onclick="downloadParticipants(${event.eventId})">Download Participants</button>
+                    </div>
+                </td>
+            `;
             tbody.appendChild(tr);
         });
     }
@@ -1377,7 +1320,95 @@
                 notificationSystem.error('Error resetting password. Please try again.');
             });
     }
+
+    function showParticipants(eventId, eventTitle) {
+        const url = `${contextPath}/admin/events/${eventId}/participants`;
+        fetch(url, { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                let html = `<h6 style="text-align:center; margin-bottom: 20px;">Participants for <strong>${eventTitle}</strong></h6>`;
+                if (!Array.isArray(data) || data.length === 0) {
+                    html += '<div class="alert alert-info mt-3">No participants enrolled for this event.</div>';
+                } else {
+                    html += `<div class="table-responsive" style="margin-top: 20px;">
+                        <table class="table table-bordered align-middle" style="background: #fff; border-radius: 10px; overflow: hidden;">
+                        <thead>
+                            <tr style="text-align:center; background:#f8f9fa;">
+                                <th style="text-align:center;">Name</th>
+                                <th style="text-align:center;">Email</th>
+                                <th style="text-align:center;">Phone</th>
+                                <th style="text-align:center;">Dietary Restriction</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    data.forEach(user => {
+                        html += `<tr>
+                            <td style="text-align:center; vertical-align:middle;">${user.fullName || user.email}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.email}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.phoneNumber || 'N/A'}</td>
+                            <td style="text-align:center; vertical-align:middle;">${user.dietRes || 'None'}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table></div>';
+                }
+                document.getElementById('participantsListContainer').innerHTML = html;
+                new bootstrap.Modal(document.getElementById('participantsModal')).show();
+            })
+            .catch(err => {
+                document.getElementById('participantsListContainer').innerHTML = '<div class="alert alert-danger">Failed to load participants.</div>';
+                new bootstrap.Modal(document.getElementById('participantsModal')).show();
+            });
+    }
+
+    function downloadParticipants(eventId) {
+        // Start the download of participants as CSV
+        fetch(`${contextPath}/admin/events/${eventId}/participants/download`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // This creates a link element to trigger the download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `participants_event_${eventId}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            notificationSystem.success('Participants downloaded successfully.');
+        })
+        .catch(error => {
+            console.error('Error downloading participants:', error);
+            notificationSystem.error('Error downloading participants. Please try again.');
+        });
+    }
 </script>
 <script src="js/session-manager.js"></script>
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: none;">
+                <h5 class="modal-title fw-bold" id="mapModalLabel" style="color: orange;">Our Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0 1rem 1rem 1rem;">
+                <div style="width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+                    <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2974.3260773299653!2d6.851301512542072!3d52.24187950666631!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47b813da253dae2f%3A0x304ac4c4dc858bd7!2sDrienerlolaan%205%2C%207522%20NB%20Enschede!5e1!3m2!1sen!2snl!4v1751111180286!5m2!1sen!2snl"
+                            width="100%" height="100%" style="border:0; min-height:300px;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+
 </html>

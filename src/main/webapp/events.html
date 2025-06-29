@@ -401,7 +401,7 @@
 <script>
     function loadEvents() {
         console.log('Loading events from server...');
-        fetch('/events')
+        fetch('/tegel_webapp/events')
             .then(response => {
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
@@ -614,7 +614,7 @@
         formData.set('isActive', isActive ? 'true' : 'false');
         formData.set('isPublic', isPublic ? 'true' : 'false');
 
-        fetch('/events', {
+        fetch('/tegel_webapp/events', {
             method: 'POST',
             body: formData
         })

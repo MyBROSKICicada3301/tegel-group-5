@@ -1,136 +1,121 @@
-# TEGEL-group-5
+# TEGEL Group 5 Web Application
 
-## Getting started
+## Project Overview
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+This project is a web application for the TEGEL group, developed as part of a university assignment. The application provides features such as user registration, authentication, event management, announcements, newsletters, and administrative tools. 
 
-Already a pro? Just edit this README.md and make it your own. Want to make it
-easy? [Use the template at the bottom](#editing-this-readme)!
+_It is built using Java , HTML , CSS , JavaScript and a relational database backend._
 
-## Add your files
+## Features
+- **User registration and login:**
+  - New users can sign up with their email, password, and personal details. Passwords are securely hashed. Registered users can log in to access personalized features.
+- **Profile management:**
+  - Users can view and update their profile information, including name, contact details, and password. Profile changes are validated and securely stored.
+- **Event listing, details, and registration:**
+  - All users can browse a list of upcoming and past events. Each event has a detail page with description, date, time, location, and images. Logged-in users can register for events, and view their registered events.
+- **Announcements and newsletters:**
+  - Announcements are posted by admins and visible to all users on the homepage. Newsletters are managed by admins and can be viewed or subscribed to by users.
+- **Admin panel for user and event management:**
+  - Admins have access to a dedicated panel to manage users (view, edit, delete, reset passwords), create and edit events, post announcements, and manage newsletters.
+- **Image upload and retrieval:**
+  - Admins can upload images for events and announcements. Images are stored in the database or filesystem and displayed throughout the application.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file)
-  or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file)
-  files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository)
-  or push an existing Git repository with the following command:
+## Technologies Used
+- Java Servlet API
+- JDBC (Java Database Connectivity)
+- HTML, CSS, JavaScript (frontend)
+- Maven (tool to build the project)
+- GitLab Repository for version control
 
-```
-cd existing_repo
-git remote add origin https://gitlab.utwente.nl/s3372871/tegel-group-5.git
-git branch -M main
-git push -uf origin main
-```
+## Database
+- PostgreSQL database hosted at: [bronto.ewi.utwente.nl](https://bronto.ewi.utwente.nl/phppgadmin/redirect.php?subject=root)
 
-## Integrate with your tools
+## Installation & Setup
 
-- [ ] [Set up project integrations](https://gitlab.utwente.nl/s3372871/tegel-group-5/-/settings/integrations)
+### Prerequisites
+- Java 17 or higher
+- Apache Tomcat 10 or compatible servlet container
+- Maven
+- PostgreSQL database (see above)
 
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template
-below (or feel free to structure it however you want - this is just a starting point!). Thanks
-to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in
-the template are suggestions for most open source projects. Also keep in mind that while a README
-can be too long and detailed, too long is better than too short. If you think your README is too
-long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-
-Choose a self-explaining name for your project.
-
-## Description
-
-Let people know what your project can do specifically. Provide context and add a link to any
-reference visitors might be unfamiliar with. A list of Features or a Background subsection can also
-be added here. If there are alternatives to your project, this is a good place to list
-differentiating factors.
-
-## Badges
-
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests
-are passing for the project. You can use Shields to add some to your README. Many services also have
-instructions for adding a badge.
-
-## Visuals
-
-Depending on what you are making, it can be a good idea to include screenshots or even a video (
-you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out
-Asciinema for a more sophisticated method.
-
-## Installation
-
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn,
-NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a
-novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people
-to using your project as quickly as possible. If it only runs in a specific context like a
-particular programming language version or operating system or has dependencies that have to be
-installed manually, also add a Requirements subsection.
+### Steps
+1. **Clone the repository:**
+   ```sh
+   git clone https://gitlab.utwente.nl/s3372871/tegel-group-5.git
+   cd tegel-group-5
+   ```
+2. **Configure the database:**
+   - Create a database and run the SQL scripts in `design/` to set up tables.
+   - Update database credentials in `DatabaseManager.java` (found in `src/main/java/com/tegel/dao/`).
+3. **Build the project:**
+   ```sh
+   mvn clean package
+   ```
+4. **Deploy the WAR file:**
+   - Deploy `target/tegel-webapp-1.0-SNAPSHOT.war` to your servlet container (e.g., Tomcat's `webapps/` directory).
+5. **Access the application:**
+   - Open your browser and go to `http://localhost:8080/tegel-webapp/` (URL may vary based on deployment).
 
 ## Usage
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the
-smallest example of usage that you can demonstrate, while providing links to more sophisticated
-examples if they are too long to reasonably include in the README.
+Follow these steps to use the TEGEL Group 5 Web Application:
 
-## Support
+1. **Open the Application:**
+   - In your web browser, navigate to `http://localhost:8080/tegel-webapp/` (or the appropriate deployment URL).
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat
-room, an email address, etc.
+2. **Browse Events and Announcements:**
+   - The homepage displays current announcements and a list of upcoming events.
+   - Click on any event to view its details, including description, date, time, location, and images.
 
-## Roadmap
+3. **Register for an Account:**
+   - Click the "Sign Up" or "Register" button.
+   - Fill in your email, password, and personal details.
+   - Submit the form to create your account.
+   - You can now log in using your credentials.
 
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+4. **Log In:**
+   - Click the "Login" button.
+   - Enter your registered email and password.
+   - Upon successful login, you will have access to personalized features.
 
-## Contributing
+5. **Manage Your Profile:**
+   - After logging in, go to your account/profile page.
+   - View or update your personal information and change your password if needed.
 
-State if you are open to contributions and what your requirements are for accepting them.
+6. **Register for Events:**
+   - While logged in, browse the events list.
+   - Click on an event and use the "Register" button to sign up for that event.
+   - View your registered events in your profile or a dedicated section.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how
-to get started. Perhaps there is a script that they should run or some environment variables that
-they need to set. Make these steps explicit. These instructions could also be useful to your future
-self.
+7. **View Newsletters:**
+   - Access the newsletters section to read or subscribe to newsletters.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code
-quality and reduce the likelihood that the changes inadvertently break something. Having
-instructions for running tests is especially helpful if it requires external setup, such as starting
-a Selenium server for testing in a browser.
+8. **Admin Features (for Admin Users):**
+   - Log in with an admin account.
+   - Access the admin panel to manage users, events, announcements, and newsletters.
+   - Upload images for events and announcements as needed.
 
-## Authors and acknowledgment
+9. **Log Out:**
+   - Click the "Logout" button to securely end your session.
 
-Show your appreciation to those who have contributed to the project.
+## Development
+- Source code is in `src/main/java/com/tegel/`.
+- Frontend files are in `src/main/webapp/`.
+- Tests are in `src/test/java/`.
+- Use `mvn test` to run unit and integration tests.
+
+
+## Authors
+**TEGEL-5 team (_students of 2024-2025 batch BSc TCS at University of Twente_):**
+- Ethan Noronha (s3361993)
+- Cyril Shibu (s3412989)
+- Gerben Bank (s3206726)
+- Shishir Sudeesh Nambiar (s3372871)
+
 
 ## License
+This project is for educational purposes.
 
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying
-that development has slowed down or stopped completely. Someone may choose to fork your project or
-volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also
-make an explicit request for maintainers.
+## Acknowledgments
+- University of Twente
+- SGV TEGEL team

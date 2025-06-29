@@ -842,19 +842,10 @@
                 '<span class="badge bg-success">Active</span>' :
                 '<span class="badge bg-secondary">Inactive</span>';
 
-            // Determine image source and create image HTML if available
-            let imageHtml = '';
-            if (event.imageId) {
-                imageHtml = `<img src="${contextPath}/images/${event.imageId}" alt="Event thumbnail" class="event-thumbnail">`;
-            } else if (event.image && !isNaN(parseInt(event.image))) {
-                // For legacy format where image might be stored as a string ID
-                imageHtml = `<img src="${contextPath}/images/${event.image}" alt="Event thumbnail" class="event-thumbnail">`;
-            }
-
+            // Remove imageHtml and only show event name
             tr.innerHTML = `
                 <td>
                     <div class="d-flex align-items-center">
-                        ${imageHtml ? `<div class="me-2">${imageHtml}</div>` : ''}
                         <div>${event.title}</div>
                     </div>
                 </td>

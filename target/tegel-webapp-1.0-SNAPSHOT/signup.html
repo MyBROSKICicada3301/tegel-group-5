@@ -233,6 +233,25 @@
                 background: transparent;
             }
         }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control, .form-select {
+            margin-top: 5px;
+            margin-bottom: 0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .form-label {
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+        }
+        #signupForm {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -281,6 +300,7 @@
                 <form id="signupForm">
                     <div class="form-group">
                         <input id="fullName" class="form-control" type="text" placeholder="Full Name" required>
+                        <div id="nameFeedback" style="font-size: 13px; color: #dc3545;"></div>
                     </div>
 
                     <div class="form-group">
@@ -289,6 +309,7 @@
 
                     <div class="form-group">
                         <input id="emailAddress" class="form-control" type="email" placeholder="Email address" required>
+                        <div id="emailFeedback" style="font-size: 13px; color: #dc3545;"></div>
                     </div>
 
                     <div class="form-group">
@@ -298,6 +319,7 @@
                                 <i class="fas fa-eye-slash"></i>
                             </span>
                         </div>
+                        <div id="passwordStrength" style="font-size: 13px; margin-top: 5px;"></div>
                     </div>
 
                     <div class="form-group">
@@ -305,7 +327,41 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="tel" id="phone" class="form-control" placeholder="Phone number" required>
+                        <label for="countryCode" class="form-label">Country</label>
+                        <select id="countryCode" class="form-select" required>
+                            <option value="" disabled selected>Select country</option>
+                            <option value="43">Austria (+43)</option>
+                            <option value="32">Belgium (+32)</option>
+                            <option value="359">Bulgaria (+359)</option>
+                            <option value="385">Croatia (+385)</option>
+                            <option value="357">Cyprus (+357)</option>
+                            <option value="420">Czech Republic (+420)</option>
+                            <option value="45">Denmark (+45)</option>
+                            <option value="372">Estonia (+372)</option>
+                            <option value="358">Finland (+358)</option>
+                            <option value="33">France (+33)</option>
+                            <option value="49">Germany (+49)</option>
+                            <option value="30">Greece (+30)</option>
+                            <option value="36">Hungary (+36)</option>
+                            <option value="353">Ireland (+353)</option>
+                            <option value="39">Italy (+39)</option>
+                            <option value="371">Latvia (+371)</option>
+                            <option value="370">Lithuania (+370)</option>
+                            <option value="352">Luxembourg (+352)</option>
+                            <option value="356">Malta (+356)</option>
+                            <option value="31">Netherlands (+31)</option>
+                            <option value="48">Poland (+48)</option>
+                            <option value="351">Portugal (+351)</option>
+                            <option value="40">Romania (+40)</option>
+                            <option value="421">Slovakia (+421)</option>
+                            <option value="386">Slovenia (+386)</option>
+                            <option value="34">Spain (+34)</option>
+                            <option value="46">Sweden (+46)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" class="form-control" placeholder="Phone number (without country code)" required>
+                        <div id="phoneFeedback" style="font-size: 13px; color: #dc3545;"></div>
                     </div>
 
                     <div class="form-group">
@@ -336,7 +392,7 @@
                        target="_blank" rel="noopener" class="me-3">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <a href="mailto:tegelmin@gmail.com" target="_blank" rel="noopener">
                         <i class="fas fa-envelope"></i>
                     </a>
                 </div>
@@ -393,8 +449,93 @@
             }
         });
 
+        // --- Real-time validation and password strength ---
+        const passwordInput = document.getElementById('password');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const emailInput = document.getElementById('emailAddress');
+        const emailFeedback = document.getElementById('emailFeedback');
+        const phoneInput = document.getElementById('phone');
+        const phoneFeedback = document.getElementById('phoneFeedback');
+        const nameInput = document.getElementById('fullName');
+        const nameFeedback = document.getElementById('nameFeedback');
+
+        passwordInput.addEventListener('input', function() {
+            const val = passwordInput.value;
+            let strength = 0;
+            if (val.length >= 8) strength++;
+            if (/[A-Z]/.test(val)) strength++;
+            if (/[a-z]/.test(val)) strength++;
+            if (/[0-9]/.test(val)) strength++;
+            if (/[^A-Za-z0-9]/.test(val)) strength++;
+            let msg = '';
+            let color = '#dc3545';
+            if (val.length === 0) {
+                msg = '';
+            } else if (strength <= 2) {
+                msg = 'Weak password';
+                color = '#dc3545';
+            } else if (strength === 3 || strength === 4) {
+                msg = 'Medium strength password';
+                color = '#ffc107';
+            } else if (strength === 5) {
+                msg = 'Strong password!';
+                color = '#28a745';
+            }
+            passwordStrength.textContent = msg;
+            passwordStrength.style.color = color;
+        });
+
+        emailInput.addEventListener('input', function() {
+            const val = emailInput.value;
+            const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+            if (val.length === 0 || valid) {
+                emailFeedback.textContent = '';
+            } else {
+                emailFeedback.textContent = 'Please enter a valid email address.';
+            }
+        });
+
+        phoneInput.addEventListener('input', function() {
+            // Validate only local number: 7-12 digits, no country code
+            const val = phoneInput.value.replace(/\D/g, '');
+            const valid = /^\d{7,12}$/.test(val);
+            if (val.length === 0 || valid) {
+                phoneFeedback.textContent = '';
+            } else {
+                phoneFeedback.textContent = 'Enter a valid local phone number (7-12 digits, no country code).';
+            }
+        });
+
+        nameInput.addEventListener('input', function() {
+            const val = nameInput.value;
+            const valid = /^[A-Za-z\s'-]{2,}$/.test(val);
+            if (val.length === 0 || valid) {
+                nameFeedback.textContent = '';
+            } else {
+                nameFeedback.textContent = 'Name should only contain letters, spaces, apostrophes, or hyphens.';
+            }
+        });
+
         signupForm.addEventListener('submit', function (event) {
             event.preventDefault();
+
+            // Age validation: user must be at least 13 years old
+            const dobInput = document.getElementById('dob');
+            const dobValue = dobInput.value;
+            if (dobValue) {
+                const today = new Date();
+                const dobDate = new Date(dobValue);
+                let age = today.getFullYear() - dobDate.getFullYear();
+                const m = today.getMonth() - dobDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+                    age--;
+                }
+                if (age < 13) {
+                    showAlert('You must be at least 13 years old to sign up.', 'danger');
+                    dobInput.focus();
+                    return;
+                }
+            }
 
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
@@ -408,7 +549,12 @@
             formData.append('emailAddress', document.getElementById('emailAddress').value);
             formData.append('password', document.getElementById('password').value);
             formData.append('dob', document.getElementById('dob').value);
-            formData.append('phone', document.getElementById('phone').value);
+            const countryCode = document.getElementById('countryCode').value;
+            let phoneVal = document.getElementById('phone').value.replace(/\D/g, '');
+            if (countryCode && phoneVal) {
+                phoneVal = `+${countryCode}${phoneVal}`;
+            }
+            formData.append('phone', phoneVal);
             formData.append('dietary', document.getElementById('dietary').value);
 
             fetch('/tegel_webapp/signup', {

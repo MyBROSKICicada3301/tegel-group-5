@@ -53,7 +53,7 @@
 
         .admin-title { margin-bottom: 2rem; }
         .action-buttons .btn { margin-right: 0.5rem; }
-        .footer { background-color: #343a40; color: #ffffff; padding: 30px 0; margin-top: auto; }
+        .footer { background-color: #000000; color: #ffffff; padding: 30px 0; margin-top: auto; }
         .footer .social-links a { color: #ffc107; text-decoration: none; margin-right: 15px; font-size: 1.5rem; transition: color 0.3s ease, transform 0.3s ease; }
         .footer .social-links a:hover { color: #ffeb3b; transform: translateY(-2px); }
         .footer .address-text { color: #adb5bd; font-size: 14px; margin: 0; }
@@ -184,7 +184,7 @@
                        target="_blank" rel="noopener" class="me-3">
                         <i class="bi bi-instagram text-warning fs-4"></i>
                     </a>
-                    <a href="mailto:sgvtegel@gmail.com" target="_blank" rel="noopener">
+                    <a href="mailto:tegelmin@gmail.com" target="_blank" rel="noopener">
                         <i class="bi bi-envelope text-warning fs-4"></i>
                     </a>
                 </div>
@@ -408,7 +408,7 @@
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
-                .then(data => {
+                .then data => {
                     bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
                     loadNewsletters();
                     newsletterToDelete = null;

@@ -401,7 +401,7 @@
 <script>
     function loadEvents() {
         console.log('Loading events from server...');
-        fetch('/tegel_webapp/events')
+        fetch('/events')
             .then(response => {
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
@@ -614,7 +614,7 @@
         formData.set('isActive', isActive ? 'true' : 'false');
         formData.set('isPublic', isPublic ? 'true' : 'false');
 
-        fetch('/tegel_webapp/events', {
+        fetch('/events', {
             method: 'POST',
             body: formData
         })
@@ -693,17 +693,6 @@
             e.preventDefault()
             createEvent(e);
         });
-
-        // Insert at the top of the main content
-        const mainContent = document.querySelector('main');
-        mainContent.insertBefore(notification, mainContent.firstChild);
-
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 500);
-        }, 5000);
-
 
         // Reset the form and error messages when the modal is closed
         const createEventModal = document.getElementById('createEventModal');

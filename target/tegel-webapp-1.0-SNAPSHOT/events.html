@@ -569,6 +569,41 @@
 
         const form = document.getElementById('eventCreateForm');
         const formData = new FormData(form);
+        let errors = {};
+
+        // Validate required fields
+        const title = formData.get('title')?.trim();
+        const description = formData.get('description')?.trim();
+        const date = formData.get('date');
+        const maxParticipants = formData.get('maxParticipants');
+        const location = formData.get('location')?.trim();
+        const price = formData.get('price');
+
+        // Clear previous error messages
+        clearFieldErrors();
+
+        // Date validation: must not be empty and not in the past
+        if (!date) {
+            errors.date = 'Date is required.';
+        } else {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const eventDate = new Date(date);
+            if (eventDate < today) {
+                errors.date = 'Date cannot be in the past.';
+            }
+        }
+        if (!title) errors.title = 'Title is required.';
+        if (!description) errors.description = 'Description is required.';
+        if (!maxParticipants || isNaN(maxParticipants) || Number(maxParticipants) <= 1) errors.maxParticipants = 'Maximum participants must be a positive number.';
+        if (!location) errors.location = 'Location is required.';
+        if (price === null || price === undefined || price === '' || isNaN(price) || Number(price) < 0) errors.price = 'Event price is required and must be a non-negative number.';
+
+        // Show errors if any
+        if (Object.keys(errors).length > 0) {
+            showFieldErrors(errors);
+            return;
+        }
 
         // Handle checkboxes
         const hasFoodOption = document.getElementById('hasFoodOption').checked;
@@ -579,9 +614,6 @@
         formData.set('isActive', isActive ? 'true' : 'false');
         formData.set('isPublic', isPublic ? 'true' : 'false');
 
-        // Validate form (keep your existing validation)
-
-        // Changed URL from /admin/events to /events
         fetch('/tegel_webapp/events', {
             method: 'POST',
             body: formData
@@ -597,16 +629,46 @@
             .then(data => {
                 showMessage('Event created successfully!', 'success');
                 setTimeout(() => {
-                    // Close the modal and reload events
                     const modal = bootstrap.Modal.getInstance(document.getElementById('createEventModal'));
                     modal.hide();
                     loadEvents();
                 }, 1500);
             })
             .catch(error => {
-                console.error('Error:', error);
                 showMessage(error.message, 'danger');
             });
+    }
+
+    function showFieldErrors(errors) {
+        if (errors.title) setFieldError('eventTitle', errors.title);
+        if (errors.description) setFieldError('eventDescription', errors.description);
+        if (errors.date) setFieldError('eventDate', errors.date);
+        if (errors.maxParticipants) setFieldError('maxParticipants', errors.maxParticipants);
+        if (errors.location) setFieldError('eventLocation', errors.location);
+        if (errors.price) setFieldError('eventPrice', errors.price);
+    }
+
+    function setFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        let errorElem = field.parentNode.querySelector('.invalid-feedback');
+        if (!errorElem) {
+            errorElem = document.createElement('div');
+            errorElem.className = 'invalid-feedback';
+            field.parentNode.appendChild(errorElem);
+        }
+        errorElem.textContent = message;
+        field.classList.add('is-invalid');
+    }
+
+    function clearFieldErrors() {
+        const fields = ['eventTitle', 'eventDescription', 'eventDate', 'maxParticipants', 'eventLocation', 'eventPrice'];
+        fields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.classList.remove('is-invalid');
+            const errorElem = field && field.parentNode.querySelector('.invalid-feedback');
+            if (errorElem) errorElem.remove();
+        });
     }
 
     // Helper function to show messages

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -73,6 +74,20 @@ public class EventServlet extends HttpServlet {
                     events = eventDAO.getAllActiveEvents();
                 }
                 logger.info("EventServlet: Retrieved " + events.size() + " events");
+
+                // Only show event titles to unauthenticated users
+                boolean isAuthenticated = request.getSession(false) != null && request.getSession(false).getAttribute("user") != null;
+                if (!isAuthenticated) {
+                    // Return only event titles (and date for sorting)
+                    var simpleEvents = events.stream().map(e -> new Object() {
+                        String title = e.getTitle();
+                        LocalDate date = e.getDate();
+                    }).collect(Collectors.toList());
+                    String jsonEvents = gson.toJson(simpleEvents);
+                    response.getWriter().write(jsonEvents);
+                    logger.info("EventServlet: Sent only event titles for unauthenticated user");
+                    return;
+                }
 
                 // Update current participant count for each event
                 for (Event event : events) {

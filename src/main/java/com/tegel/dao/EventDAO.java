@@ -354,26 +354,16 @@ public class EventDAO {
 
     public List<Event> getUpcomingEvents() {
         List<Event> events = new ArrayList<>();
-        String sql =
-                "SELECT * FROM " + SCHEMA + ".event WHERE isactive = ? AND date >= ? ORDER BY date";
-
+        String sql = "SELECT * FROM " + SCHEMA + ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date";
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setBoolean(1, true);
-            stmt.setDate(2, Date.valueOf(LocalDate.now()));
-            ResultSet rs = stmt.executeQuery();
-
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 events.add(mapResultSetToEvent(rs));
             }
-
-            logger.info("Retrieved " + events.size() + " upcoming events");
-
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database error retrieving upcoming events", e);
         }
-
         return events;
     }
 
@@ -382,19 +372,17 @@ public class EventDAO {
      */
     public List<Event> getUpcomingEvents(int limit) {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT e.*, COUNT(er.user_id) as current_participants " +
-                "FROM mod4db.event e LEFT JOIN mod4db.eventregistration er ON e.event_id = er.event_id " +
-                "WHERE e.isactive = true AND e.date >= ? GROUP BY e.event_id ORDER BY e.date ASC LIMIT ?";
+        String sql = "SELECT * FROM " + SCHEMA + ".event WHERE isactive = true AND date >= CURRENT_DATE ORDER BY date LIMIT ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(LocalDate.now()));
-            stmt.setInt(2, limit);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                events.add(mapResultSetToEvent(rs));
+            stmt.setInt(1, limit);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    events.add(mapResultSetToEvent(rs));
+                }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database error retrieving upcoming events", e);
+            logger.log(Level.SEVERE, "Database error retrieving limited upcoming events", e);
         }
         return events;
     }

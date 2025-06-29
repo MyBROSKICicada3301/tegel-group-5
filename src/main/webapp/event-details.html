@@ -208,6 +208,10 @@
                 padding: 12px 20px;
             }
         }
+
+        .event-location {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1050,8 +1054,9 @@
     });
     document.addEventListener('DOMContentLoaded', () => {
         document.body.addEventListener('click', async function(e) {
-            if (e.target.classList.contains('event-location')) {
-                const location = e.target.textContent.trim();
+            const locationDiv = e.target.closest('.event-location');
+            if (locationDiv) {
+                const location = locationDiv.textContent.trim();
                 let lat = 52.244, lon = 6.862; // Default fallback coordinates
 
                 // Geocode the address using Nominatim
@@ -1059,8 +1064,8 @@
                     const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
                     const data = await response.json();
                     if (data && data.length > 0) {
-                        lat = data[0].lat;
-                        lon = data[0].lon;
+                        lat = Number(data[0].lat);
+                        lon = Number(data[0].lon);
                     }
                 } catch (err) {
                     console.warn('Geocoding failed, using default coordinates.');

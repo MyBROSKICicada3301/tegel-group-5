@@ -1,4 +1,7 @@
 package com.tegel.servlet;
+/**
+ * Servelt for managing event-related operations in the admin panel.
+ */
 
 import com.tegel.dao.EventDAO;
 import com.tegel.dao.ImageDAO;

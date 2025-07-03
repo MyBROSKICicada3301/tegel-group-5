@@ -326,6 +326,10 @@ public class EventManagementServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
+        if (!isAuthorized(request, response)) {
+            return;
+        }
+
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -339,7 +343,14 @@ public class EventManagementServlet extends HttpServlet {
 
             // Extract event ID from path
             String eventIdStr = pathInfo.substring(1);
-            int eventId = Integer.parseInt(eventIdStr);
+            int eventId;
+
+            // Check if this is a status update request (e.g., /admin/events/123/status)
+            if (pathInfo.contains("/status")) {
+                eventIdStr = pathInfo.split("/")[1]; // Get the event ID before "/status"
+            }
+
+            eventId = Integer.parseInt(eventIdStr);
 
             if (!SecurityUtils.isValidUserId(eventId)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -355,6 +366,67 @@ public class EventManagementServlet extends HttpServlet {
                 return;
             }
 
+            // Handle status update requests specifically - NO ownership check for admins
+            if (pathInfo.contains("/status")) {
+                // Only allow admins to change event status
+                HttpSession session = request.getSession(false);
+                String userRole = (String) session.getAttribute("role"); // Fixed: changed from "userRole" to "role"
+                if (!"admin".equals(userRole)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"error\":\"Only admins can change event status\"}");
+                    return;
+                }
+
+                String activeStr = request.getParameter("active");
+                if (activeStr != null) {
+                    boolean isActive = Boolean.parseBoolean(activeStr);
+                    existingEvent.setActive(isActive);
+
+                    if (eventDAO.updateEvent(existingEvent)) {
+                        logger.info("Event status updated successfully by admin: " + eventId + " -> active: " + isActive);
+                        response.getWriter().write(gson.toJson(existingEvent));
+                        return;
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\":\"Failed to update event status\"}");
+                        return;
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("{\"error\":\"Missing 'active' parameter for status update\"}");
+                    return;
+                }
+            }
+
+            // Check if this is a simple status update (admin changing active status)
+            // This handles the case where admin.html sends all event data but we only want to update status
+            HttpSession session = request.getSession(false);
+            String userRole = (String) session.getAttribute("role");
+            String isActiveParam = request.getParameter("isActive");
+
+            if ("admin".equals(userRole) && isActiveParam != null) {
+                // Check if this looks like a status-only update by seeing if minimal required fields are provided
+                String titleParam = request.getParameter("title");
+                String dateParam = request.getParameter("date");
+
+                // If we have the basic event data, treat this as a status update for admin
+                if (titleParam != null && dateParam != null) {
+                    boolean newActiveStatus = Boolean.parseBoolean(isActiveParam);
+                    existingEvent.setActive(newActiveStatus);
+
+                    if (eventDAO.updateEvent(existingEvent)) {
+                        logger.info("Event status updated by admin via regular endpoint: " + eventId + " -> active: " + newActiveStatus);
+                        response.getWriter().write(gson.toJson(existingEvent));
+                        return;
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\":\"Failed to update event status\"}");
+                        return;
+                    }
+                }
+            }
+
+            // Regular event update logic continues here...
             // Process the image upload first to get the image ID for the event update
             Part imagePart = request.getPart("eventImage");
             Integer newImageId = null;

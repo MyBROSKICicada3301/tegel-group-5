@@ -1,0 +1,339 @@
+{
+  "workflow_configuration": {
+    "brand_settings": {
+      "brand_name": "Your Brand Name",
+      "monitoring_keywords": "yourbrand,brandname,product",
+      "competitive_brands": "competitor1,competitor2,competitor3",
+      "website_url": "https://yourbrand.com",
+      "primary_hashtags": "#yourbrand,#brandhashtag"
+    },
+    "platform_configuration": {
+      "platforms_enabled": "instagram,facebook,twitter,linkedin,tiktok,youtube",
+      "instagram": {
+        "username": "@yourbrand",
+        "account_type": "business",
+        "track_stories": true,
+        "track_reels": true
+      },
+      "facebook": {
+        "page_id": "your-facebook-page-id",
+        "track_posts": true,
+        "track_events": true
+      },
+      "twitter": {
+        "username": "@yourbrand",
+        "track_mentions": true,
+        "track_hashtags": true
+      },
+      "linkedin": {
+        "company_id": "your-linkedin-company-id",
+        "track_company_posts": true,
+        "track_employee_posts": false
+      },
+      "tiktok": {
+        "username": "@yourbrand",
+        "track_trending": true
+      },
+      "youtube": {
+        "channel_id": "your-youtube-channel-id",
+        "track_videos": true,
+        "track_shorts": true
+      }
+    },
+    "analysis_settings": {
+      "days_to_analyze": 7,
+      "max_posts_per_platform": 50,
+      "include_sentiment_analysis": true,
+      "include_competitive_analysis": true,
+      "sentiment_threshold": 0.1,
+      "performance_benchmark": 50
+    },
+    "reporting_configuration": {
+      "report_frequency": "daily",
+      "report_format": "comprehensive",
+      "include_executive_summary": true,
+      "include_detailed_metrics": true,
+      "include_recommendations": true,
+      "include_action_items": true
+    },
+    "notification_settings": {
+      "send_email_alerts": true,
+      "alert_email": "marketing@yourbrand.com",
+      "alert_threshold": 30,
+      "slack_webhook": "",
+      "teams_webhook": ""
+    },
+    "storage_configuration": {
+      "notion_database_id": "your-notion-database-id",
+      "notion_logs_database_id": "your-notion-logs-database-id",
+      "backup_storage": true,
+      "data_retention_days": 365
+    },
+    "ai_configuration": {
+      "openai_model": "gpt-4",
+      "max_tokens": 2000,
+      "temperature": 0.3,
+      "custom_prompts": {
+        "sentiment_analysis": "Analyze the sentiment of the following social media content for brand monitoring purposes...",
+        "competitive_analysis": "Compare the brand performance against competitors using the following data...",
+        "trend_analysis": "Identify trends and patterns in the social media data..."
+      }
+    },
+    "schedule_settings": {
+      "cron_expression": "0 0 8 * * *",
+      "timezone": "UTC",
+      "retry_attempts": 3,
+      "retry_delay_minutes": 15
+    }
+  },
+  "notion_database_templates": {
+    "main_reports_database": {
+      "title": "Brand Digital Presence Reports",
+      "properties": [
+        {
+          "name": "Report ID",
+          "type": "title",
+          "description": "Unique identifier for each report"
+        },
+        {
+          "name": "Brand Name",
+          "type": "rich_text",
+          "description": "Brand being monitored"
+        },
+        {
+          "name": "Report Date",
+          "type": "date",
+          "description": "When the report was generated"
+        },
+        {
+          "name": "Performance Score",
+          "type": "number",
+          "description": "Overall performance score (0-100)"
+        },
+        {
+          "name": "Engagement Rate",
+          "type": "number",
+          "description": "Average engagement rate across platforms"
+        },
+        {
+          "name": "Total Engagement",
+          "type": "number",
+          "description": "Sum of likes, comments, shares"
+        },
+        {
+          "name": "Reach",
+          "type": "number",
+          "description": "Total reach/impressions"
+        },
+        {
+          "name": "Sentiment Score",
+          "type": "number",
+          "description": "AI-calculated sentiment score"
+        },
+        {
+          "name": "Market Position",
+          "type": "select",
+          "options": ["Market Leader", "Strong Competitor", "Market Follower", "Needs Improvement"],
+          "description": "Market position assessment"
+        },
+        {
+          "name": "Platforms",
+          "type": "multi_select",
+          "options": ["Instagram", "Facebook", "Twitter", "LinkedIn", "TikTok", "YouTube"],
+          "description": "Platforms analyzed in this report"
+        },
+        {
+          "name": "AI Insights",
+          "type": "rich_text",
+          "description": "AI-generated insights and analysis"
+        },
+        {
+          "name": "Recommendations",
+          "type": "rich_text",
+          "description": "Action recommendations"
+        },
+        {
+          "name": "Action Items",
+          "type": "rich_text",
+          "description": "Specific tasks and deadlines"
+        }
+      ]
+    },
+    "execution_logs_database": {
+      "title": "Workflow Execution Logs",
+      "properties": [
+        {
+          "name": "Execution ID",
+          "type": "title",
+          "description": "Unique execution identifier"
+        },
+        {
+          "name": "Execution Date",
+          "type": "date",
+          "description": "When the workflow ran"
+        },
+        {
+          "name": "Status",
+          "type": "select",
+          "options": ["Success", "Success with Warnings", "Error", "Partial Failure"],
+          "description": "Execution status"
+        },
+        {
+          "name": "Data Quality Score",
+          "type": "number",
+          "description": "Data quality assessment (0-100)"
+        },
+        {
+          "name": "Errors",
+          "type": "rich_text",
+          "description": "Any errors encountered"
+        },
+        {
+          "name": "Warnings",
+          "type": "rich_text",
+          "description": "Any warnings or issues"
+        },
+        {
+          "name": "Next Execution",
+          "type": "date",
+          "description": "Scheduled next run time"
+        },
+        {
+          "name": "Processing Log",
+          "type": "rich_text",
+          "description": "Detailed execution log"
+        }
+      ]
+    }
+  },
+  "api_requirements": {
+    "instagram_basic_display": {
+      "required_permissions": ["user_profile", "user_media"],
+      "rate_limits": "200 requests per hour per user",
+      "documentation": "https://developers.facebook.com/docs/instagram-basic-display-api"
+    },
+    "facebook_graph": {
+      "required_permissions": ["pages_read_engagement", "pages_show_list"],
+      "rate_limits": "600 calls per app per hour",
+      "documentation": "https://developers.facebook.com/docs/graph-api"
+    },
+    "twitter_v2": {
+      "required_permissions": ["Tweet.read", "users.read"],
+      "rate_limits": "300 requests per 15-minute window",
+      "documentation": "https://developer.twitter.com/en/docs/twitter-api"
+    },
+    "linkedin_marketing": {
+      "required_permissions": ["r_organization_social", "r_ads_reporting"],
+      "rate_limits": "Varies by endpoint",
+      "documentation": "https://docs.microsoft.com/en-us/linkedin/marketing/"
+    },
+    "youtube_data_v3": {
+      "required_permissions": ["youtube.readonly"],
+      "rate_limits": "10,000 quota units per day",
+      "documentation": "https://developers.google.com/youtube/v3"
+    },
+    "openai": {
+      "required_model": "gpt-4 or gpt-3.5-turbo",
+      "rate_limits": "Varies by plan",
+      "documentation": "https://platform.openai.com/docs"
+    },
+    "notion": {
+      "required_permissions": ["read", "insert"],
+      "rate_limits": "3 requests per second average",
+      "documentation": "https://developers.notion.com"
+    },
+    "sendgrid": {
+      "required_permissions": ["mail.send"],
+      "rate_limits": "Varies by plan",
+      "documentation": "https://docs.sendgrid.com"
+    }
+  },
+  "deployment_checklist": [
+    {
+      "step": 1,
+      "task": "Set up social media developer accounts",
+      "details": "Create developer accounts for each platform API"
+    },
+    {
+      "step": 2,
+      "task": "Generate API credentials",
+      "details": "Obtain API keys, tokens, and OAuth credentials"
+    },
+    {
+      "step": 3,
+      "task": "Configure n8n credentials",
+      "details": "Add all API credentials to n8n credential store"
+    },
+    {
+      "step": 4,
+      "task": "Create Notion databases",
+      "details": "Set up main reports and logs databases with proper structure"
+    },
+    {
+      "step": 5,
+      "task": "Import workflow",
+      "details": "Import the JSON workflow file into n8n"
+    },
+    {
+      "step": 6,
+      "task": "Configure workflow variables",
+      "details": "Set brand name, keywords, and other configuration variables"
+    },
+    {
+      "step": 7,
+      "task": "Test individual nodes",
+      "details": "Verify each platform's data collection works correctly"
+    },
+    {
+      "step": 8,
+      "task": "Test full workflow",
+      "details": "Run complete workflow and verify report generation"
+    },
+    {
+      "step": 9,
+      "task": "Set up monitoring",
+      "details": "Configure alerts and monitoring for workflow execution"
+    },
+    {
+      "step": 10,
+      "task": "Schedule workflow",
+      "details": "Activate the scheduled trigger for automated execution"
+    }
+  ],
+  "troubleshooting_guide": {
+    "common_issues": [
+      {
+        "issue": "Authentication failed",
+        "solution": "Check API credentials and permissions",
+        "prevention": "Regularly monitor credential expiration dates"
+      },
+      {
+        "issue": "Rate limit exceeded",
+        "solution": "Reduce request frequency or implement delays",
+        "prevention": "Monitor API usage and implement proper rate limiting"
+      },
+      {
+        "issue": "No data collected",
+        "solution": "Verify brand name and account settings",
+        "prevention": "Test data collection endpoints regularly"
+      },
+      {
+        "issue": "AI analysis failed",
+        "solution": "Check OpenAI credits and content policy compliance",
+        "prevention": "Monitor token usage and content guidelines"
+      },
+      {
+        "issue": "Notion integration error",
+        "solution": "Verify database IDs and integration permissions",
+        "prevention": "Regularly test Notion API connectivity"
+      }
+    ],
+    "performance_optimization": [
+      "Implement caching for repeated API calls",
+      "Use batch processing for multiple brands",
+      "Optimize AI prompt length and complexity",
+      "Implement incremental data collection",
+      "Use webhooks where possible instead of polling"
+    ]
+  }
+}

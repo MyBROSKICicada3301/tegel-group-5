@@ -1,0 +1,1031 @@
+{
+  "name": "Brand Digital Presence Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "cronExpression": "0 0 8 * * *"
+            }
+          ]
+        },
+        "options": {
+          "timezone": "UTC"
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily Monitoring Schedule",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "notes": "Triggers the brand monitoring workflow daily at 8:00 AM UTC. Can be customized per brand requirements."
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "brand_name",
+              "value": "={{ $json.brand_name || 'Your Brand Name' }}"
+            },
+            {
+              "name": "monitoring_keywords",
+              "value": "={{ $json.monitoring_keywords || 'brand,company,product' }}"
+            },
+            {
+              "name": "platforms_enabled",
+              "value": "={{ $json.platforms_enabled || 'instagram,facebook,twitter,linkedin,tiktok,youtube' }}"
+            },
+            {
+              "name": "notion_database_id",
+              "value": "={{ $json.notion_database_id || '' }}"
+            },
+            {
+              "name": "report_frequency",
+              "value": "{{ $json.report_frequency || 'daily' }}"
+            },
+            {
+              "name": "competitive_brands",
+              "value": "={{ $json.competitive_brands || '' }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "days_to_analyze",
+              "value": "={{ $json.days_to_analyze || 7 }}"
+            },
+            {
+              "name": "max_posts_per_platform",
+              "value": "={{ $json.max_posts_per_platform || 50 }}"
+            }
+          ],
+          "boolean": [
+            {
+              "name": "include_sentiment_analysis",
+              "value": "={{ $json.include_sentiment_analysis !== false }}"
+            },
+            {
+              "name": "include_competitive_analysis",
+              "value": "={{ $json.include_competitive_analysis !== false }}"
+            },
+            {
+              "name": "send_email_alerts",
+              "value": "={{ $json.send_email_alerts !== false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "workflow-variables",
+      "name": "Workflow Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ],
+      "notes": "Configuration variables for brand monitoring. Customize these values for different brands and monitoring requirements."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "instagram-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "instagram",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "facebook-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "facebook",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "twitter-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "twitter",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "linkedin-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "linkedin",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "tiktok-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "tiktok",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "youtube-enabled",
+              "leftValue": "={{ $json.platforms_enabled }}",
+              "rightValue": "youtube",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "platform-router",
+      "name": "Platform Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        680,
+        300
+      ],
+      "notes": "Routes the workflow to enabled social media platforms based on configuration."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "instagramBasicDisplayApi",
+        "url": "=https://graph.instagram.com/me/media",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "fields",
+                "value": "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,like_count,comments_count"
+              },
+              {
+                "name": "limit",
+                "value": "={{ $json.max_posts_per_platform }}"
+              }
+            ]
+          },
+          "timeout": 30000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Brand-Monitor/1.0"
+            }
+          ]
+        }
+      },
+      "id": "instagram-data",
+      "name": "Instagram Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        200
+      ],
+      "notes": "Collects Instagram posts, engagement metrics, and profile data using Instagram Basic Display API."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "facebookGraphApi",
+        "url": "=https://graph.facebook.com/v18.0/me/posts",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "fields",
+                "value": "id,message,created_time,likes.summary(true),comments.summary(true),shares,reactions.summary(true)"
+              },
+              {
+                "name": "limit",
+                "value": "={{ $json.max_posts_per_platform }}"
+              }
+            ]
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "facebook-data",
+      "name": "Facebook Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        300
+      ],
+      "notes": "Collects Facebook posts, engagement metrics including likes, comments, shares, and reactions."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twitterOAuth2Api",
+        "url": "=https://api.twitter.com/2/tweets/search/recent",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "query",
+                "value": "=from:{{ $json.brand_name }} OR {{ $json.monitoring_keywords }}"
+              },
+              {
+                "name": "max_results",
+                "value": "={{ $json.max_posts_per_platform }}"
+              },
+              {
+                "name": "tweet.fields",
+                "value": "created_at,public_metrics,context_annotations,lang"
+              },
+              {
+                "name": "user.fields",
+                "value": "public_metrics,verified"
+              },
+              {
+                "name": "expansions",
+                "value": "author_id"
+              }
+            ]
+          }
+        }
+      },
+      "id": "twitter-data",
+      "name": "Twitter/X Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        400
+      ],
+      "notes": "Collects tweets and engagement metrics using Twitter API v2, including mentions and brand-related content."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "linkedInOAuth2Api",
+        "url": "=https://api.linkedin.com/v2/shares",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "q",
+                "value": "owners"
+              },
+              {
+                "name": "owners",
+                "value": "={{ $json.linkedin_company_id }}"
+              },
+              {
+                "name": "count",
+                "value": "={{ $json.max_posts_per_platform }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "linkedin-data",
+      "name": "LinkedIn Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        500
+      ],
+      "notes": "Collects LinkedIn company posts and engagement metrics for professional brand presence monitoring."
+    },
+    {
+      "parameters": {
+        "url": "=https://www.tiktok.com/api/recommend/item_list/",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "count",
+                "value": "={{ $json.max_posts_per_platform }}"
+              },
+              {
+                "name": "keyword",
+                "value": "={{ $json.brand_name }}"
+              }
+            ]
+          },
+          "timeout": 30000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; Brand-Monitor/1.0)"
+            }
+          ]
+        }
+      },
+      "id": "tiktok-data",
+      "name": "TikTok Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        600
+      ],
+      "notes": "Collects TikTok videos and engagement metrics related to brand mentions and keywords."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "url": "=https://www.googleapis.com/youtube/v3/search",
+        "options": {
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "part",
+                "value": "snippet"
+              },
+              {
+                "name": "q",
+                "value": "={{ $json.brand_name }} {{ $json.monitoring_keywords }}"
+              },
+              {
+                "name": "type",
+                "value": "video"
+              },
+              {
+                "name": "maxResults",
+                "value": "={{ $json.max_posts_per_platform }}"
+              },
+              {
+                "name": "order",
+                "value": "date"
+              }
+            ]
+          }
+        }
+      },
+      "id": "youtube-data",
+      "name": "YouTube Data Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        700
+      ],
+      "notes": "Collects YouTube videos and channel metrics related to brand content and mentions."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Data Processing and Metrics Calculation\nconst items = $input.all();\nconst processedData = [];\n\n// Process each platform's data\nfor (const item of items) {\n  const platformData = item.json;\n  const platform = determinePlatform(platformData);\n  \n  if (platform) {\n    const metrics = calculateMetrics(platformData, platform);\n    const normalizedData = {\n      platform: platform,\n      brand_name: $('Workflow Variables').first().json.brand_name,\n      collection_date: new Date().toISOString(),\n      metrics: metrics,\n      raw_data: platformData,\n      processing_timestamp: Date.now()\n    };\n    \n    processedData.push(normalizedData);\n  }\n}\n\n// Helper function to determine platform from data structure\nfunction determinePlatform(data) {\n  if (data.media_type !== undefined) return 'instagram';\n  if (data.message !== undefined && data.created_time !== undefined) return 'facebook';\n  if (data.public_metrics !== undefined && data.lang !== undefined) return 'twitter';\n  if (data.shares !== undefined) return 'linkedin';\n  if (data.video !== undefined) return 'tiktok';\n  if (data.snippet !== undefined && data.snippet.channelId !== undefined) return 'youtube';\n  return null;\n}\n\n// Helper function to calculate standardized metrics\nfunction calculateMetrics(data, platform) {\n  const metrics = {\n    engagement_rate: 0,\n    reach: 0,\n    impressions: 0,\n    likes: 0,\n    comments: 0,\n    shares: 0,\n    followers_growth: 0,\n    performance_score: 0\n  };\n  \n  switch (platform) {\n    case 'instagram':\n      metrics.likes = data.like_count || 0;\n      metrics.comments = data.comments_count || 0;\n      metrics.engagement_rate = calculateEngagementRate(metrics.likes, metrics.comments, data.followers_count || 1000);\n      break;\n      \n    case 'facebook':\n      metrics.likes = data.likes?.summary?.total_count || 0;\n      metrics.comments = data.comments?.summary?.total_count || 0;\n      metrics.shares = data.shares?.count || 0;\n      metrics.engagement_rate = calculateEngagementRate(metrics.likes + metrics.comments + metrics.shares, 0, data.fan_count || 1000);\n      break;\n      \n    case 'twitter':\n      if (data.public_metrics) {\n        metrics.likes = data.public_metrics.like_count || 0;\n        metrics.comments = data.public_metrics.reply_count || 0;\n        metrics.shares = data.public_metrics.retweet_count || 0;\n        metrics.impressions = data.public_metrics.impression_count || 0;\n        metrics.engagement_rate = calculateEngagementRate(metrics.likes + metrics.comments + metrics.shares, 0, metrics.impressions || 1);\n      }\n      break;\n      \n    case 'linkedin':\n      // LinkedIn metrics processing\n      metrics.likes = data.likes || 0;\n      metrics.comments = data.comments || 0;\n      metrics.shares = data.shares || 0;\n      break;\n      \n    case 'tiktok':\n      // TikTok metrics processing\n      if (data.stats) {\n        metrics.likes = data.stats.diggCount || 0;\n        metrics.comments = data.stats.commentCount || 0;\n        metrics.shares = data.stats.shareCount || 0;\n        metrics.reach = data.stats.playCount || 0;\n      }\n      break;\n      \n    case 'youtube':\n      // YouTube metrics processing\n      if (data.statistics) {\n        metrics.likes = parseInt(data.statistics.likeCount) || 0;\n        metrics.comments = parseInt(data.statistics.commentCount) || 0;\n        metrics.reach = parseInt(data.statistics.viewCount) || 0;\n      }\n      break;\n  }\n  \n  // Calculate performance score (0-100)\n  metrics.performance_score = calculatePerformanceScore(metrics, platform);\n  \n  return metrics;\n}\n\n// Helper function to calculate engagement rate\nfunction calculateEngagementRate(totalEngagements, additionalEngagements, followerCount) {\n  const total = totalEngagements + additionalEngagements;\n  return followerCount > 0 ? (total / followerCount) * 100 : 0;\n}\n\n// Helper function to calculate performance score\nfunction calculatePerformanceScore(metrics, platform) {\n  let score = 0;\n  \n  // Engagement rate weight: 40%\n  score += Math.min(metrics.engagement_rate * 4, 40);\n  \n  // Reach/Impressions weight: 30%\n  const reachScore = Math.log10(Math.max(metrics.reach || metrics.impressions || 1, 1)) * 3;\n  score += Math.min(reachScore, 30);\n  \n  // Total interactions weight: 30%\n  const totalInteractions = metrics.likes + metrics.comments + metrics.shares;\n  const interactionScore = Math.log10(Math.max(totalInteractions, 1)) * 3;\n  score += Math.min(interactionScore, 30);\n  \n  return Math.min(Math.round(score), 100);\n}\n\nreturn processedData.map(data => ({ json: data }));"
+      },
+      "id": "data-processor",
+      "name": "Data Processing & Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        400
+      ],
+      "notes": "Processes raw social media data, calculates standardized metrics (engagement rate, reach, performance scores), and normalizes data structure across platforms."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "sentiment-enabled",
+              "leftValue": "={{ $('Workflow Variables').first().json.include_sentiment_analysis }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "sentiment-check",
+      "name": "Sentiment Analysis Check",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        400
+      ],
+      "notes": "Checks if sentiment analysis is enabled in the workflow configuration."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "resource": "chat",
+        "operation": "create",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert brand analyst specializing in social media sentiment analysis and competitive intelligence. Analyze the provided social media data and provide comprehensive insights including sentiment analysis, performance trends, competitive positioning, and actionable recommendations."
+            },
+            {
+              "role": "user",
+              "content": "=Analyze the following brand social media data and provide insights:\n\nBrand: {{ $('Workflow Variables').first().json.brand_name }}\nPlatforms: {{ $('Workflow Variables').first().json.platforms_enabled }}\nData Period: Last {{ $('Workflow Variables').first().json.days_to_analyze }} days\n\nSocial Media Data:\n{{ JSON.stringify($json, null, 2) }}\n\nPlease provide analysis in the following structure:\n1. Overall Sentiment Analysis (positive, negative, neutral percentages)\n2. Platform Performance Comparison\n3. Top Performing Content Analysis\n4. Engagement Trends and Patterns\n5. Competitive Insights (if competitive data available)\n6. Growth Opportunities and Recommendations\n7. Risk Areas and Concerns\n8. Key Performance Indicators Summary\n\nFormat the response as structured JSON for easy parsing and database storage."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2000
+        }
+      },
+      "id": "ai-analysis",
+      "name": "AI Sentiment & Performance Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [
+        1560,
+        300
+      ],
+      "notes": "Uses GPT-4 to perform comprehensive sentiment analysis, competitive intelligence, and provide actionable insights for brand digital presence."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Competitive Analysis Module\nconst items = $input.all();\nconst brandData = items[0].json;\nconst competitiveBrands = $('Workflow Variables').first().json.competitive_brands;\n\nif (!competitiveBrands || competitiveBrands === '') {\n  return [{ json: { ...brandData, competitive_analysis: 'No competitive brands configured' } }];\n}\n\nconst competitors = competitiveBrands.split(',').map(brand => brand.trim());\nconst competitiveInsights = {\n  brand_performance: brandData.metrics,\n  competitive_landscape: [],\n  market_position: '',\n  opportunities: [],\n  threats: []\n};\n\n// Analyze competitive positioning\nconst avgEngagementRate = brandData.metrics.engagement_rate;\nconst avgPerformanceScore = brandData.metrics.performance_score;\n\n// Market position analysis\nif (avgPerformanceScore >= 80) {\n  competitiveInsights.market_position = 'Market Leader';\n} else if (avgPerformanceScore >= 60) {\n  competitiveInsights.market_position = 'Strong Competitor';\n} else if (avgPerformanceScore >= 40) {\n  competitiveInsights.market_position = 'Market Follower';\n} else {\n  competitiveInsights.market_position = 'Needs Improvement';\n}\n\n// Identify opportunities based on performance\nif (avgEngagementRate < 2.0) {\n  competitiveInsights.opportunities.push('Improve content engagement strategies');\n}\nif (brandData.metrics.reach < 10000) {\n  competitiveInsights.opportunities.push('Expand audience reach through targeted campaigns');\n}\nif (brandData.metrics.followers_growth < 5) {\n  competitiveInsights.opportunities.push('Implement follower growth initiatives');\n}\n\n// Identify potential threats\nif (avgEngagementRate < 1.0) {\n  competitiveInsights.threats.push('Below-average engagement may indicate content quality issues');\n}\nif (brandData.metrics.performance_score < 30) {\n  competitiveInsights.threats.push('Overall performance significantly below industry standards');\n}\n\nconst result = {\n  ...brandData,\n  competitive_analysis: competitiveInsights,\n  analysis_timestamp: new Date().toISOString()\n};\n\nreturn [{ json: result }];"
+      },
+      "id": "competitive-analysis",
+      "name": "Competitive Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        500
+      ],
+      "notes": "Performs competitive analysis comparing brand performance against configured competitors, identifying market position, opportunities, and threats."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Report Generation Module\nconst items = $input.all();\nconst analysisData = items[0].json;\nconst variables = $('Workflow Variables').first().json;\n\n// Generate comprehensive report\nconst report = {\n  report_id: `report_${Date.now()}`,\n  brand_name: variables.brand_name,\n  report_date: new Date().toISOString(),\n  report_period: `Last ${variables.days_to_analyze} days`,\n  platforms_analyzed: variables.platforms_enabled.split(','),\n  \n  // Executive Summary\n  executive_summary: {\n    overall_performance_score: analysisData.metrics?.performance_score || 0,\n    total_engagement: (analysisData.metrics?.likes || 0) + (analysisData.metrics?.comments || 0) + (analysisData.metrics?.shares || 0),\n    engagement_rate: analysisData.metrics?.engagement_rate || 0,\n    reach: analysisData.metrics?.reach || 0,\n    sentiment_score: extractSentimentScore(analysisData.ai_analysis),\n    market_position: analysisData.competitive_analysis?.market_position || 'Not analyzed'\n  },\n  \n  // Platform Performance\n  platform_performance: generatePlatformBreakdown(analysisData),\n  \n  // AI Insights\n  ai_insights: analysisData.ai_analysis || 'AI analysis not performed',\n  \n  // Competitive Analysis\n  competitive_insights: analysisData.competitive_analysis || 'Competitive analysis not performed',\n  \n  // Key Metrics\n  key_metrics: {\n    followers_growth: analysisData.metrics?.followers_growth || 0,\n    engagement_rate: analysisData.metrics?.engagement_rate || 0,\n    reach: analysisData.metrics?.reach || 0,\n    impressions: analysisData.metrics?.impressions || 0,\n    performance_score: analysisData.metrics?.performance_score || 0\n  },\n  \n  // Recommendations\n  recommendations: generateRecommendations(analysisData),\n  \n  // Action Items\n  action_items: generateActionItems(analysisData),\n  \n  // Report Metadata\n  metadata: {\n    generated_by: 'Brand Digital Presence Monitor',\n    workflow_version: '1.0',\n    data_sources: variables.platforms_enabled.split(','),\n    analysis_depth: variables.include_sentiment_analysis ? 'Comprehensive' : 'Basic',\n    competitive_analysis: variables.include_competitive_analysis\n  }\n};\n\n// Helper function to extract sentiment score from AI analysis\nfunction extractSentimentScore(aiAnalysis) {\n  if (!aiAnalysis || typeof aiAnalysis !== 'string') return 0;\n  \n  try {\n    const analysis = JSON.parse(aiAnalysis);\n    if (analysis.sentiment && analysis.sentiment.overall_score) {\n      return analysis.sentiment.overall_score;\n    }\n  } catch (e) {\n    // If parsing fails, try to extract score with regex\n    const scoreMatch = aiAnalysis.match(/sentiment.*?score.*?(\\d+(?:\\.\\d+)?)/i);\n    if (scoreMatch) {\n      return parseFloat(scoreMatch[1]);\n    }\n  }\n  \n  return 0;\n}\n\n// Helper function to generate platform breakdown\nfunction generatePlatformBreakdown(data) {\n  const platforms = {};\n  \n  if (data.platform) {\n    platforms[data.platform] = {\n      engagement_rate: data.metrics?.engagement_rate || 0,\n      performance_score: data.metrics?.performance_score || 0,\n      total_interactions: (data.metrics?.likes || 0) + (data.metrics?.comments || 0) + (data.metrics?.shares || 0),\n      reach: data.metrics?.reach || data.metrics?.impressions || 0\n    };\n  }\n  \n  return platforms;\n}\n\n// Helper function to generate recommendations\nfunction generateRecommendations(data) {\n  const recommendations = [];\n  const metrics = data.metrics || {};\n  \n  if (metrics.engagement_rate < 2.0) {\n    recommendations.push({\n      priority: 'High',\n      category: 'Engagement',\n      recommendation: 'Focus on creating more engaging content to improve engagement rates',\n      expected_impact: 'Increase engagement rate by 0.5-1.5%'\n    });\n  }\n  \n  if (metrics.performance_score < 50) {\n    recommendations.push({\n      priority: 'High',\n      category: 'Overall Performance',\n      recommendation: 'Comprehensive content strategy review and optimization needed',\n      expected_impact: 'Improve overall performance score by 20-30 points'\n    });\n  }\n  \n  if (metrics.reach < 10000) {\n    recommendations.push({\n      priority: 'Medium',\n      category: 'Reach',\n      recommendation: 'Implement paid promotion strategies to expand audience reach',\n      expected_impact: 'Increase reach by 25-50%'\n    });\n  }\n  \n  return recommendations;\n}\n\n// Helper function to generate action items\nfunction generateActionItems(data) {\n  const actionItems = [];\n  const metrics = data.metrics || {};\n  \n  actionItems.push({\n    task: 'Review and optimize posting schedule',\n    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),\n    assignee: 'Social Media Manager',\n    priority: 'Medium'\n  });\n  \n  if (metrics.engagement_rate < 1.5) {\n    actionItems.push({\n      task: 'Conduct content audit and develop engagement improvement plan',\n      deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),\n      assignee: 'Content Team',\n      priority: 'High'\n    });\n  }\n  \n  if (data.competitive_analysis?.opportunities?.length > 0) {\n    actionItems.push({\n      task: 'Implement competitive opportunity strategies',\n      deadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),\n      assignee: 'Marketing Team',\n      priority: 'Medium'\n    });\n  }\n  \n  return actionItems;\n}\n\nreturn [{ json: report }];"
+      },
+      "id": "report-generator",
+      "name": "Report Generator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        400
+      ],
+      "notes": "Generates comprehensive brand monitoring reports with executive summary, platform performance, AI insights, recommendations, and action items."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "resource": "database",
+        "operation": "create",
+        "databaseId": "={{ $('Workflow Variables').first().json.notion_database_id }}",
+        "simple": false,
+        "properties": {
+          "values": [
+            {
+              "key": "Report ID",
+              "type": "title",
+              "title": "={{ $json.report_id }}"
+            },
+            {
+              "key": "Brand Name",
+              "type": "richText",
+              "richText": "={{ $json.brand_name }}"
+            },
+            {
+              "key": "Report Date",
+              "type": "date",
+              "date": "={{ $json.report_date }}"
+            },
+            {
+              "key": "Performance Score",
+              "type": "number",
+              "number": "={{ $json.executive_summary.overall_performance_score }}"
+            },
+            {
+              "key": "Engagement Rate",
+              "type": "number",
+              "number": "={{ $json.executive_summary.engagement_rate }}"
+            },
+            {
+              "key": "Total Engagement",
+              "type": "number",
+              "number": "={{ $json.executive_summary.total_engagement }}"
+            },
+            {
+              "key": "Reach",
+              "type": "number",
+              "number": "={{ $json.executive_summary.reach }}"
+            },
+            {
+              "key": "Sentiment Score",
+              "type": "number",
+              "number": "={{ $json.executive_summary.sentiment_score }}"
+            },
+            {
+              "key": "Market Position",
+              "type": "select",
+              "select": "={{ $json.executive_summary.market_position }}"
+            },
+            {
+              "key": "Platforms",
+              "type": "multiSelect",
+              "multiSelect": "={{ $json.platforms_analyzed }}"
+            },
+            {
+              "key": "AI Insights",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.ai_insights) }}"
+            },
+            {
+              "key": "Recommendations",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.recommendations) }}"
+            },
+            {
+              "key": "Action Items",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.action_items) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notion-integration",
+      "name": "Notion Database Storage",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        300
+      ],
+      "notes": "Stores the comprehensive brand monitoring report in Notion database with structured fields for easy analysis and tracking."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "email-alerts-enabled",
+              "leftValue": "={{ $('Workflow Variables').first().json.send_email_alerts }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            },
+            {
+              "id": "performance-threshold",
+              "leftValue": "={{ $json.executive_summary.overall_performance_score }}",
+              "rightValue": 30,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "alert-conditions",
+      "name": "Alert Conditions",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2000,
+        500
+      ],
+      "notes": "Checks conditions for sending email alerts based on performance thresholds and configuration settings."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendGridApi",
+        "fromEmail": "notifications@yourbrand.com",
+        "toEmail": "={{ $('Workflow Variables').first().json.alert_email || 'marketing@yourbrand.com' }}",
+        "subject": "=Brand Performance Alert: {{ $('Workflow Variables').first().json.brand_name }}",
+        "message": "=Brand Digital Presence Monitor Alert\n\nBrand: {{ $('Workflow Variables').first().json.brand_name }}\nReport Date: {{ $json.report_date }}\nPerformance Score: {{ $json.executive_summary.overall_performance_score }}/100\n\nAlert Reason: Performance score below threshold (30)\n\nKey Issues:\n- Engagement Rate: {{ $json.executive_summary.engagement_rate }}%\n- Total Engagement: {{ $json.executive_summary.total_engagement }}\n- Market Position: {{ $json.executive_summary.market_position }}\n\nRecommendations:\n{{ JSON.stringify($json.recommendations, null, 2) }}\n\nAction Items:\n{{ JSON.stringify($json.action_items, null, 2) }}\n\nPlease review the full report in Notion for detailed analysis and next steps.\n\n---\nGenerated by Brand Digital Presence Monitor\n{{ $json.report_date }}",
+        "options": {
+          "attachments": [
+            {
+              "type": "json",
+              "property": "json",
+              "filename": "=brand_report_{{ $json.report_id }}.json"
+            }
+          ]
+        }
+      },
+      "id": "email-alerts",
+      "name": "Email Alert System",
+      "type": "n8n-nodes-base.sendGrid",
+      "typeVersion": 1.1,
+      "position": [
+        2220,
+        500
+      ],
+      "notes": "Sends email alerts when performance falls below thresholds, including detailed report and action items."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Error Handling and Logging Module\nconst items = $input.all();\nconst errors = [];\nconst warnings = [];\nconst processingLog = [];\n\n// Collect and analyze any errors or issues\nfor (const item of items) {\n  const data = item.json;\n  \n  // Check for data quality issues\n  if (!data.brand_name || data.brand_name === '') {\n    errors.push('Brand name is missing or empty');\n  }\n  \n  if (!data.platforms_analyzed || data.platforms_analyzed.length === 0) {\n    warnings.push('No platforms were successfully analyzed');\n  }\n  \n  if (data.executive_summary?.overall_performance_score === 0) {\n    warnings.push('Performance score is zero - check data collection');\n  }\n  \n  if (!data.notion_database_id) {\n    errors.push('Notion database ID is missing - reports will not be stored');\n  }\n  \n  // Log successful operations\n  processingLog.push({\n    timestamp: new Date().toISOString(),\n    operation: 'Brand monitoring completed',\n    brand: data.brand_name,\n    platforms: data.platforms_analyzed?.length || 0,\n    performance_score: data.executive_summary?.overall_performance_score || 0,\n    status: errors.length === 0 ? 'success' : 'warning'\n  });\n}\n\nconst errorReport = {\n  workflow_execution: {\n    execution_id: `exec_${Date.now()}`,\n    execution_date: new Date().toISOString(),\n    status: errors.length === 0 ? (warnings.length === 0 ? 'success' : 'success_with_warnings') : 'error',\n    errors: errors,\n    warnings: warnings,\n    processing_log: processingLog\n  },\n  next_execution: {\n    scheduled_time: getNextExecutionTime(),\n    estimated_duration: '5-10 minutes',\n    platforms_to_monitor: $('Workflow Variables').first().json.platforms_enabled?.split(',') || []\n  },\n  system_health: {\n    data_quality_score: calculateDataQualityScore(errors, warnings),\n    api_status: 'operational', // This would be dynamically determined in a real implementation\n    storage_status: errors.some(e => e.includes('Notion')) ? 'degraded' : 'operational'\n  }\n};\n\n// Helper function to calculate next execution time\nfunction getNextExecutionTime() {\n  const now = new Date();\n  const tomorrow = new Date(now);\n  tomorrow.setDate(tomorrow.getDate() + 1);\n  tomorrow.setHours(8, 0, 0, 0); // 8:00 AM tomorrow\n  return tomorrow.toISOString();\n}\n\n// Helper function to calculate data quality score\nfunction calculateDataQualityScore(errors, warnings) {\n  let score = 100;\n  score -= errors.length * 20; // Each error reduces score by 20\n  score -= warnings.length * 5; // Each warning reduces score by 5\n  return Math.max(score, 0);\n}\n\nreturn [{ json: errorReport }];"
+      },
+      "id": "error-handling",
+      "name": "Error Handling & Logging",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        300
+      ],
+      "notes": "Handles errors, warnings, and logging throughout the workflow execution. Provides system health monitoring and next execution planning."
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "resource": "database",
+        "operation": "create",
+        "databaseId": "={{ $('Workflow Variables').first().json.notion_logs_database_id || $('Workflow Variables').first().json.notion_database_id }}",
+        "simple": false,
+        "properties": {
+          "values": [
+            {
+              "key": "Execution ID",
+              "type": "title",
+              "title": "={{ $json.workflow_execution.execution_id }}"
+            },
+            {
+              "key": "Execution Date",
+              "type": "date",
+              "date": "={{ $json.workflow_execution.execution_date }}"
+            },
+            {
+              "key": "Status",
+              "type": "select",
+              "select": "={{ $json.workflow_execution.status }}"
+            },
+            {
+              "key": "Data Quality Score",
+              "type": "number",
+              "number": "={{ $json.system_health.data_quality_score }}"
+            },
+            {
+              "key": "Errors",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.workflow_execution.errors) }}"
+            },
+            {
+              "key": "Warnings",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.workflow_execution.warnings) }}"
+            },
+            {
+              "key": "Next Execution",
+              "type": "date",
+              "date": "={{ $json.next_execution.scheduled_time }}"
+            },
+            {
+              "key": "Processing Log",
+              "type": "richText",
+              "richText": "={{ JSON.stringify($json.workflow_execution.processing_log) }}"
+            }
+          ]
+        }
+      },
+      "id": "logging-storage",
+      "name": "Execution Logging",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2440,
+        300
+      ],
+      "notes": "Stores workflow execution logs, errors, warnings, and system health metrics in Notion for monitoring and troubleshooting."
+    }
+  ],
+  "connections": {
+    "schedule-trigger": {
+      "main": [
+        [
+          {
+            "node": "workflow-variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "workflow-variables": {
+      "main": [
+        [
+          {
+            "node": "platform-router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "platform-router": {
+      "main": [
+        [
+          {
+            "node": "instagram-data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "facebook-data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "twitter-data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "linkedin-data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "tiktok-data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "youtube-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "instagram-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "facebook-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "twitter-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "linkedin-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tiktok-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "youtube-data": {
+      "main": [
+        [
+          {
+            "node": "data-processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data-processor": {
+      "main": [
+        [
+          {
+            "node": "sentiment-check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sentiment-check": {
+      "main": [
+        [
+          {
+            "node": "ai-analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "competitive-analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai-analysis": {
+      "main": [
+        [
+          {
+            "node": "report-generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "competitive-analysis": {
+      "main": [
+        [
+          {
+            "node": "report-generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "report-generator": {
+      "main": [
+        [
+          {
+            "node": "notion-integration",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "alert-conditions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "error-handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notion-integration": {
+      "main": [
+        [
+          {
+            "node": "error-handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "alert-conditions": {
+      "main": [
+        [
+          {
+            "node": "email-alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email-alerts": {
+      "main": [
+        [
+          {
+            "node": "error-handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "error-handling": {
+      "main": [
+        [
+          {
+            "node": "logging-storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-07-29T07:42:00.000Z",
+  "updatedAt": "2024-07-29T07:42:00.000Z",
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": {
+      "workflowId": ""
+    }
+  },
+  "staticData": {},
+  "tags": [
+    {
+      "id": "brand-monitoring",
+      "name": "Brand Monitoring"
+    },
+    {
+      "id": "social-media",
+      "name": "Social Media"
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics"
+    },
+    {
+      "id": "ai-analysis",
+      "name": "AI Analysis"
+    }
+  ],
+  "triggerCount": 1,
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "brand-monitor-instance"
+  },
+  "id": "brand-digital-presence-monitor",
+  "versionId": "1.0.0"
+}
